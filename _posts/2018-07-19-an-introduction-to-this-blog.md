@@ -33,4 +33,7 @@ Some other category of posts you can find on this blog are:
 
 
 That is all for now. I hope this blog will be able to teach something to someone else and to myself.
+
+
+
     “Be curious. Read widely. Try new things. I think a lot of what people call intelligence boils down to curiosity.” - Aaron Swartz
