@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Cool Story Bro #1: SingleBlendMesh and my interest for code optimization
+title: Cool Story Bro - SingleBlendMesh and my interest for code optimization
 date: 2018-07-20
 categories:: cool-story-bro
 tags: c++ maya plugin optimization deformer
