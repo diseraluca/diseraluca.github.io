@@ -133,4 +133,10 @@ As we can see here there is a (depending on context) slight change in performanc
 An interesting thing to note, that appeared in all the tests, is that the deformer which uses CHECK_MSTATUS_AND_RETURN actually seems to perform a bit better than the version which uses CHECK_MSTATUS. I didn't expect it.
 Both of them, though, are trashed by the version without checking. With almost a full second of difference.
 
-In the introduction of this post I said that in an MPxNode::initialize the checks performance may be ignore. This actually made me wonder about that. As such I prepared and run another experiment. This time I profiled 
+### Conclusion
+
+Well, this was mostly a quench my thirst experimentation. The result were mostly expectable.
+We should keep MStatus checking as much as possible out of our performance-dependant code, furthermore we  avoid to introduce more branching by not using them.
+Most of the MStatuses are usually not worth checking at all anyway. Sometimes there is a possibility that some code may become risky if a Maya method fails but most methods aren't going to fail in normal conditions if used correctly.
+I still think, and as style choice it is my preference, that checking the statuses on the first drafts of the code is good practice to avoid or find more easily typos, bugs or misuses of the API.
+This doesn't mean that we should never use them in finalized code. There are cases where it is worth it to be sure the plugin won't crash in the improbable case that some simple API method goes wrong.
