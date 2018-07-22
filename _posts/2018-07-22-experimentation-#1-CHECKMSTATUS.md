@@ -56,11 +56,11 @@ They're the following:
 
 ~~~ c++
 
-#define CHECK_MSTATUS	(	_status )
+#define CHECK_MSTATUS	( _status )
 
-#define CHECK_MSTATUS_AND_RETURN	(	_status, _retVal )
+#define CHECK_MSTATUS_AND_RETURN	( _status, _retVal )
 
-#define CHECK_MSTATUS_AND_RETURN_IT	(	_status ) 	
+#define CHECK_MSTATUS_AND_RETURN_IT	( _status ) 	
 ~~~
 
 All of them prints an error if the MStatus is not Mstatus::kSuccess. Furthermore CHECK_MSTATUS_AND_RETURN and CHECK_MSTATUS_AND_RETURN_IT returns _retVal and _status respectively in case of a not MStatus::kSucces _status.
