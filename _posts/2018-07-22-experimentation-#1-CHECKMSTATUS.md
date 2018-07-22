@@ -128,3 +128,9 @@ On a Windows 7 home premium 64 bit OS
 
 ![Deformer Sample Chart]({{ "/assets/CHECK_MSTATUS_Experimentation_DeformerSamples_Chart.png" | absolute_url }})
 ![Deformer Sample Average Chart]({{ "/assets/CHECK_MSTATUS_Experimentation_DeformerAverage_Chart.png" | absolute_url }})
+
+As we can see here there is a (depending on context) slight change in performance.
+An interesting thing to note, that appeared in all the tests, is that the deformer which uses CHECK_MSTATUS_AND_RETURN actually seems to perform a bit better than the version which uses CHECK_MSTATUS. I didn't expect it.
+Both of them, though, are trashed by the version without checking. With almost a full second of difference.
+
+In the introduction of this post I said that in an MPxNode::initialize the checks performance may be ignore. This actually made me wonder about that. As such I prepared and run another experiment. This time I profiled 
