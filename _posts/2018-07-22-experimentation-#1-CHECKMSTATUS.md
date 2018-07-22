@@ -37,12 +37,12 @@ MStatus uninitializePlugin(MObject obj) {
 >> Sidenote: 
 >>>There exists a Macro that evaluates to true if the MStatus is not MStatus::kSuccess. The if-statement could be rewritten as such:
 
-~~~ c++
-if ( MFAIL(status) ) {
-    status.perror("Error deregistering FictionalNode.");
-    return status;
-}
-~~~
+>>> ~~~ c++
+>>> if ( MFAIL(status) ) {
+>>>     status.perror("Error deregistering FictionalNode.");
+>>>     return status;
+>>> }
+>>> ~~~
 
 >>> I never found myself using it but it's a question of style.
 
