@@ -35,7 +35,7 @@ MStatus uninitializePlugin(MObject obj) {
 ~~~
 
 >> Sidenote: 
->>>There exists a Macro that evaluates to true if the MStatus is not MStatus::kSuccess. The if-statement could be rewritten as such:
+>>>There exists a Macro that evaluates to true if the *MStatus* is not *MStatus::kSuccess*. The if-statement could be rewritten as such:
 
 >>> ~~~ c++
 >>> if ( MFAIL(status) ) {
@@ -46,24 +46,24 @@ MStatus uninitializePlugin(MObject obj) {
 
 >>> I never found myself using it but it's a question of style.
 
-As most ( maybe all? I'm not actually sure about this ) methods that do not need to return a value directly deregisterNode returns an MStatus.
-Most ( here again it may be all ) API methods that need to return a value provides an optional out_parameter to provide MStatus checking.
+As most ( maybe all? I'm not actually sure about this ) methods that do not need to return a value directly, *deregisterNode* returns an *MStatus*.
+Most ( here again it may be all ) API methods that need to return a value provides an optional out_parameter to provide *MStatus* checking.
 
 ## ...and CHECK_MSTATUS* macros
 
-Checking an MStatus is a tedious and repetitive process. As such, the Maya API provides us with three Macros to check an MStatus and print an error.
+Checking an *MStatus* is a tedious and repetitive process. As such, the Maya API provides us with three Macros to check an *MStatus* and print an error.
 They're the following:
 
 ~~~ c++
 
-#define CHECK_MSTATUS	( _status )
+#define CHECK_MSTATUS ( _status )
 
-#define CHECK_MSTATUS_AND_RETURN	( _status, _retVal )
+#define CHECK_MSTATUS_AND_RETURN ( _status, _retVal )
 
-#define CHECK_MSTATUS_AND_RETURN_IT	( _status ) 	
+#define CHECK_MSTATUS_AND_RETURN_IT ( _status ) 	
 ~~~
 
-All of them prints an error if the MStatus is not Mstatus::kSuccess. Furthermore CHECK_MSTATUS_AND_RETURN and CHECK_MSTATUS_AND_RETURN_IT returns _retVal and _status respectively in case of a not MStatus::kSucces _status.
+All of them prints an error if the *MStatus* is not *Mstatus::kSuccess*. Furthermore *CHECK_MSTATUS_AND_RETURN* and *CHECK_MSTATUS_AND_RETURN_IT* returns **_retVal** and **_status** respectively in case of a not *MStatus::kSucces* **_status**.
 Here you can see an example of their uses:
 
 ~~~ c++
@@ -84,15 +84,15 @@ MStatus UselessyExpensiveDeformerWithCheck::initialize()
 }
 ~~~
 
-One notable thing about the CHECK_MSTATUS_AND_RETURN_IT is its definition:
+One notable thing about the *CHECK_MSTATUS_AND_RETURN_IT* is its definition:
 
 ~~~ c++
 #define CHECK_MSTATUS_AND_RETURN_IT(_status)			\
 CHECK_MSTATUS_AND_RETURN((_status), (_status))
 ~~~
 
-Here you should be careful about what you pass to it since _status will be expanded two times and that could be a cause of side-effects ( it usually be a concern with how this macro is used but it's good to know ).
-This is all you need to know about MStatus and the CHECK_MSTATUS* macros.
+Here you should be careful about what you pass to it since **_status** will be expanded two times and that could be a cause of side-effects ( it usually won't be a concern with how this macro is used but it's good to know ).
+This is all you need to know about MStatus and the *CHECK_MSTATUS\** macros.
 
 ## Finally let's experiment a little!
 
@@ -110,19 +110,21 @@ For this experimentation I've prepared some simple deformers which present the f
 There are equivalent versions that checks the MStatus from iterator.position.
 All in all it's just a useless calculation used as an excuse for the experimentation.
 
-The plugin was developed with Maya 2017 update 4 using Maya 2017 update 4 C++ API on Visual studio community 2017.
-The tests were run on Maya 2017 update 4 and profiled with std::chrono using a 1 sample per 100 calls rate.
+The plugin was developed with *Maya 2017 update 4* using Maya 2017 update 4 C++ API* on *Visual studio community 2017*.
+The tests were run on *Maya 2017 update 4* and profiled with **std::chrono** using a *1 sample per 100 calls rate*.
 
 One test scene was prepared for each deformer (1 without status checking, 2 with status checking).
-The test scene consists of 1 polyShpere with 633602 vertices with the deformer attached.
+The test scene consists of 1 *polyShpere* with 633602 vertices with the deformer attached.
 The deformer had an output-affecting value animated linearly from 0.0 to 1.0 on a 2000 frame timeline at 24fps.
 The profiling was done on multiple playback of this animation.
 
+~~~
 The test rig was the following:
 CPU: Intel Core i7-3930k @ 3.20GHz
 RAM: 16GB ddr4
 GPU: Geforce GTX 680
 On a Windows 7 home premium 64 bit OS
+~~~
 
 ## Some result to crunch
 
@@ -130,13 +132,13 @@ On a Windows 7 home premium 64 bit OS
 ![Deformer Sample Average Chart]({{ "/assets/CHECK_MSTATUS_Experimentation_DeformerAverage_Chart.png" | absolute_url }})
 
 As we can see here there is a (depending on context) slight change in performance.
-An interesting thing to note, that appeared in all the tests, is that the deformer which uses CHECK_MSTATUS_AND_RETURN actually seems to perform a bit better than the version which uses CHECK_MSTATUS. I didn't expect it.
+An interesting thing to note, that appeared in all the tests, is that the deformer which uses *CHECK_MSTATUS_AND_RETURN* actually seems to perform a bit better than the version which uses* CHECK_MSTATUS*. I didn't expect it.
 Both of them, though, are trashed by the version without checking, with almost a full second of difference.
 
 ### Conclusion
 
 Well, this was mostly a quench my thirst experimentation. The result were mostly expectable.
-We should keep MStatus checking as much as possible out of our performance-dependant code, furthermore we  avoid to introduce more branching by not using them.
-Most of the MStatuses are usually not worth checking at all anyway. Sometimes there is a possibility that some code may become risky if a Maya method fails but most methods aren't going to fail in normal conditions if used correctly.
+We should keep *MStatus* checking as much as possible out of our performance-dependant code, furthermore we  avoid to introduce more branching by not using them.
+Most of the *MStatuses* are usually not worth checking at all anyway. Sometimes there is a possibility that some code may become risky if a Maya method fails but most methods aren't going to fail in normal conditions if used correctly.
 I still think, and as style choice it is my preference, that checking the statuses on the first drafts of the code is good practice to avoid or find more easily typos, bugs or misuses of the API.
 This doesn't mean that we should never use them in finalized code. There are cases where it is worth it to be sure the plugin won't crash in the improbable case that some simple API method goes wrong.
