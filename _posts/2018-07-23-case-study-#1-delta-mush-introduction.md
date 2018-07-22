@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Case Study 1: Delta Mush - Introduction
+title: Case Study 1 Delta Mush - Introduction
 date: 2018-07-22
 categories: case-study
 tags: c++ maya plugin optimization case-study
