@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: experimentation
 title: Experimentation 1 - CHECK_MSTATUS* macros
 date: 2018-07-22
 categories: experimentation
