@@ -7,7 +7,7 @@ date: 2018-07-19
 This blog is my personal page that I will use to share my studies and experiments or products.
 The main content you will find is coding posts related to Maya plugin and code optimizations.
 There are two main categories of posts that will be part of this blog:
-<!--more-->
+<!--godomalissimo-->
 
 #### Case Study
 
