@@ -9,7 +9,7 @@ tags: c++ maya plugin optimization deformer
 In this post I'd like to talk about the hows of how I got interested in code optimization.
 
 It all started somewhat randomly about a week ago....
-
+<!--godomalissimo-->
 # The SingleBlendMesh deformer
 
 Just out of school I was looking for some project to develop my skills. Being interested in working in the VFX/Film industry the more reasonable
@@ -21,7 +21,7 @@ It presented a lot of interesting challenges, from deepening my array attributes
 
 A few hours of work and the base to work on was done. A simple BlendShape deformer that accepted only one mesh.
 Looking to improve it I was getting ready to make it a multiple BlendShape deformer...
-<!--godomalissimo-->
+
 ## ...But then I got lost...
 
 One lingering interest I had for a while was working with Maya Profiler. I always loved profilers. They can give you an insight on your code workings and provide you with data to back up your development timeline choices.
