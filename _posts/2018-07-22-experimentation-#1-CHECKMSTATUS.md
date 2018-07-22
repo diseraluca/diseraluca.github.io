@@ -11,7 +11,7 @@ tags: c++ maya plugin optimization
 Well, I recently did. I actually use the *CHECK_MSTATUS\** macros a lot in the first drafts of my plugins. 
 While it usually won't matter in an MPxNode::initialize, for example, I was pretty curious about the performance of these macros.
 Before diving in the experimentation let's introduce them.
-<!--more-->
+<!--godomalissimo-->
 ## The MStatus class...
 
 As you may know the Maya API provides an MStatus class ( this is actually true for the C++ API only as both the Python and .NET API provides different error checking mechanism ) that is, mostly, ubiquitous in the API methods returns or paramaters.
