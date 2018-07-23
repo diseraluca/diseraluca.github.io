@@ -104,7 +104,7 @@ After we have deformed the mesh and smoothed it we can build a second transforma
 
 $$
 \begin{align*}
-    C_i = [\t_i\textsuperscript{'}, n_i', b_i', s_i\textsuperscript{'}]
+    C_i = [t_i\sp{'}, n_i', b_i', s_i\textsuperscript{'}]
 \end{align*}
 $$
 
