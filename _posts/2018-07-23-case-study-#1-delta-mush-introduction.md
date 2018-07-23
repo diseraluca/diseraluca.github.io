@@ -29,11 +29,13 @@ The first part of the algorithm is the smoothing part ( not so surprising uh? ).
 Formally it is the defined per-vertex as such:
 
 {% raw %}
+
 $$
 \begin{align*}
     x_i = \sum{j=1}^N w_jp_j
 \end{align*}
 $$
+
 {% endraw %}
 
 Where $$ N $$ is number of connected vertices to vertex $$i$$, $$ p_j $$ are the position in space of the connected vertices and $$x_i$$ is the resulting position of vertex $$i$$.
