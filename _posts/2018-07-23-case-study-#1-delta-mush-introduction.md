@@ -28,11 +28,13 @@ But how does it work? Well, it is actually simpler than it seems. The algorithm 
 The first part of the algorithm is the smoothing part ( not so surprising uh? ). The Delta Mush usually uses weighted Laplacian Smoothing.
 Formally it is the defined per-vertex as such:
 
+{% raw %}
 $$
 \begin{align*}
     x_i = \sum{j=1}^N w_jp_j
 \end{align*}
 $$
+{% endraw %}
 
 Where $$ N $$ is number of connected vertices to vertex $$i$$, $$ p_j $$ are the position in space of the connected vertices and $$x_i$$ is the resulting position of vertex $$i$$.
 $$w_j$$ is a weight factor that is applied to the transformation. It can be constant or it can be calculated from a series of factors. One techniques is to use the lenght of the edge between vertex $$i$$ and vertex $$j$$ to find an inversely proportional weight.
