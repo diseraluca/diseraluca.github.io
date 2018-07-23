@@ -77,7 +77,7 @@ From these pieces we can build the following transformation matrix:
 
 $$
 \begin{align*}
-    R_i = [t_i, n_i, b_i, s_i]
+    R_i = [t_i n_i b_i s_i]
 \end{align*}
 $$
 
@@ -97,14 +97,14 @@ $$
 {% endraw %}
 
 where $$p_i$$ is the original position of the vertex.
-This first pass is done on the original mesh in rest position ( we will cache this delta in the end since they don't change and needs to be calculated only once ).
+This first pass is done on the original mesh in rest position ( we will cache this deltas in the end since they don't change and needs to be calculated only once ).
 After we have deformed the mesh and smoothed it we can build a second transformation matrix as follows:
 
 {% raw %}
 
 $$
 \begin{align*}
-    C_i = [{t_i}^', {n_i}', {b_i}', {s_i}^']
+    C_i = [{t_i}^' {n_i}' {b_i}' {s_i}^']
 \end{align*}
 $$
 
@@ -125,7 +125,7 @@ $$
 ## Closing up
 
 Now this may seem more difficult than it actually is to you. I haven't properly explained many things and supposed that you already knew at least some concepts ( like what a coordinate system is or transformation matrices ) but all will be more clear when we will put our hands on some code.
-To recap, in an easier to understand way, the Delta Mush deformer is performed as follows:
+To recap, in an easier to understand way, the *Delta Mush* deformer is performed as follows:
 
 1. Smooth the rest pose mesh
 2. Calculate the Deltas for the smoothed rest pose mesh
