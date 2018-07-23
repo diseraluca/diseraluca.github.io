@@ -12,6 +12,7 @@ This is the introduction to the first Case Study series. In this first Case Stud
 study some optimization technique on it.
 But what is a Delta Mush?
 
+<!--godomalissimo-->
 The Delta Mush algorithm is a smoothing algorithm that aims to reduce the time needed for production level skinning by cleaning up undesirable deformations.
 It was developed at Rhythm & Hues studios ( which unfortunaly has signed bankruptcy a few years ago ) and then became popular as a production level tool.
 The algorithm itself isn't much difficult, which is a plus, but delivers great results and cuts production times.
@@ -58,7 +59,79 @@ Those deltas will then be reapplied to the deformed mesh to regain the lost volu
 The idea here is that if the smoothing of the mesh ( in its original position - The bind pose ) produced a certain loss of volume the smoothing of the deformed mesh will produce a similar amount of loss. By reapplying the delta we are trying to get as near as possible to the original position of the vertex.
 
 There is a problem tough. If the mesh is deformed, and we apply the deltas, we may find that we are displacing the vertexes in the wrong direction. That is because the displacement of the smoothing may have changed its orientation.
-Here comes the aforementioned tangent space.
+Here comes the aforementioned tangent space to save the day.
 
 ## Tangent Space
 
+So, tangent space is a somewhat complex concept. But for our purposes we can try and simplify it a bit.
+In essence Tangent Space is a coordinate system relative to a certain surface where up is directly away from the surface ( how a normal would be for example ).
+In our case, we have to build this space relative to every vertex so that we can store and reapply the deltas correctly independant of how the vertices are transformed.
+
+![Tangent Space]({{ "/assets/DeltaMushIntroduction_CaseStudy_tangentSpaceExample.png" | absolute_url }})
+
+As you can see from the image we can build it using the normal, the tangent and the binormal ( Maya API provides them for us trough MFnMesh using the UV of the mesh. I know of another method to build tangent space that doesn't need UVs but we are probably gonna use Maya API directly in the code ).
+
+From these pieces we can build the following transformation matrix:
+
+{% raw %}
+
+$$
+/begin{align*}
+    R_i = [t_i, n_i, b_i, s_i]
+/end{align*}
+$$
+
+{% endraw %}
+
+where $$t_i$$, $$n_i$$, $$b_i$$, $$s_i$$ are the tangent, the normal, the binormal, and the smoothed position of vertex $$i$$.
+Trough applying the inverse of this matrix we can find a vector $$v_i$$, that is the displacement of the vertex (AKA the delta), as follows:
+
+{% raw %}
+
+$$
+/begin{align*}
+    v_i = {R_i}^{-1}p_i
+/end{align*}
+$$
+
+{% endraw %}
+
+where $$p_i$$ is the original position of the vertex.
+This first pass is done on the original mesh in rest position ( we will cache this delta in the end since they don't change and needs to be calculated only once ).
+After we have deformed the mesh and smoothed it we can build a second transformation matrix as follows:
+
+{% raw %}
+
+$$
+/begin{align*}
+    C_i = [{t_i}^', {n_i}', {b_i}', {s_i}^']
+/end{align*}
+$$
+
+{% endraw %}
+
+where $${t_i}^'$$, $${n_i}'$$, $${b_i}'$$, $${s_i}^'$$ are the tangent, normal, binormal and smoothed position of vertex i in a deformed state. Trough this matrix ( which represents tangent space transformations ) we can find the final position $$d_i$$ of vertex $$i$$ by applying the transformation to $$v_i$$:
+
+{% raw %}
+
+$$
+/begin{align*}
+    d_i = C_iv_i
+/end{align*}
+$$
+
+{% endraw %}
+
+## Closing up
+
+Now this may seem more difficult than it actually is to you. I haven't properly explained many things and supposed that you know at least some basic meanings ( like what a coordinate system is ) but all will be more clear when we will put our hands on some code.
+To recap, in an easier to understand way, the Delta Mush deformer is performed as follows:
+
+1. Smooth the rest pose mesh
+2. Calculate the Deltas for the smoothed rest pose mesh
+3. Smooth the deformation mesh
+4. Apply the delta back to the smoothed deformation mesh
+
+It is as simple as that.
+Next time we will dive directly into the code of a first, completely unoptimized, version of a Delta Mush Deformer and finally dirty our hands a bit.
+See you next time.
