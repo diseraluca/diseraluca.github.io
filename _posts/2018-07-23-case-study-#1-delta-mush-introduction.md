@@ -110,7 +110,7 @@ $$
 
 {% endraw %}
 
-where $$t_i^'$$, $$n_i'$$, $$b_i'$$, $$s_i^'$$ are the tangent, normal, binormal and smoothed position of vertex $$i$$ in a deformed state. Trough this matrix ( which represents tangent space transformations ) we can find the final position $$d_i$$ of vertex $$i$$ by applying the transformation to $$v_i$$:
+where $$t_i^2$$, $$n_i'$$, $$b_i'$$, $$s_i^2$$ are the tangent, normal, binormal and smoothed position of vertex $$i$$ in a deformed state. Trough this matrix ( which represents tangent space transformations ) we can find the final position $$d_i$$ of vertex $$i$$ by applying the transformation to $$v_i$$:
 
 {% raw %}
 
