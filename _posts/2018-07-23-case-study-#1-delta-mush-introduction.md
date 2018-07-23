@@ -104,13 +104,13 @@ After we have deformed the mesh and smoothed it we can build a second transforma
 
 $$
 \begin{align*}
-    C_i = [t_i\sp{'}, n_i', b_i', s_i\textsuperscript{'}]
+    C_i = [t_i^{'}, n_i', b_i', s_i^{'}]
 \end{align*}
 $$
 
 {% endraw %}
 
-where $$t_i\textsuperscript{'}$$, $$n_i'$$, $$b_i'$$, $$s_i\textsuperscript{'}$$ are the tangent, normal, binormal and smoothed position of vertex $$i$$ in a deformed state. Trough this matrix ( which represents tangent space transformations ) we can find the final position $$d_i$$ of vertex $$i$$ by applying the transformation to $$v_i$$:
+where $$t_i^{'}$$, $$n_i'$$, $$b_i'$$, $$s_i^{'}$$ are the tangent, normal, binormal and smoothed position of vertex $$i$$ in a deformed state. Trough this matrix ( which represents tangent space transformations ) we can find the final position $$d_i$$ of vertex $$i$$ by applying the transformation to $$v_i$$:
 
 {% raw %}
 
