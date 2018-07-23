@@ -11,7 +11,7 @@ There are two main categories of posts that will be part of this blog:
 
 #### Case Study
 
->> A case study a series of posts about a particular project I'm working on and studying.
+>> A case study is a series of posts about a particular project I'm working on and studying.
 >> Every case study will be a long running series where I will explain my workings and products.
 >> They will contain a good amount of code that will be developed iteratively from a post to another.
 
