@@ -133,3 +133,17 @@ namespace SingleMeshBlend_cs
 }
 ~~~
 
+#### Autodesk namespaces
+
+As you can see from the first few lines, the API modules resides in the Autodesk.Maya namespace. We import them with the using directive.
+
+~~~ c#
+using Autodesk.Maya.OpenMaya;
+using Autodesk.Maya.OpenMayaAnim;
+~~~
+
+#### C# attributes and the .Net API
+
+~~~ c#
+[assembly: MPxNodeClass(typeof(SingleMeshBlend_cs.SingleBlendMesh), "SingleBlendMesh", 0x0d12309, NodeType = MPxNode.NodeType.kDeformerNode)]
+~~~
