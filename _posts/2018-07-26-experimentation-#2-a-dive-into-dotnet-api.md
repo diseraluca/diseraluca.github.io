@@ -195,3 +195,29 @@ I may have done something horribly wrong but I could not get it to work.
 #### C# properties examples
 
 ~~~c#
+if (!blendMeshPlug.isConnected)
+~~~
+
+~~~c#
+float envelopeValue = block.inputValue(envelope).asFloat;
+~~~
+
+Those are examples of point 1 of the changes list:
+
+1. **C#** properties instead of getter and setters ( for example *MFnAttribute set/isReadable()* ).
+
+If you understand python **@property** decorator you probably already understand how they works.
+Otherwise, they are wrappers that provide public access to a class field. When you are reading the value you are actually calling a *get()* method in the background and a *set()* method is called when assigning to it.
+Properties can be read-only, write-only or read-and-write.
+
+#### Implicit casting
+
+~~~c#
+MVector delta = (new MVector(targetPosition) - new MVector(currentPosition)) * blendWeightValue * envelopeValue;
+~~~
+
+In *C#* implicit casting is possible only when a conversion operator in marked as **implicit**. In this case I had to create some new vectors to make the compution work because no implicit casting could be done (actually there doesn't seem to exist a conversion from MPoint to MVector at all) ( in *C++* there is no need for explicit casting in this code for example ).
+I'm sure there is a better way of writing this line, but it currently escapes me.
+
+## Some numbers to go with
+
