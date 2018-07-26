@@ -15,6 +15,7 @@ It is a pretty simple code but exposes some of maya functionality. Furthermore i
 
 Now before diving in let's introduce the *.Net API*
 
+<!--godomalissimo-->
 ## The .Net Maya API
 
 The *.Net API* was introduced with *Maya 2013 extension 2* and uses *Microsoft .Net technology*.
@@ -40,12 +41,15 @@ It isn't to difficult to setup VS for the API. I'm using Visual Studio 2017 Comm
 * Create a new *C#* project ( File->New->Project ) by choosing the **Class Library (.Net Framework)** Template. Here it is a good idea to set the target framework
    to the one used by the API code examples. I'm on *Maya 2017 update 4* and the *.net framework* is **4.5.1**.
    ![VS1]({{ "/assets/DOTNET_Experimentation_visualStudio_1.png" | absolute_url }})
+   
 * Add a reference ( In the solution explorer right-click references -> add reference ) to the openmayacs.dll that comes with your installation of maya.
    You can find it in %MAYA_LOCATION%/bin/. Coming with it you should find openmayacs.xml, the code documentation that will enable Intellisense etc.
    It will be loaded automatically with the reference.
+   
 * After loading the reference we should set ( click on the reference and you can see its properties ) *Copy Local* property of the openmayacs reference to False.
    This means that the openmayacs.dll reference won't be copied to the assembly directory. Failure to do so may create problems when the plugin will be used by maya.
    ![VS2]({{ "/assets/DOTNET_Experimentation_visualStudio_2.png" | absolute_url }})
+   
 * In the project property, under build events -> post-build event command line, add:
 
 ~~~
