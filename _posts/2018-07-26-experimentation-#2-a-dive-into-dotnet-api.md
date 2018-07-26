@@ -27,7 +27,7 @@ There are some notable differences, tough:
    when the plugin is unloaded was added for the *.Net API*
 3. *MStatus* is non-existant in the *.Net API*. API methods that used *MStatus* return *void* or *bool*. In case of errors exceptions are raised.
 4. Iterators implements the *C#* interface *IEnumerable<T>*.
-5. Maya Collections implement the *C#* *IEnumerable* and *IList* interfaces. Furthermore, they provide construsctors that accepts *C#* arrays
+5. Maya Collections implement the *C#* *IEnumerable* and *IList* interfaces. Furthermore, they provide constructors that accepts *C#* arrays
    and methods that return them.
 6. **OpenMayaFx** has not been ported to the *.Net API*.
 7. A new class, *MDockStation* was added to enable the use of **WPF** windows in the Maya UI.
@@ -241,7 +241,7 @@ I expected it to be slow but this is too much. It's just WOW.
 ## Conclusion
 
 Now, this wasn't the best case to test the *.Net API*, you would never use it for performance heavy code, the same as *Python*.
-Regarding the prototyping potential, it surely as hell removes a lot of the boilerplate code ( even more than *Python* ) and that may help writing code faster ( but not faster code by far as we've seen **chuckles stupidly** ).
+Regarding the prototyping potential, it surely as hell removes a lot of the boilerplate code ( even more than *Python* ) and that may help writing code faster ( but not faster code by far as we've seen \***chuckles stupidly**\* ).
 Unfortunately I find it to be, currently, too cumbersome. The documentation is pretty non-existant and not many people seems to use it so it would be difficult getting an helping hand.
 Furthermore, *Python* is practically the lingua-franca of the VFX/Film industry and would provide more growing possibilities while giving the same capacity of *C#* regarding Maya API.
 Now, I'm a total beginner in *C#*, there may be some language features that makes *C#* the best tool for some production code but I can't see it at the moment and I'm not sure it would be worth the hassle.
