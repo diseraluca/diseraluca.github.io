@@ -77,8 +77,6 @@ namespace SingleMeshBlend_cs
 {
     class SingleBlendMesh : MPxGeometryFilter, IMPxNode
     {
-        public int cID = MProfiler.addCategory("SingleBlendMesh");
-
         public static MObject blendMesh = null;
 
         [MPxNodeNumeric("blw", "blendWeight", MFnNumericData.Type.kDouble, Min = new[] { 0.0 }, Max = new[] { 1.0 }, Keyable = true)]
@@ -100,8 +98,6 @@ namespace SingleMeshBlend_cs
 
         public override void deform(MDataBlock block, MItGeometry iter, MMatrix mat, uint multiIndex)
         {
-            MProfilingScope p = new MProfilingScope(cID, MProfiler.ProfilingColor.kColorD_L1, "deform", "SingleBlendMeshDeformer", thisMObject());
-
             MPlug blendMeshPlug = new MPlug(thisMObject(), blendMesh);
             if (!blendMeshPlug.isConnected)
             {
@@ -147,3 +143,55 @@ using Autodesk.Maya.OpenMayaAnim;
 ~~~c#
 [assembly: MPxNodeClass(typeof(SingleMeshBlend_cs.SingleBlendMesh), "SingleBlendMesh", 0x0d12309, NodeType = MPxNode.NodeType.kDeformerNode)]
 ~~~
+
+This may be the line that confused you the most if you're not accustomed to *C#*. What does it mean?
+Well, what you see here are **C#'s attributes**. They are a way to add metadata information that can be retrieved trought the *reflection* system.
+In this particular case we are attaching data to initialize to register the node on the assembly of the build. This code replaces what you would usually put in the initializePlugin with MFnPlugin::registerNode.
+
+You can see other examples of **C#'s attributes** later in the code. For example to declare an attribute of the node:
+
+~~~c#
+[MPxNodeNumeric("blw", "blendWeight", MFnNumericData.Type.kDouble, Min = new[] { 0.0 }, Max = new[] { 1.0 }, Keyable = true)]
+public static MObject blendWeight = null;
+~~~
+
+#### The initialize method
+
+In *C#* plugins we don't necessarily need an initialize method. Most nodes attributes can be declared using **C#'s attributes** with *[MPxNodeNumeric/Enum/...]* and with *[MPxNodeAffectby]* and *[MPxNodeAffects]*.
+In this particular case we had to declare it because it doens't seem to be an **C#'s attribute## for *typed attributes*.
+Another thing to note is that the initialize too is marked by an attribute, *[MPxNodeInitializer]*:
+
+~~~c#
+       [MPxNodeInitializer()]
+        public static bool initialize()
+        {
+            MFnTypedAttribute tAttr = new MFnTypedAttribute();
+
+            blendMesh = tAttr.create("blendMesh", "blm", MFnData.Type.kMesh );
+            addAttribute(blendMesh);
+
+            attributeAffects(blendMesh, outputGeom);
+            attributeAffects(blendWeight, outputGeom);
+
+            return true;
+        }
+~~~
+
+The rest of the initialize method behaves like it would in the *C++ API*.
+
+#### The IMPxNode interface
+
+~~~c#
+class SingleBlendMesh : MPxGeometryFilter, IMPxNode
+~~~
+
+*C#* supports single-inerithance but unlimited interfaces. The *IMPxNode* interface provides the needed abstract methods for a custom node ( compute ) and is needed to create it. Similar interfaces exist for other type of plugins like *IMPxCommand*.
+
+One interesting thing to note is that the *C++* version of this deformer supports per-vertex weights. Here I had to use *MPxGeometryFilter* instead of *MPxDeformerNode* as the base class ( the difference between the two is that the latter supports per-vertex weights while the former doesn't. *MPxGeometryFilter* is actually the base class of *MPxDeformerNode* ) because *MPxDeformerNode* seems to not be supported correctly.
+At least on my implementation of the *.Net API*, *MPxDeformerNode* isn't complete and does not provide a deform method to override nor does it implement *IMPxNode*.
+
+I may have done something horribly wrong but I could not get it to work.
+
+#### C# properties examples
+
+~~~c#
