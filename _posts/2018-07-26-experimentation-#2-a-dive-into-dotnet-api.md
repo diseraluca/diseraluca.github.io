@@ -8,7 +8,7 @@ tags: c# maya plugin maya-api dotnet-api
 
 ## Why C# ?
 
-For a possible-work I'm studying **Unity** and, obviously, **C#**. Now, I'm still a total beginner with C# but what better way to get accustomated
+For a possible-work I'm studying **Unity** and, obviously, **C#**. Now, I'm still a total beginner with C# ( *C# in a nutshell* is so much more boring than I tought that I'm having difficulties reading it ) but what better way to get accustomated
 to a new language than to get your hands dirty and write something you know how to write and like to write ?
 For this experimentation I've chosen to rewrite the [SingleBlendMesh V1.0](https://diseraluca.github.io/blog/2018/07/20/cool-story-bro-1) ( The completely unoptimized and ugly one ).
 It is a pretty simple code but exposes some of maya functionality. Furthermore it uses almost only *Maya API* call so it is a good testing ground for speed ( being a deformer is a plus ).
@@ -63,3 +63,73 @@ copy "$(TargetPath)" "$(SolutionDir)assemblies\$(TargetName).nll.dll"
 * That's all! We're ready to develop some plugins!
 
 ## The SingleMeshBlend_cs deformer
+
+First of all I will show you the whole code. Then I will concentrate on those things I found interesting. Please remember that this is the first time I'm writing *C#* code ( apart from some trivial **Unity** script ). Many things are probably not the best, or even correct, way of writing *C#* code. The same may be valid for the *.Net API* side of things. Bear that in mind while reading this post.
+Let's, for real this time, dive into the code:
+
+~~~ c#
+using Autodesk.Maya.OpenMaya;
+using Autodesk.Maya.OpenMayaAnim;
+
+[assembly: MPxNodeClass(typeof(SingleMeshBlend_cs.SingleBlendMesh), "SingleBlendMesh", 0x0d12309, NodeType = MPxNode.NodeType.kDeformerNode)]
+
+namespace SingleMeshBlend_cs
+{
+    class SingleBlendMesh : MPxGeometryFilter, IMPxNode
+    {
+        public int cID = MProfiler.addCategory("SingleBlendMesh");
+
+        public static MObject blendMesh = null;
+
+        [MPxNodeNumeric("blw", "blendWeight", MFnNumericData.Type.kDouble, Min = new[] { 0.0 }, Max = new[] { 1.0 }, Keyable = true)]
+        public static MObject blendWeight = null;
+
+        [MPxNodeInitializer()]
+        public static bool initialize()
+        {
+            MFnTypedAttribute tAttr = new MFnTypedAttribute();
+
+            blendMesh = tAttr.create("blendMesh", "blm", MFnData.Type.kMesh );
+            addAttribute(blendMesh);
+
+            attributeAffects(blendMesh, outputGeom);
+            attributeAffects(blendWeight, outputGeom);
+
+            return true;
+        }
+
+        public override void deform(MDataBlock block, MItGeometry iter, MMatrix mat, uint multiIndex)
+        {
+            MProfilingScope p = new MProfilingScope(cID, MProfiler.ProfilingColor.kColorD_L1, "deform", "SingleBlendMeshDeformer", thisMObject());
+
+            MPlug blendMeshPlug = new MPlug(thisMObject(), blendMesh);
+            if (!blendMeshPlug.isConnected)
+            {
+                MGlobal.displayWarning(this.name() + ": blendMesh not connected. Please connect a mesh.");
+                return;
+            }
+         
+            float envelopeValue = block.inputValue(envelope).asFloat;
+            MObject blendMeshValue = block.inputValue(blendMesh).asMesh;
+            double blendWeightValue = block.inputValue(blendWeight).asDouble;
+
+            MFnMesh blendMeshFn = new MFnMesh(blendMeshValue);
+
+            for (iter.reset(); !iter.isDone; iter.next())
+            {
+                MPoint currentPosition = iter.position();
+
+                MPoint targetPosition = new MPoint();
+                blendMeshFn.getPoint(iter.index, targetPosition);
+
+                
+                MVector delta = (new MVector(targetPosition) - new MVector(currentPosition)) * blendWeightValue * envelopeValue;
+                MPoint newPosition = new MPoint(delta + (new MVector(currentPosition)));
+
+                iter.setPosition(newPosition);
+            }
+        }
+    }
+}
+~~~
+
