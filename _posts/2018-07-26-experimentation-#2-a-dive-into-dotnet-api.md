@@ -67,7 +67,7 @@ copy "$(TargetPath)" "$(SolutionDir)assemblies\$(TargetName).nll.dll"
 First of all I will show you the whole code. Then I will concentrate on those things I found interesting. Please remember that this is the first time I'm writing *C#* code ( apart from some trivial **Unity** script ). Many things are probably not the best, or even correct, way of writing *C#* code. The same may be valid for the *.Net API* side of things. Bear that in mind while reading this post.
 Let's, for real this time, dive into the code:
 
-~~~ c#
+```c#
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaAnim;
 
@@ -131,19 +131,19 @@ namespace SingleMeshBlend_cs
         }
     }
 }
-~~~
+```
 
 #### Autodesk namespaces
 
 As you can see from the first few lines, the API modules resides in the Autodesk.Maya namespace. We import them with the using directive.
 
-~~~ c#
+~~~c#
 using Autodesk.Maya.OpenMaya;
 using Autodesk.Maya.OpenMayaAnim;
 ~~~
 
 #### C# attributes and the .Net API
 
-~~~ c#
+~~~c#
 [assembly: MPxNodeClass(typeof(SingleMeshBlend_cs.SingleBlendMesh), "SingleBlendMesh", 0x0d12309, NodeType = MPxNode.NodeType.kDeformerNode)]
 ~~~
