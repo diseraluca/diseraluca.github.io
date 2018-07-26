@@ -36,7 +36,7 @@ There are some other differences in how the code is written since it uses *C#* s
 
 ## Setting up Visual Studio for .Net API development
 
-It isn't to difficult to setup VS for the API. I'm using Visual Studio 2017 Community, other version of the software may vary the needed steps.
+It isn't too difficult to setup VS for the API. I'm using Visual Studio 2017 Community, other version of the software may vary the needed steps.
 
 * Create a new *C#* project ( File->New->Project ) by choosing the **Class Library (.Net Framework)** Template. Here it is a good idea to set the target framework
    to the one used by the API code examples. I'm on *Maya 2017 update 4* and the *.net framework* is **4.5.1**.
@@ -158,7 +158,7 @@ public static MObject blendWeight = null;
 #### The initialize method
 
 In *C#* plugins we don't necessarily need an initialize method. Most nodes attributes can be declared using **C#'s attributes** with *[MPxNodeNumeric/Enum/...]* and with *[MPxNodeAffectby]* and *[MPxNodeAffects]*.
-In this particular case we had to declare it because it doens't seem to be an **C#'s attribute## for *typed attributes*.
+In this particular case we had to declare it because it doens't seem to be an **C#'s attribute** for *typed attributes*.
 Another thing to note is that the initialize too is marked by an attribute, *[MPxNodeInitializer]*:
 
 ~~~c#
@@ -178,6 +178,9 @@ Another thing to note is that the initialize too is marked by an attribute, *[MP
 ~~~
 
 The rest of the initialize method behaves like it would in the *C++ API*.
+Something to note here is that there exist a *[MPxNodeAffects(str, str)]* attribute that goes right before the class definition. I've tried using it for blendWeight but I couldn't get it to work.
+I may have done something wrong or it may not work if a initialize method is used ( I tend to the former since the *[MPxNodeNumeric]* numeric attribute has worked anyway ).
+This is why there is an *attributeAffects* for *blendWeight* too.
 
 #### The IMPxNode interface
 
@@ -216,7 +219,7 @@ Properties can be read-only, write-only or read-and-write.
 MVector delta = (new MVector(targetPosition) - new MVector(currentPosition)) * blendWeightValue * envelopeValue;
 ~~~
 
-In *C#* implicit casting is possible only when a conversion operator in marked as **implicit**. In this case I had to create some new vectors to make the compution work because no implicit casting could be done (actually there doesn't seem to exist a conversion from MPoint to MVector at all) ( in *C++* there is no need for explicit casting in this code for example ).
+In *C#* implicit casting is possible only when a conversion operator in marked as **implicit**. In this case I had to create some new vectors to make the computation work because no implicit casting could be done (actually there doesn't seem to exist a conversion from MPoint to MVector at all) ( in *C++* there is no need for explicit casting in this code for example ).
 I'm sure there is a better way of writing this line, but it currently escapes me.
 
 ## Some numbers to go with
