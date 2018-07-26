@@ -51,7 +51,7 @@ if not exist "$(SolutionDir)assemblies" mkdir "$(SolutionDir)assemblies"
 copy "$(TargetPath)" "$(SolutionDir)assemblies\$(TargetName).nll.dll"
 ~~~
 
-This, after a build is complete, will create a directory called *Assemblies*, copy the builded assembly into it and change its extension to **.nll.dll** ( the extension needed by *C#* maya plugin ).
+> This, after a build is complete, will create a directory called *Assemblies*, copy the builded assembly into it and change its extension to **.nll.dll** ( the extension needed by *C#* maya plugin ).
 
 5. That's all! We're ready to develop some plugins!
 
