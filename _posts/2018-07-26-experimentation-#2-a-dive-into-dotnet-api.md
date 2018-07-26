@@ -224,3 +224,19 @@ I'm sure there is a better way of writing this line, but it currently escapes me
 
 ## Some numbers to go with
 
+Now, I used the exact same testing environment from the *C++* version.
+The results were.... Even worse than I expected.
+For the 4-sphere scene I couldn't even complete one profiling. It was so absurdly slow that I waited hours and still could not get some result. I just felt disgusted.
+For the 1-sphere version the result are horrible. You can see yourself:
+
+| Language   | Node Evaluation Total | Node Evaluation Average | Deform Evaluation Total | Deform Evaluation Average | Deform Evaluation Min | Deform Evaluation Max :|
+|:-----------|:---------------------:|:-----------------------:|:-----------------------:|:-------------------------:|:---------------------:|-----------------------:|
+| C#         | ~366000ms             | ~3050                   | ~366000ms               | ~3620ms                   | ~3000ms               | ~6000ms                |
+|----
+| C++        | 7580ms                | 57.3ms                  | 5894ms                  | 49.17ms                   | 48.2ms                | 51ms                   |
+
+Well, the data talks. The *C#* version came out a whoppin' ~***52*** times slower than the *C++* version. 
+I expected it to be slow but this is too much. It's just WOW.
+While I was feeling sick, I decided to throw *Python* in and wrote this version of the deformer in it.
+Here are some result:
+
