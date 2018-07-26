@@ -19,7 +19,7 @@ Now before diving in let's introduce the *.Net API*
 ## The .Net Maya API
 
 The *.Net API* was introduced with *Maya 2013 extension 2* and uses *Microsoft .Net technology*.
-The API is generated from the *C++ API* we, mostly, have equivalent interfaces between the two API.
+The API is generated from the *C++ API* and we, mostly, have equivalent interfaces between the two API.
 There are some notable differences, tough:
 
 1. **C#** properties instead of getter and setters ( for example *MFnAttribute set/isReadable()* ).
