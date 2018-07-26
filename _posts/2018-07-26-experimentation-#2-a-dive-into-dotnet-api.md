@@ -8,7 +8,7 @@ tags: c# maya plugin maya-api dotnet-api
 
 ## Why C# ?
 
-For a possible-work I'm studying **Unity** and, obviously, **C#**. Now, I'm still a total beginner with C# ( *C# in a nutshell* is so much more boring than I tought that I'm having difficulties reading it ) but what better way to get accustomated
+For a possible-work I'm studying **Unity** and, obviously, **C#**. Now, I'm still a total beginner with C# ( *C# in a nutshell* is so much more boring than I tought that I'm having difficulties reading it ) but what better way to get accustomed
 to a new language than to get your hands dirty and write something you know how to write and like to write ?
 For this experimentation I've chosen to rewrite the [SingleBlendMesh V1.0](https://diseraluca.github.io/blog/2018/07/20/cool-story-bro-1) ( The completely unoptimized and ugly one ).
 It is a pretty simple code but exposes some of maya functionality. Furthermore it uses almost only *Maya API* call so it is a good testing ground for speed ( being a deformer is a plus ).
