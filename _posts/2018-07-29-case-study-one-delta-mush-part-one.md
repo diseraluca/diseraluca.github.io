@@ -161,7 +161,106 @@ As you can see we don't have much going on here.
 I've put a lot of methods to simplify the reading of the deform method. This has fractured the code in some places.
 I especially chose to pass many references around to keep the methods as generic as possible but I would actually move some memory to instance variables ( this would probably save some performance by removing the allocation of data we are doing and removing some refence pointers passing ) and read it from there.
 
+*deltaCache* is an helper structure to store the per-vertex deltas we will calculate. But why are we storing the **magnitude** too?
+We will use it later to scale the final delta to the correct lenght to avoid the problems of precision losing and to be sure to have the correct lenght since we are modifying the vectors a lot.
+
 We have a small amount of attributes ( some new ones will need to be added later tough ), nothing fancy, that we will se in the next section.
 
 #### The initialize method
 
+~~~cpp
+// Copyright 2018 Luca Di Sera
+//		Contact: disera.luca@gmail.com
+//				 https://github.com/diseraluca
+//				 https://www.linkedin.com/in/luca-di-sera-200023167
+//
+// This code is licensed under the MIT License. 
+// More informations can be found in the LICENSE file in the root folder of this repository
+//
+//
+// File : DeltaMush.cpp
+
+#include "DeltaMush.h"
+
+#include <maya/MFnTypedAttribute.h>
+#include <maya/MFnNumericAttribute.h>
+#include <maya/MGlobal.h>
+#include <maya/MItGeometry.h>
+#include <maya/MItMeshVertex.h>
+#include <maya/MFloatVectorArray.h>
+#include <maya/MMatrix.h>
+
+MString DeltaMush::typeName{ "ldsDeltaMush" };
+MTypeId DeltaMush::typeId{ 0xd1230a };
+
+MObject DeltaMush::referenceMesh;
+MObject DeltaMush::smoothingIterations;
+MObject DeltaMush::smoothWeight;
+MObject DeltaMush::deltaWeight;
+
+void * DeltaMush::creator()
+{
+	return new DeltaMush();
+}
+
+MStatus DeltaMush::initialize()
+{
+	MStatus status{};
+
+	MFnTypedAttribute   tAttr;
+	MFnNumericAttribute nAttr;
+
+	referenceMesh = tAttr.create("referenceMesh", "ref", MFnData::kMesh, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	CHECK_MSTATUS(addAttribute(referenceMesh));
+
+	smoothingIterations = nAttr.create("smoothingIterations", "smi", MFnNumericData::kInt, 1, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	CHECK_MSTATUS(nAttr.setKeyable(true));
+	CHECK_MSTATUS(nAttr.setMin(1));
+	CHECK_MSTATUS(addAttribute(smoothingIterations));
+
+	smoothWeight = nAttr.create("smoothWeight", "smw", MFnNumericData::kDouble, 1.0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	CHECK_MSTATUS(nAttr.setKeyable(true));
+	CHECK_MSTATUS(nAttr.setMin(0.0));
+	CHECK_MSTATUS(nAttr.setMax(1.0));
+	CHECK_MSTATUS(addAttribute(smoothWeight));
+
+	deltaWeight = nAttr.create("deltaWeight", "dlw", MFnNumericData::kDouble, 1.0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	CHECK_MSTATUS(nAttr.setKeyable(true));
+	CHECK_MSTATUS(nAttr.setMin(0.0));
+	CHECK_MSTATUS(nAttr.setMax(1.0));
+	CHECK_MSTATUS(addAttribute(deltaWeight));
+
+	CHECK_MSTATUS(attributeAffects(referenceMesh, outputGeom));
+	CHECK_MSTATUS(attributeAffects(smoothingIterations, outputGeom));
+	CHECK_MSTATUS(attributeAffects(smoothWeight, outputGeom));
+	CHECK_MSTATUS(attributeAffects(deltaWeight, outputGeom));
+
+	MGlobal::executeCommand("makePaintable -attrType multiFloat -sm deformer ldsDeltaMush weights");
+
+	return MStatus::kSuccess;
+}
+~~~
+
+Here again, we pretty much have all boilerplate code.
+We have a typedAttribute of type kMesh that is the mesh we will use as a refence.
+We expect this mesh to have the same topology as the deformed mesh and the same per-vertex ID. In simpler terms, it should be a bind-pose copy of the deformed mesh.
+
+Then we have the number of iterations for the smoothing algorithm ( as we said before it will be a simple average smoothing ) and some weights for the smoothing and the delta application.
+
+~~~cpp
+MGlobal::executeCommand("makePaintable -attrType multiFloat -sm deformer ldsDeltaMush weights");
+~~~
+
+If you have written a deformer before you should have seen this line of code. It is just us enabling the per-vertex weight for the deformer. It escapes me why there doesn't exist an API method for this but we are constrained to use MEL commands.
+We should probably concatenate the typeName instead of writing it as a literal to keep the string references to zero so that we can change the name without breaking anything but it is just a small precaution for what we are currently doing.
+
+Well, nothing difficult as you can see.
+Let's finally dive to the real core of the delta mush.
+
+## The DeltaMush
+
+# WIP
