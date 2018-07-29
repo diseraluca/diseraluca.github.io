@@ -40,3 +40,56 @@ Now, calculating more than one delta is obviously slower. We could use only one 
 The algorithm to use depends on what you purposes are. For performance reason we could even implement both of them and let the user choose which one to use.
 
 As you can see it is a simple method that will translate easily into code.
+
+## Maya Boilerplate
+
+First we will talk about some of the boilerplate code we have to write. We will then finally dive into the deform method.
+
+#### Plugin Registration
+
+~~~cpp
+// Copyright 2018 Luca Di Sera
+//		Contact: disera.luca@gmail.com
+//				 https://github.com/diseraluca
+//				 https://www.linkedin.com/in/luca-di-sera-200023167
+//
+// This code is licensed under the MIT License. 
+// More informations can be found in the LICENSE file in the root folder of this repository
+//
+//
+// File : pluginMain.cpp
+
+#include "DeltaMush.h"
+
+#include <maya/MFnPlugin.h>
+
+MStatus initializePlugin(MObject obj) {
+	MStatus status{};
+	MFnPlugin plugin{ obj, "Luca Di Sera", "1.0.0.0", "Any", &status };
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	status = plugin.registerNode(DeltaMush::typeName, DeltaMush::typeId, DeltaMush::creator, DeltaMush::initialize, MPxNode::kDeformerNode);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	return MStatus::kSuccess;
+}
+
+MStatus uninitializePlugin(MObject obj) {
+	MStatus status{};
+	MFnPlugin plugin{ obj };
+
+	status = plugin.deregisterNode(DeltaMush::typeId);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	return MStatus::kSuccess;
+}
+~~~
+
+There isn't much to explain here. We're just registering the node and providing the .dll entry point.
+I've seen some people use string literals for the typeName but I like to keep everything under the class namespace.
+
+#### DeltaMush header
+
+~~~cpp
+
+~~~
