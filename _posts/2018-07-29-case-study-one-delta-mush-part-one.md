@@ -263,4 +263,180 @@ Let's finally dive to the real core of the delta mush.
 
 ## The DeltaMush
 
-# WIP
+~~~cpp
+MStatus DeltaMush::deform(MDataBlock & block, MItGeometry & iterator, const MMatrix & matrix, unsigned int multiIndex)
+{
+	MStatus status{};
+
+	MPlug referenceMeshPlug{ thisMObject(), referenceMesh };
+	if (!referenceMeshPlug.isConnected()) {
+		MGlobal::displayWarning(this->name() + ": referenceMesh is not connected. Please connect a mesh");
+		return MStatus::kUnknownParameter;
+	}
+
+	// Retrieves attributes values
+	float envelopeValue{ block.inputValue(envelope).asFloat() };
+	MObject referenceMeshValue{ block.inputValue(referenceMesh).asMesh() };
+	int smoothingIterationsValue{ block.inputValue(smoothingIterations).asInt() };
+	double smoothWeightValue{ block.inputValue(smoothWeight).asDouble() };
+	double deltaWeightValue{ block.inputValue(deltaWeight).asDouble() };
+
+	int vertexCount{ iterator.count(&status) };
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	// Retrieves the positions for the reference mesh
+	MFnMesh referenceMeshFn{ referenceMeshValue };
+	MPointArray referenceMeshVertexPositions{};
+	referenceMeshVertexPositions.setLength(vertexCount);
+	CHECK_MSTATUS_AND_RETURN_IT(referenceMeshFn.getPoints(referenceMeshVertexPositions));
+
+	// Build the neighbours array 
+	std::vector<MIntArray> referenceMeshNeighbours{};
+	getNeighbours(referenceMeshValue, referenceMeshNeighbours, vertexCount);
+
+	// Calculate the smoothed positions for the reference mesh
+	MPointArray referenceMeshSmoothedPositions{};
+	averageSmoothing(referenceMeshVertexPositions, referenceMeshSmoothedPositions, referenceMeshNeighbours, smoothingIterationsValue, smoothWeightValue);
+
+	// Calculate the deltas
+	std::vector<deltaCache> deltas{};
+	cacheDeltas(referenceMeshVertexPositions, referenceMeshSmoothedPositions, referenceMeshNeighbours, deltas, vertexCount);
+
+	MPointArray meshVertexPositions{};
+	iterator.allPositions(meshVertexPositions);
+
+	// Caculate the smoothed positions for the deformed mesh
+	MPointArray meshSmoothedPositions{};
+	averageSmoothing(meshVertexPositions, meshSmoothedPositions, referenceMeshNeighbours, smoothingIterationsValue, smoothWeightValue);
+
+	// Apply the deltas
+	MPointArray resultPositions{};
+	resultPositions.setLength(vertexCount);
+
+	for (unsigned int vertexIndex{ 0 }; vertexIndex < vertexCount; vertexIndex++) {
+		MVector delta{};
+
+		unsigned int neighbourIterations{ referenceMeshNeighbours[vertexIndex].length() - 1 };
+		for (unsigned int neighbourIndex{ 0 }; neighbourIndex < neighbourIterations; neighbourIndex++) {
+			MVector tangent = meshSmoothedPositions[referenceMeshNeighbours[vertexIndex][neighbourIndex]] - meshSmoothedPositions[vertexIndex];
+			MVector neighbourVerctor = meshSmoothedPositions[referenceMeshNeighbours[vertexIndex][neighbourIndex + 1]] - meshSmoothedPositions[vertexIndex];
+
+			tangent.normalize();
+			neighbourVerctor.normalize();
+
+			MVector binormal{ tangent ^ neighbourVerctor };
+			MVector normal{ tangent ^ binormal };
+
+			// Build Tangent Space Matrix
+			MMatrix tangentSpaceMatrix{};
+			buildTangentSpaceMatrix(tangentSpaceMatrix, tangent, normal, binormal);
+
+			// Accumulate the displacement Vectors
+			delta += tangentSpaceMatrix * deltas[vertexIndex].deltas[neighbourIndex];
+		}
+
+		// Averaging the delta
+		delta /= static_cast<double>(neighbourIterations);
+
+		// Scaling the delta
+		delta = delta.normal() * (deltas[vertexIndex].deltaMagnitude * deltaWeightValue);
+
+		resultPositions[vertexIndex] = meshSmoothedPositions[vertexIndex] + delta;
+
+		// We calculate the new definitive delta and apply the remaining scaling factors to it
+		delta = resultPositions[vertexIndex] - meshVertexPositions[vertexIndex];
+
+		float vertexWeight{ weightValue(block, multiIndex, vertexIndex) };
+		resultPositions[vertexIndex] = meshVertexPositions[vertexIndex] + (delta * vertexWeight * envelopeValue);
+	}
+
+	iterator.setAllPositions(resultPositions);
+
+	return MStatus::kSuccess;
+}
+~~~
+
+As you can see the algorithm boils down to this 4 simple step, as said in the introductiond:
+
+1. Smooth the rest pose mesh
+2. Calculate the Deltas for the smoothed rest pose mesh
+3. Smooth the deformation mesh
+4. Apply the delta back to the smoothed deformation mesh
+
+That last big chunk of code is just the us applying the delta. It does not reside in a method as I was testing some things and it isn't worth it to refactor right now as we will change it a lot in the next section.
+
+#### Preparing some values we need
+
+~~~cpp
+MStatus DeltaMush::deform(MDataBlock & block, MItGeometry & iterator, const MMatrix & matrix, unsigned int multiIndex)
+{
+	MStatus status{};
+
+	MPlug referenceMeshPlug{ thisMObject(), referenceMesh };
+	if (!referenceMeshPlug.isConnected()) {
+		MGlobal::displayWarning(this->name() + ": referenceMesh is not connected. Please connect a mesh");
+		return MStatus::kUnknownParameter;
+	}
+
+	// Retrieves attributes values
+	float envelopeValue{ block.inputValue(envelope).asFloat() };
+	MObject referenceMeshValue{ block.inputValue(referenceMesh).asMesh() };
+	int smoothingIterationsValue{ block.inputValue(smoothingIterations).asInt() };
+	double smoothWeightValue{ block.inputValue(smoothWeight).asDouble() };
+	double deltaWeightValue{ block.inputValue(deltaWeight).asDouble() };
+
+	int vertexCount{ iterator.count(&status) };
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+
+	// Retrieves the positions for the reference mesh
+	MFnMesh referenceMeshFn{ referenceMeshValue };
+	MPointArray referenceMeshVertexPositions{};
+	referenceMeshVertexPositions.setLength(vertexCount);
+	CHECK_MSTATUS_AND_RETURN_IT(referenceMeshFn.getPoints(referenceMeshVertexPositions));
+
+	// Build the neighbours array 
+	std::vector<MIntArray> referenceMeshNeighbours{};
+	getNeighbours(referenceMeshValue, referenceMeshNeighbours, vertexCount);
+~~~
+
+Before coming to the first part of the algorithm, smoothing the reference mesh, wee have to prepare some data.
+First of all we check if we have an input mesh connected. Without one we could not make the deformer work ( this won't be totally true later when we cache out data as we can work on the cached data without having *referenceMesh* connected and keep doing it until the need to rebind ).
+This warning will be printed as soon as the deformer is createad as, for now, we are not providing a command to use it and the user has to connect *referenceMesh* manually.
+
+We get the value of all the attributes that we need. This is just normal administration.
+After that we store the current number of vertex. This will be used a lot. As we expect the two meshes to be the same we will use this same value for every calculation that needs it be it on the reference mesh or on the deformed mesh.
+As a design choiche we are not checking if this equality is true and just assume that the user uses a correct reference mesh. This is debatable, but for the purposes of this study it would just be a distraction to check.
+
+We then prepare the data needed to work on the reference mesh.
+Just a note here, that you probably already know, but setting the needed lenght and gettint all the points in one go is a lot faster that dynamically reallocating memory ( that is a costly operation ) and getting them one by one.
+Lastly, before we can finally get to the smoothing, we get and store the per-vertex neighbours indeces to use later.
+
+The get neighbour function has the following, pretty simple, implementation:
+
+~~~cpp
+MStatus DeltaMush::getNeighbours(MObject & mesh, std::vector<MIntArray>& out_neighbours, unsigned int vertexCount) const
+{
+	out_neighbours.resize(vertexCount);
+
+	MItMeshVertex meshVtxIt{ mesh };
+	for (unsigned int vertexIndex{ 0 }; vertexIndex < vertexCount; vertexIndex++, meshVtxIt.next()) {
+		CHECK_MSTATUS_AND_RETURN_IT(meshVtxIt.getConnectedVertices(out_neighbours[vertexIndex]));
+	}
+
+	return MStatus::kSuccess;
+}
+~~~
+
+As you can see it is a pretty simple method, maya does the work for us and we just have to provide some containers. One thing to note, is that we should [delete the MStatus check in the loop for performance reasons](https://diseraluca.github.io/blog/2018/07/22/experimentation-1-CHECKMSTATUS). But for now we can leave it there.
+
+Finally we can get to the first point of our list. The smoothing.
+
+#### Average Smoothing
+
+~~~cpp
+// Calculate the smoothed positions for the reference mesh
+	MPointArray referenceMeshSmoothedPositions{};
+	averageSmoothing(referenceMeshVertexPositions, referenceMeshSmoothedPositions, referenceMeshNeighbours, smoothingIterationsValue, smoothWeightValue);
+~~~
+
+I wrapped this in a method that has the following implementation:
