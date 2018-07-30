@@ -544,9 +544,20 @@ out_deltas[vertexIndex].deltaMagnitude = delta.length();
 
 As explained in the [introduction](https://diseraluca.github.io/blog/2018/07/22/case-study-1-delta-mush-introduction) to this case study:
 
-    The idea here is that if the smoothing of the mesh ( in its original position - The bind pose ) produced a certain loss of volume       the smoothing of the deformed mesh will produce a similar amount of loss. By reapplying the delta we are trying to get as near as       possible to the original position of the vertex.
+    The idea here is that if the smoothing of the mesh ( in its original position - The bind pose ) produced a certain loss of volume
+    the smoothing of the deformed mesh will produce a similar amount of loss. By reapplying the delta we are trying to get as near as
+    possible to the original position of the vertex.
     
     
 Here we are, then, finding the displcement vector of this volume loss, going from the smoothed position of the vertex to the initial position of the vertex. When we will apply this delta we will get as near as possible to the original volume of the mesh.
+We then store its magnitude to rescale the final delta later.
 
-   
+~~~cpp
+unsigned int neighbourIterations{ neighbours[vertexIndex].length() - 1 };
+~~~
+
+We then start to iterate over the vertex pairs. Now, since we are iterating over pairs and not single elements, the number of iterations we have to do is reduced by one. This is because we are going to eat the last element with the penultimate element and by iterating on all the elements we would go out of the array bounds.
+This is easily seen in the image:
+
+![Array pairs]({{ "/assets/DeltaMushPart1_CaseStudy_array.png" | absolute_url }})
+
