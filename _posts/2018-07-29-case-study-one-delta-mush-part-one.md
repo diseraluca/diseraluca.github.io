@@ -561,3 +561,81 @@ This is easily seen in the image:
 
 ![Array pairs]({{ "/assets/DeltaMushPart1_CaseStudy_array.png" | absolute_url }})
 
+~~~cpp
+unsigned int neighbourIterations{ neighbours[vertexIndex].length() - 1 };
+		out_deltas[vertexIndex].deltas.setLength(neighbourIterations);
+		for (unsigned int neighbourIndex{ 0 }; neighbourIndex < neighbourIterations; neighbourIndex++) {
+			MVector tangent = smoothedPositions[neighbours[vertexIndex][neighbourIndex]] - smoothedPositions[vertexIndex];
+			MVector neighbourVerctor = smoothedPositions[neighbours[vertexIndex][neighbourIndex + 1]] - smoothedPositions[vertexIndex];
+
+			tangent.normalize();
+			neighbourVerctor.normalize();
+
+			MVector binormal{ tangent ^ neighbourVerctor };
+			MVector normal{ tangent ^ binormal };
+
+			// Build Tangent Space Matrix
+			MMatrix tangentSpaceMatrix{};
+			buildTangentSpaceMatrix(tangentSpaceMatrix, tangent, normal, binormal);
+
+			// Calculate the displacement Vector
+			out_deltas[vertexIndex].deltas[neighbourIndex] = tangentSpaceMatrix.inverse() * delta;
+~~~
+
+This is what we do for each pair of neighbours. We have to build our tangent space matrix. As said at the start of this post we find ourselves two vectors from the current vertex to two of their neighbours. The one I called *tangent* is the one I will use as is.
+Here we work with normalized vectors, we first do a cross product to find an axis tangent to the two vertices. The second cross product is to ensure orthogonality, as said before.
+
+*buildTangentSpaceMatrix* is there to make the code more readable and is implemented as follows:
+
+~~~cpp
+MStatus DeltaMush::buildTangentSpaceMatrix(MMatrix & out_TangetSpaceMatrix, const MVector & tangent, const MVector & normal, const MVector & binormal) const
+{
+	// M = [tangent, normal, bitangent, translation(smoothedPosition]]
+	out_TangetSpaceMatrix[0][0] = tangent.x;
+	out_TangetSpaceMatrix[0][1] = tangent.y;
+	out_TangetSpaceMatrix[0][2] = tangent.z;
+	out_TangetSpaceMatrix[0][3] = 0.0;
+
+	out_TangetSpaceMatrix[1][0] = normal.x;
+	out_TangetSpaceMatrix[1][1] = normal.y;
+	out_TangetSpaceMatrix[1][2] = normal.z;
+	out_TangetSpaceMatrix[1][3] = 0.0;
+
+	out_TangetSpaceMatrix[2][0] = binormal.x;
+	out_TangetSpaceMatrix[2][1] = binormal.y;
+	out_TangetSpaceMatrix[2][2] = binormal.z;
+	out_TangetSpaceMatrix[2][3] = 0.0;
+
+	out_TangetSpaceMatrix[3][0] = 0.0;
+	out_TangetSpaceMatrix[3][1] = 0.0;
+	out_TangetSpaceMatrix[3][2] = 0.0;
+	out_TangetSpaceMatrix[3][3] = 1.0;
+
+	return MStatus::kSuccess;
+}
+~~~
+
+As you can see we're just assigning the values manually to where they belong. There are cleaner ways to write this matrix but we will change how we work with this data in the future so we'll leave it like that.
+
+~~~cpp
+out_deltas[vertexIndex].deltas[neighbourIndex] = tangentSpaceMatrix.inverse() * delta;
+~~~
+
+Having the tangent space matrix and having the delta, we apply the inverse of the matrix to the delta and store it for later use.
+
+#### Smoothing the deformed mesh
+
+~~~cpp
+MPointArray meshVertexPositions{};
+	iterator.allPositions(meshVertexPositions);
+
+	// Caculate the smoothed positions for the deformed mesh
+	MPointArray meshSmoothedPositions{};
+	averageSmoothing(meshVertexPositions, meshSmoothedPositions, referenceMeshNeighbours, smoothingIterationsValue, smoothWeightValue);
+~~~
+
+Most of the code in the second part of the deformer is the same as the first. Here we smooth the mesh like we did for the reference one.
+Nothing to say here.
+
+#### Finally applying the deltas back
+
