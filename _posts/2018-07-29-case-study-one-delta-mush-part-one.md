@@ -440,3 +440,113 @@ Finally we can get to the first point of our list. The smoothing.
 ~~~
 
 I wrapped this in a method that has the following implementation:
+
+~~~cpp
+MStatus DeltaMush::averageSmoothing(const MPointArray & verticesPositions, MPointArray & out_smoothedPositions, const std::vector<MIntArray>& neighbours, unsigned int iterations, double weight) const
+{
+	unsigned int vertexCount{ verticesPositions.length() };
+	out_smoothedPositions.setLength(vertexCount);
+
+	// A copy is necessary to avoid losing the original data trough the computations while working iteratively on the smoothed positions
+	MPointArray verticesPositionsCopy{ verticesPositions };
+	for (unsigned int iterationIndex{ 0 }; iterationIndex < iterations; iterationIndex++) {
+		for (unsigned int vertexIndex{ 0 }; vertexIndex < vertexCount; vertexIndex++) {
+			MVector averagePosition{ neighboursAveragePosition(verticesPositionsCopy, neighbours, vertexIndex) };
+			MVector smoothedPosition{ ((averagePosition - verticesPositionsCopy[vertexIndex]) * weight) + verticesPositionsCopy[vertexIndex] };
+
+			out_smoothedPositions[vertexIndex] = smoothedPosition;
+		}
+
+		verticesPositionsCopy.copy(out_smoothedPositions);
+	}
+
+	return MStatus::kSuccess;
+}
+~~~
+
+To recap, the simple smoothing we are doing here is an additive smoothing that calculates the smoothed position for iteration n as the average position, as of iteration n-1, of the neighbour verteces.
+
+As you can see this type of simple smoothing can be done in a few lines of code. The only "tricky" part here is that we have to make a copy of the data for the following iterations. Since we could be accessing a vertex more than one time ( for example vertex 64 and vertex 1 may be neighbours ) we have to keep the original and n-1 iteration data intact so that we won't work on the wrong set of data.
+If we didn't we could end up working with an asynchronous data set, with some vertex on iteration n, other on interation n+1 or others that are a mix of n-iteration positions and n-1 iteration positions.
+Now, this isn't always necessary, but we will look into optimizing how we use and reuse data later on.
+
+neighboursAveragePosition is implemented as follow:
+
+~~~cpp
+MVector DeltaMush::neighboursAveragePosition(const MPointArray & verticesPositions, const std::vector<MIntArray>& neighbours, unsigned int vertexIndex) const
+{
+	unsigned int neighbourCount{ neighbours[vertexIndex].length() };
+
+	MVector averagePosition{};
+	for (unsigned int neighbourIndex{ 0 }; neighbourIndex < neighbourCount; neighbourIndex++) {
+		averagePosition += verticesPositions[neighbours[vertexIndex][neighbourIndex]];
+	}
+
+	averagePosition /= neighbourCount;
+
+	return averagePosition;
+}
+~~~
+
+This is self explanatory. We are just accumulating the positions of the neighbours and averaging them.
+This is it. The smoothing part, as you can see, is as simple as it gets.
+Let's move on.
+
+#### Calculating the deltas
+
+~~~cpp
+// Calculate the deltas
+	std::vector<deltaCache> deltas{};
+	cacheDeltas(referenceMeshVertexPositions, referenceMeshSmoothedPositions, referenceMeshNeighbours, deltas, vertexCount);
+~~~
+
+This is wrapped up in a method. It is called cache deltas because we should cache them since they're non-changing data. But we will look into it in the next part.
+
+~~~cpp
+MStatus DeltaMush::cacheDeltas(const MPointArray & vertexPositions, const MPointArray & smoothedPositions, const std::vector<MIntArray>& neighbours, std::vector<deltaCache> & out_deltas, unsigned int vertexCount) const
+{
+	out_deltas.resize(vertexCount);
+	for (unsigned int vertexIndex{ 0 }; vertexIndex < vertexCount; vertexIndex++) {
+		MVector delta{ vertexPositions[vertexIndex] - smoothedPositions[vertexIndex] };
+		out_deltas[vertexIndex].deltaMagnitude = delta.length();
+
+		unsigned int neighbourIterations{ neighbours[vertexIndex].length() - 1 };
+		out_deltas[vertexIndex].deltas.setLength(neighbourIterations);
+		for (unsigned int neighbourIndex{ 0 }; neighbourIndex < neighbourIterations; neighbourIndex++) {
+			MVector tangent = smoothedPositions[neighbours[vertexIndex][neighbourIndex]] - smoothedPositions[vertexIndex];
+			MVector neighbourVerctor = smoothedPositions[neighbours[vertexIndex][neighbourIndex + 1]] - smoothedPositions[vertexIndex];
+
+			tangent.normalize();
+			neighbourVerctor.normalize();
+
+			MVector binormal{ tangent ^ neighbourVerctor };
+			MVector normal{ tangent ^ binormal };
+
+			// Build Tangent Space Matrix
+			MMatrix tangentSpaceMatrix{};
+			buildTangentSpaceMatrix(tangentSpaceMatrix, tangent, normal, binormal);
+
+			// Calculate the displacement Vector
+			out_deltas[vertexIndex].deltas[neighbourIndex] = tangentSpaceMatrix.inverse() * delta;
+		}
+	}
+
+	return MStatus::kSuccess;
+}
+~~~
+
+As you can see this one turns out to be a simple method too. As explained before, we are calculating a tangent space delta for every neighbours pair.
+
+~~~cpp
+MVector delta{ vertexPositions[vertexIndex] - smoothedPositions[vertexIndex] };
+out_deltas[vertexIndex].deltaMagnitude = delta.length();
+~~~
+
+As explained in the [introduction](https://diseraluca.github.io/blog/2018/07/22/case-study-1-delta-mush-introduction) to this case study:
+
+    The idea here is that if the smoothing of the mesh ( in its original position - The bind pose ) produced a certain loss of volume       the smoothing of the deformed mesh will produce a similar amount of loss. By reapplying the delta we are trying to get as near as       possible to the original position of the vertex.
+    
+    
+Here we are, then, finding the displcement vector of this volume loss, going from the smoothed position of the vertex to the initial position of the vertex. When we will apply this delta we will get as near as possible to the original volume of the mesh.
+
+   
