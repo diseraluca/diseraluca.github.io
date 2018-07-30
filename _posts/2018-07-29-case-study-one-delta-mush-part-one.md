@@ -639,3 +639,79 @@ Nothing to say here.
 
 #### Finally applying the deltas back
 
+~~~cpp
+// Apply the deltas
+	MPointArray resultPositions{};
+	resultPositions.setLength(vertexCount);
+
+	for (unsigned int vertexIndex{ 0 }; vertexIndex < vertexCount; vertexIndex++) {
+		MVector delta{};
+
+		unsigned int neighbourIterations{ referenceMeshNeighbours[vertexIndex].length() - 1 };
+		for (unsigned int neighbourIndex{ 0 }; neighbourIndex < neighbourIterations; neighbourIndex++) {
+			MVector tangent = meshSmoothedPositions[referenceMeshNeighbours[vertexIndex][neighbourIndex]] - meshSmoothedPositions[vertexIndex];
+			MVector neighbourVerctor = meshSmoothedPositions[referenceMeshNeighbours[vertexIndex][neighbourIndex + 1]] - meshSmoothedPositions[vertexIndex];
+
+			tangent.normalize();
+			neighbourVerctor.normalize();
+
+			MVector binormal{ tangent ^ neighbourVerctor };
+			MVector normal{ tangent ^ binormal };
+
+			// Build Tangent Space Matrix
+			MMatrix tangentSpaceMatrix{};
+			buildTangentSpaceMatrix(tangentSpaceMatrix, tangent, normal, binormal);
+
+			// Accumulate the displacement Vectors
+			delta += tangentSpaceMatrix * deltas[vertexIndex].deltas[neighbourIndex];
+		}
+
+		// Averaging the delta
+		delta /= static_cast<double>(neighbourIterations);
+
+		// Scaling the delta
+		delta = delta.normal() * (deltas[vertexIndex].deltaMagnitude * deltaWeightValue);
+
+		resultPositions[vertexIndex] = meshSmoothedPositions[vertexIndex] + delta;
+
+		// We calculate the new definitive delta and apply the remaining scaling factors to it
+		delta = resultPositions[vertexIndex] - meshVertexPositions[vertexIndex];
+
+		float vertexWeight{ weightValue(block, multiIndex, vertexIndex) };
+		resultPositions[vertexIndex] = meshVertexPositions[vertexIndex] + (delta * vertexWeight * envelopeValue);
+	}
+
+	iterator.setAllPositions(resultPositions);
+~~~
+
+Here again we have a lot of repeated code. First thing first we have to buid our matrices again.
+This time, tough, we are going to apply it to our stored deltas, one by one, which we accumulate into a vector and then average.
+
+~~~cpp
+// Accumulate the displacement Vectors
+			delta += tangentSpaceMatrix * deltas[vertexIndex].deltas[neighbourIndex];
+		}
+
+		// Averaging the delta
+		delta /= static_cast<double>(neighbourIterations);
+
+~~~
+
+After this most of the work is done. We actually finally have our delta to apply. There is a problem.
+The direction of the vector is most surely correct, but its magnitude is not.
+
+~~~cpp
+// Scaling the delta
+		delta = delta.normal() * (deltas[vertexIndex].deltaMagnitude * deltaWeightValue);
+
+		resultPositions[vertexIndex] = meshSmoothedPositions[vertexIndex] + delta;
+~~~
+
+This is where our stored magnitude comes for help. By normalizing the vector, thus giving us a vector of lenght one, and then multiplying it by the original magnitude, we are scaling it back to its original length. Nothing more simple!
+Here we apply our weight value to modify our scaling factor. If we had a **0.5** *deltaWeightValue* we would apply only half of our scaling factor - Thus getting back a delta only half as long as the original one.
+
+We then apply this displacement to the position of the smoothed vertex ( remember that our deltas reinflate the smoothed vertex in the direction of the original vertex position ) to find our final position.
+And this is it, this is a working DeltaMush deformer. But we have a little fiddling left to do...
+
+#### Applying per-vertex weight and the global envelope value
+
