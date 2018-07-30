@@ -590,7 +590,7 @@ Here we work with normalized vectors, we first do a cross product to find an axi
 ~~~cpp
 MStatus DeltaMush::buildTangentSpaceMatrix(MMatrix & out_TangetSpaceMatrix, const MVector & tangent, const MVector & normal, const MVector & binormal) const
 {
-	// M = [tangent, normal, bitangent, translation(smoothedPosition]]
+	// M = [tangent, normal, bitangent, zeroed-translation]
 	out_TangetSpaceMatrix[0][0] = tangent.x;
 	out_TangetSpaceMatrix[0][1] = tangent.y;
 	out_TangetSpaceMatrix[0][2] = tangent.z;
@@ -715,3 +715,24 @@ And this is it, this is a working DeltaMush deformer. But we have a little fiddl
 
 #### Applying per-vertex weight and the global envelope value
 
+~~~cpp
+// We calculate the new definitive delta and apply the remaining scaling factors to it
+		delta = resultPositions[vertexIndex] - meshVertexPositions[vertexIndex];
+
+		float vertexWeight{ weightValue(block, multiIndex, vertexIndex) };
+		resultPositions[vertexIndex] = meshVertexPositions[vertexIndex] + (delta * vertexWeight * envelopeValue);
+~~~
+
+This too is mostly self-explaining. Now that we have our final position we can apply those post-deformation weights to it.
+To do this we get us a displacement vector from our original position to our final position. 
+And then scale it relative to the envelope and the per-vertex weight. By adding this scaled delta to the original position we find our (for real this time) final position that is between the original deformed mesh and the DeltaMushed one.
+
+## Conclusion
+
+So, this has been a long post. I hope the code is clear enough. I expect people reading this to have, at least, a basic understanding of maya API and MPxDeformerNodes.
+As you've seen the DeltaMush itself is not too difficult to implement. Having said that, it is a great mid-level deformer exercise that will give us so many possibilities for interesting optimizations and experiments.
+Before going, I will leave you with some data about the "speed" of this current version. I won't talk about test scenes and so on because we will see them the next time when we will compare two versions of this deformer.
+
+
+As you can see, it's terrible. But don't worry we will start making it better next time when we will talk about Data Caching.
+We have endless possbilities for optimizing this code, and a long way ahed of use, but don't worry the exciting part is gonna start soon.
