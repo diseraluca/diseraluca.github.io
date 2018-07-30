@@ -8,12 +8,12 @@ tags: c++ maya plugin optimization case-study
 
 ## Introduction
 
-Welcome the to the first part of the Delta Mush case study. We will dive into a first working, but completely and horribly unoptimized, version of the deformer.
+Welcome the to the first part of the **Delta Mush** case study. We will dive into a first working, but completely and horribly unoptimized, version of the deformer.
 
 <!--godomalissimo-->
 Before starting there is a small disclaimer I'd like to write. It is important so bear the following in mind while reading or studying the code.
 As a first draft the code is not optimized in any way. Actually I've written it in a worse way than I would ( or should ) so as to be able to show some concepts in the following case study parts. Some choice are there to make the code more expressive so that you can more easily understand what we are doing.
-This has actually made the code a bit ugly for my taste. I'm not gonna refactor it for now ( even tough it needs it ) because we are going to have to restructure a lot of code and rethink how we store and pass around data and data structures when we will talk about data caching.
+This has actually made the code a bit ugly for my taste. I'm not gonna refactor it for now ( even tough it needs it ) because we are going to have to restructure a lot of code and rethink how we store and pass around data and data structures when we will talk about **data caching**.
 There is some code replication, there are useless comments, some  comments that should be there aren't and so on...
 We are gonna change it slowly when we have a more representative structure.
 So please bear with it.
@@ -34,7 +34,7 @@ So, as you can see from the image **(1)**, we will use the neighbour vertexes pa
 Those will be the base of our tanget space. We will do a cross product to find an orthogonal axis.
 Since we could have a triangle that isn't a right triangle to ensure the orghonality of all the axis we are going to do a second cross product to replace one of the two neighbour vectors **(2)**.
 This will be done on every triangle we can build from the neighbours **(3)**. We will have more than one delta with this process.
-In the end we average the deltas we've find to have the the final delta we need **(4)**.
+In the end we average the deltas we've found to have the the final delta we need **(4)**.
 
 Now, calculating more than one delta is obviously slower. We could use only one triangle and use a single delta but we would have a less precise outcome.
 The algorithm to use depends on what you purposes are. For performance reason we could even implement both of them and let the user choose which one to use.
@@ -44,7 +44,7 @@ This should be similar to how maya computes its tangent space. I had read a post
 
 ## Maya Boilerplate
 
-First we will talk about some of the boilerplate code we have to write. We will then finally dive into the deform method.
+First we will talk about some of the boilerplate code we have to write. We will then finally dive into the *deform* method.
 
 #### Plugin Registration
 
@@ -86,8 +86,8 @@ MStatus uninitializePlugin(MObject obj) {
 }
 ~~~
 
-There isn't much to explain here. We're just registering the node and providing the .dll entry point.
-I've seen some people use string literals for the typeName but I like to keep everything under the class namespace.
+There isn't much to explain here. We're just registering the node and providing the *.dll* entry point.
+I've seen some people use string literals for the *typeName* but I like to keep everything under the class namespace.
 
 #### DeltaMush header
 
@@ -246,7 +246,7 @@ MStatus DeltaMush::initialize()
 ~~~
 
 Here again, we pretty much have all boilerplate code.
-We have a typedAttribute of type kMesh that is the mesh we will use as a refence.
+We have a *typedAttribute* of type *kMesh* that is the mesh we will use as a refence.
 We expect this mesh to have the same topology as the deformed mesh and the same per-vertex ID. In simpler terms, it should be a bind-pose copy of the deformed mesh.
 
 Then we have the number of iterations for the smoothing algorithm ( as we said before it will be a simple average smoothing ) and some weights for the smoothing and the delta application.
@@ -255,11 +255,11 @@ Then we have the number of iterations for the smoothing algorithm ( as we said b
 MGlobal::executeCommand("makePaintable -attrType multiFloat -sm deformer ldsDeltaMush weights");
 ~~~
 
-If you have written a deformer before you should have seen this line of code. It is just us enabling the per-vertex weight for the deformer. It escapes me why there doesn't exist an API method for this but we are constrained to use MEL commands.
-We should probably concatenate the typeName instead of writing it as a literal to keep the string references to zero so that we can change the name without breaking anything but it is just a small precaution for what we are currently doing.
+If you have written a deformer before you should have seen this line of code. It is just us enabling the per-vertex weight for the deformer. It escapes me why there doesn't exist an **API** method for this but we are constrained to use **MEL** commands.
+We should probably concatenate the *typeName* instead of writing it as a literal to keep the string references to zero so that we can change the name without breaking anything but it is just a small out-of-scope precaution for what we are currently doing.
 
 Well, nothing difficult as you can see.
-Let's finally dive to the real core of the delta mush.
+Let's finally dive to the real core of the **delta mush**.
 
 ## The DeltaMush
 
@@ -356,14 +356,14 @@ MStatus DeltaMush::deform(MDataBlock & block, MItGeometry & iterator, const MMat
 }
 ~~~
 
-As you can see the algorithm boils down to this 4 simple step, as said in the introductiond:
+As you can see the algorithm boils down to this 4 simple step, as said in the introduction:
 
 1. Smooth the rest pose mesh
 2. Calculate the Deltas for the smoothed rest pose mesh
 3. Smooth the deformation mesh
 4. Apply the delta back to the smoothed deformation mesh
 
-That last big chunk of code is just the us applying the delta. It does not reside in a method as I was testing some things and it isn't worth it to refactor right now as we will change it a lot in the next section.
+That last big chunk of code is just us applying the delta. It does not reside in a method as I was testing some things and it isn't worth it to refactor right now as we will change it a lot in the next parts.
 
 #### Preparing some values we need
 
@@ -408,10 +408,10 @@ After that we store the current number of vertex. This will be used a lot. As we
 As a design choiche we are not checking if this equality is true and just assume that the user uses a correct reference mesh. This is debatable, but for the purposes of this study it would just be a distraction to check.
 
 We then prepare the data needed to work on the reference mesh.
-Just a note here, that you probably already know, but setting the needed lenght and gettint all the points in one go is a lot faster that dynamically reallocating memory ( that is a costly operation ) and getting them one by one.
+Just a note here, that you probably already know, but setting the needed lenght and getting all the points in one go is a lot faster that dynamically reallocating memory ( that is a costly operation ) and getting them one by one.
 Lastly, before we can finally get to the smoothing, we get and store the per-vertex neighbours indeces to use later.
 
-The get neighbour function has the following, pretty simple, implementation:
+The *getNeighbours* method has the following, pretty simple, implementation:
 
 ~~~cpp
 MStatus DeltaMush::getNeighbours(MObject & mesh, std::vector<MIntArray>& out_neighbours, unsigned int vertexCount) const
@@ -427,7 +427,7 @@ MStatus DeltaMush::getNeighbours(MObject & mesh, std::vector<MIntArray>& out_nei
 }
 ~~~
 
-As you can see it is a pretty simple method, maya does the work for us and we just have to provide some containers. One thing to note, is that we should [delete the MStatus check in the loop for performance reasons](https://diseraluca.github.io/blog/2018/07/22/experimentation-1-CHECKMSTATUS). But for now we can leave it there.
+As you can see it is a pretty simple method, *Maya* does the work for us and we just have to provide some containers. One thing to note, is that we should [delete the MStatus check in the loop for performance reasons](https://diseraluca.github.io/blog/2018/07/22/experimentation-1-CHECKMSTATUS). But for now we can leave it there.
 
 Finally we can get to the first point of our list. The smoothing.
 
@@ -466,11 +466,11 @@ MStatus DeltaMush::averageSmoothing(const MPointArray & verticesPositions, MPoin
 
 To recap, the simple smoothing we are doing here is an additive smoothing that calculates the smoothed position for iteration n as the average position, as of iteration n-1, of the neighbour verteces.
 
-As you can see this type of simple smoothing can be done in a few lines of code. The only "tricky" part here is that we have to make a copy of the data for the following iterations. Since we could be accessing a vertex more than one time ( for example vertex 64 and vertex 1 may be neighbours ) we have to keep the original and n-1 iteration data intact so that we won't work on the wrong set of data.
-If we didn't we could end up working with an asynchronous data set, with some vertex on iteration n, other on interation n+1 or others that are a mix of n-iteration positions and n-1 iteration positions.
+As you can see this type of simple smoothing can be done in a few lines of code. The only "tricky" part here is that we have to make a copy of the data for the following iterations. Since we could be accessing a vertex more than one time ( for example vertex **64** and vertex **1** may be neighbours ) we have to keep the original and *n-1* iteration data intact so that we won't work on the wrong set of data.
+If we didn't we could end up working with an asynchronous data set, with some vertex on iteration *n*, other on interation *n+1* or others that are a mix of *n-iteration* positions and *n-1* iteration positions.
 Now, this isn't always necessary, but we will look into optimizing how we use and reuse data later on.
 
-neighboursAveragePosition is implemented as follow:
+*neighboursAveragePosition* is implemented as follow:
 
 ~~~cpp
 MVector DeltaMush::neighboursAveragePosition(const MPointArray & verticesPositions, const std::vector<MIntArray>& neighbours, unsigned int vertexIndex) const
@@ -500,7 +500,7 @@ Let's move on.
 	cacheDeltas(referenceMeshVertexPositions, referenceMeshSmoothedPositions, referenceMeshNeighbours, deltas, vertexCount);
 ~~~
 
-This is wrapped up in a method. It is called cache deltas because we should cache them since they're non-changing data. But we will look into it in the next part.
+This is wrapped up in a method. It is called *cacheDeltas* because we should actually cache them since they're non-changing data. But we will look into it in the next part.
 
 ~~~cpp
 MStatus DeltaMush::cacheDeltas(const MPointArray & vertexPositions, const MPointArray & smoothedPositions, const std::vector<MIntArray>& neighbours, std::vector<deltaCache> & out_deltas, unsigned int vertexCount) const
@@ -697,7 +697,7 @@ This time, tough, we are going to apply it to our stored deltas, one by one, whi
 
 ~~~
 
-After this most of the work is done. We actually finally have our delta to apply. There is a problem.
+After this most of the work is done. finally have our delta to apply. There is a problem.
 The direction of the vector is most surely correct, but its magnitude is not.
 
 ~~~cpp
@@ -711,7 +711,7 @@ This is where our stored magnitude comes for help. By normalizing the vector, th
 Here we apply our weight value to modify our scaling factor. If we had a **0.5** *deltaWeightValue* we would apply only half of our scaling factor - Thus getting back a delta only half as long as the original one.
 
 We then apply this displacement to the position of the smoothed vertex ( remember that our deltas reinflate the smoothed vertex in the direction of the original vertex position ) to find our final position.
-And this is it, this is a working DeltaMush deformer. But we have a little fiddling left to do...
+And this is it, this is a working **DeltaMush** deformer. But we have a little fiddling left to do...
 
 #### Applying per-vertex weight and the global envelope value
 
@@ -725,14 +725,18 @@ And this is it, this is a working DeltaMush deformer. But we have a little fiddl
 
 This too is mostly self-explaining. Now that we have our final position we can apply those post-deformation weights to it.
 To do this we get us a displacement vector from our original position to our final position. 
-And then scale it relative to the envelope and the per-vertex weight. By adding this scaled delta to the original position we find our (for real this time) final position that is between the original deformed mesh and the DeltaMushed one.
+And then scale it relative to the envelope and the per-vertex weight. By adding this scaled delta to the original position we find our (for real this time) final position that is between the original deformed mesh and the **DeltaMush** one.
 
 ## Conclusion
 
-So, this has been a long post. I hope the code is clear enough. I expect people reading this to have, at least, a basic understanding of maya API and MPxDeformerNodes.
-As you've seen the DeltaMush itself is not too difficult to implement. Having said that, it is a great mid-level deformer exercise that will give us so many possibilities for interesting optimizations and experiments.
-Before going, I will leave you with some data about the "speed" of this current version. I won't talk about test scenes and so on because we will see them the next time when we will compare two versions of this deformer.
+So, this has been a long post. I hope the code is clear enough. I expect people reading this to have, at least, a basic understanding of **Maya API** and *MPxDeformerNodes*.
+As you've seen the **DeltaMush** itself is not too difficult to implement. Having said that, it is a great mid-level deformer exercise that will give us so many possibilities for interesting optimizations and experiments.
+Before going, I will leave you with some data about the "speed" of this current version. I won't talk about test scenes and so on because we will see them the next time when we will compare two versions of this deformer but to understand how slow it is this is run on a single **478402** vertices cylinder. The time is expressed in **microseconds**.
+
+| Scene           | AverageSample         | MinSample               | MaxSample               |
+|:--------------- |:---------------------:|:-----------------------:|------------------------:|
+| Single Cylinder | 92892042              | 91532793                | 95571787                |
 
 
-As you can see, it's terrible. But don't worry we will start making it better next time when we will talk about Data Caching.
-We have endless possbilities for optimizing this code, and a long way ahed of use, but don't worry the exciting part is gonna start soon.
+As you can see, it's terrible. But don't worry we will start making it better next time when we will talk about **Data Caching**.
+We have endless possibilities for optimizing this code, and a long way ahead of us, but don't worry the exciting part is gonna start soon.
