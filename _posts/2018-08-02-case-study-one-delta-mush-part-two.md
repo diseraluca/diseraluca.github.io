@@ -96,7 +96,7 @@ private:
  	std::vector<MIntArray> referenceMeshNeighbours{};
 	std::vector<deltaCache> deltas{};
 }; 
-
+~~~
 Having changed this we can clean our methods a bit. We don't need to pass all this references around, so we change their implementation to access and use the new instance members:
 
 ~~~cpp
@@ -270,7 +270,7 @@ CHECK_MSTATUS_AND_RETURN_IT(status);
 int vertexCount{ iterator.count() };
 ~~~
 
-I've removed status checking. This is particularly visible inside for loops. Most of these maya functions are not expected to fail. If they fail there is, probably, some proble with maya itself.
+I've removed status checking. This is particularly visible inside for loops. Most of these maya functions are not expected to fail. If they fail there is, probably, some problem with maya itself.
 We could keep some of them without hindering performance much but I find it cleaner to remove them when we have a working deformer.
 
 #### Flattening deltaCache
