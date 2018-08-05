@@ -434,7 +434,7 @@ A better method is to provide our calculation for the operations we have to do:
 			normalPtr[2] = tangentPtr[0] * binormalPtr[1] - tangentPtr[1] * binormalPtr[0];
 ```
 
-This is fast, easy and safer than castin to *MVector*s.
+This is fast, easy and safer than casting to *MVector*s.
 Most of the vector's operations are just applying a formula to the 3 members and nothing else.
 If you want to simulate the *MVector*s you could even get the code from **MVector.h** and use it for the operations:
 
@@ -460,7 +460,7 @@ inline MStatus MVector::normalize()
 
 This is the code for *normalize* for example. But this is just unnecessary considering the simplicity of the operation.
 
-Now, here we could actually remove the matrix completely and just work with a *double[4][4]* ( the other interesting thing about all of this is that, where we don't need the precision, we can the transform all this data to *float*s and vectorise it to move less memory per value and look it improves performance ).
+Now, here we could actually remove the matrix completely and just work with a *double[4][4]* ( the other interesting thing about all of this is that, where we don't need the precision, we can the transform all this data to *float*s and vectorise it to move less memory per value and look if it improves performance ).
 I haven't tried&timed it yet but I think it should be a good idea. Will probably do sooner or later.
 
 Now, after all this work do we have anything to brag about? ***Absolutely yes***.
@@ -472,8 +472,10 @@ This is what I wanted to show you in this post. There are other changes that I m
 If you're like me, we are finally at the fun part of this case study. I suggest that you try working on the previous version of the code ( or better yet a version of your own ) and try all of those things yourself.
 They're beatiful to look at but the real fun lies in looking at the code and thinking about the **what**, **how** and **where**.
 
-There are many other things I'd like to try, especially things I'm recently studying like **loop unrolling**, **loop blocking** or making the number of neighbour iterations fixes ( approximating the result ).
+There are many other things I'd like to try, especially things I'm recently studying like **loop unrolling**, **loop blocking** or making the number of neighbour iterations fixed ( approximating the result ).
 There are things to clean, I think I have left some containers usages and some dirty code here and there.
-I will work and try them eventually. I may do another post on them next time but we are probably just jumping on the intrinsincs train with **AVX** and vectorising our code next time.
+I will work and try them eventually. Some of those things will just go away with us restructuring the code.
+
+I may do another post on them next time but we are probably just jumping on the intrinsics train with **AVX** and vectorising our code next time.
 
 See you next time!
