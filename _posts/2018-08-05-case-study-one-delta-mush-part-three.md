@@ -68,7 +68,7 @@ pointPtr[2]; // point.z
 pointPtr[3]; // point.w
 ```
 
-Even more interesting is the fact that maya containers like *MPointArray* and *MVectorArray* presentas the same contiguos memory for their members. This means we can do something like the following:
+Even more interesting is the fact that maya containers like *MPointArray* and *MVectorArray* present the same contiguos memory for their members. This means we can do something like the following:
 
 ```c++
 MPointArray points{4};
@@ -103,7 +103,7 @@ MVector DeltaMush::neighboursAveragePosition(const MPointArray & verticesPositio
 
 We had this code in our deformer. The speed improvement we will get from the following exercise is the one in the first image of this section.
 First we have to look at what containers we are using and how. 
-We have an *MPointArray* in *verticesPositions*, an *MVector* in *averagePosition*, and a *std::vector<MIntArray>* in *neighbours*.
+We have an *MPointArray* in *verticesPositions*, an *MVector* in *averagePosition*, and a *std::vector\<MIntArray\>* in *neighbours*.
 *neighbours* is traversed sequentially by *int*s so we can move the pointers along with the loop.
 *verticesPositions* is, instead, traversed in a non-sequential order. This means that we need it to reference the first element and dereference accordingly ( or indexing accordingly as we are in c++ ) or to move it every loop iteration by getting the memory address of the first element and adding to it. I chose the latter for this code.
 First let's access the containers with pointers.
