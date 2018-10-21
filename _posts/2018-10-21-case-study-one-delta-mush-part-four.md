@@ -192,6 +192,7 @@ int main() {
 
 	std::cin.get();
 }
+~~~
 
 Simple as that. If we were to run this operation a big number of times we would already see a big improvement in computations time, however simple it is.
 If we had AVX2 we could do even better with FMA cutting the intermediate operation and multiplying and adding in one operation.
@@ -927,24 +928,33 @@ I found out that writing a post with only about an hour a day of writing ( the t
 Looking forward, I finally got somewhat accustomized to my new time's constraints and am squeezing the most out of the small free time I have.
 
 Regarding the deltaMush, The next step is to go and parallelize our deformer.
+
 Now, I've used Maya Threads in the past but for this project, I absolutely want to try out Intel's TBB. Furthermore, I'm studying some theory and general knowledge about parallel programming to approach the parallelization of this project with a little more consciousness. 
 This obviously means that some time will pass before the next version of the code.
 I’m thinking about doing more than one parallel version as I’m really liking the differences in Threading libraries and would like to try more than one.
+
 This is something I’m still pondering about as the time is really strict and I should not use too much time on a single thing ( especially since I should be working on more (entry-level ) work-appetible projects ( maybe an autorigger or something ) if I don’t want to be stuck in my current work ).
+
 For this same reason, I will probably spend less time on micro-optimizations and tests ( as was already done for this part of the code ). For how unfortunate and joy-depriving that is.
 
 In the meantime, I am actually following some more projects and studies when I can't use my laptop.
 One of the things that, currently, is giving me happiness is the study of the Factor programming language. I fell in love with it while reading Seven More Languages in Seven Weeks and could not stop myself from studying it.
+
 My allotted time for it is really small, unfortunately, and consists of only my lunch break at work. Nonetheless, I'm making small but surely steps and would like to write about this beautiful language, which is only the third language that has made me feel so lovestruck ( after Haskell [ which I will one day learn decently ] and pure C which was my first love ),  sometimes.
 
 Another thing I got pretty interested in is competitive programming. I'm using it as a study subject for when I can't use my laptop ( as I can do it on my phone without too many problems ) and am solving exercise problems in both C++ and Factor.
 It's crazy how many interesting things I'm learning about the STL ( or the standard Factor vocabularies ) that I didn’t know.
 I may decide to write something about this too.
 
-Lastly, I’m trying to further my functional programming understanding as it is a paradigm I really love. If I can squeeze a bit of time from my sleep ( For now it seems impossible as I’m already sleeping the least my body is able to tolerate ) I’d like to start studying assembly again as I was loving it before starting to work.
+I’m trying to further my functional programming understanding as it is a paradigm I really love. 
+
+If I can squeeze a bit of time from my sleep ( For now it seems impossible as I’m already sleeping the least my body is able to tolerate ) I’d like to start studying assembly again as I was loving it before starting to work.
 
 Lastly, I'm learning a lot at work. Most of it is web-based as I'm working as a back-end developer.
-I'm really grateful for all the things I'm being taught or am discovering while working. PHP is not that bad of a language I once thought ( it has its bads, tough, but it is really really suited to what we do at work ).
+I'm really grateful for all the things I'm being taught or am discovering while working. 
+
+PHP is not that bad of a language I once thought ( it has its bads, tough, but it is really really suited to what we do at work ).
+
 Nonetheless, I must say I still feel extraneous to the programming I do at work and can't get myself to get as excited as when I study other programming topics.
 I don't think I will ever write something about it on this blog. May do a story post on my first work-experience but I’ll see.
 
