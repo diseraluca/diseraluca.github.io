@@ -3,7 +3,7 @@ layout: post
 title: Case Study 1 Delta Mush - Part 4
 date: 2018-10-21
 categories: case-study
-tags: c++ maya plugin optimization case-study
+tags: c++ maya plugin optimization case-study avx
 ---
 
 ## Finding the time
