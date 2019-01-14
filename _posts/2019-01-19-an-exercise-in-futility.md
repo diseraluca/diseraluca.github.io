@@ -106,7 +106,7 @@ There are some more constraints than needed on the function inputs, but, as they
 
 For my version of the tool, I wanted to decouple rename methods from anything that has to with Maya, moving any Maya related checks outside of them. Furthermore, some rename methods in the remade tool provided one or more side-effect, 
 with the most notable being the actual renaming of nodes in the Maya scene.
-For a better architecture, I think that rename methods themselves should be pure functions. This has actually came in handy later for the preview feature for which I've gone down a *Memoization* route.
+For a better architecture, I think that rename methods themselves should be pure functions ( even tough I broke this constraints to try and see the system stretch ). This has actually came in handy later for the preview feature for which I've gone down a *Memoization* route.
 
 Ramblings aside, the rename methods ( rename policies from now onwards as that is the name I settled on for my code ) in my tool are defined as functions that returns a RenamePolicy object that couples together a rename algorithm and an *BaseAdditionalInput* derived type.
 An example of this may be the Identity renaming that could be defined as follows:
