@@ -43,7 +43,7 @@ The client itself doesn't seem like a good one. Its logic seems way off. This ma
 Nonetheless, in this case, six hour of my life can be easily spent on this.
 
 With this mail and a timer I decided to start what I like to call an exercise in futility.
-
+<!--godomalissimo-->
 ## Some preparations
 
 I allotted an hour out of six to design what the tool should be like.
@@ -93,19 +93,11 @@ The core functionalities of the tools resides in the different renaming possibil
 In our specific context, they are burdened by the additional weight of enabling the robots-employees to add more when needed.
 By looking at the existing rename methods of the original tool, we can observe that a each rename method is a function with the following, quite informal, structure:
 
-{% raw %}
-
-$$
-\begin{align*}
-    & Let S be the set of all strings that are well-formed to be a valid Autodesk Maya dag name in the current scene, 
-    & SE be, such that SE \subset S, the set of all strings that refers to an existing dag path or a shortest unique name referring to an existing dag node in the current scene 
-    & and Let A be the set of all possible tuples containing a mixed collection of values that are needed by a particular rename method.
-    & Then, a rename method r is a function from SE \times A to S as follows:
-    & r(x) \colon SE\timesA \mapsto S
-\end{align*}
-$$
-
-{% endraw %}
+    Let $$S$$ be the set of all strings that are well-formed to be a valid Autodesk Maya dag name in the current scene, 
+    $$SE$$ be, such that $$SE \subset S$$, the set of all strings that refers to an existing dag path or a shortest unique name referring to an existing dag node in the current scene 
+    and Let $$A$$ be the set of all possible tuples containing a mixed collection of values that are needed by a particular rename method.
+    Then, a rename method $$r$$ is a function from $$SE \times A$$ to $$S$$ as follows:
+    $$r(x) \colon SE\timesA \mapsto S$$
 
 This definition defines the way in which I've seen rename methods implemented in the *cometRename* remake I've talked in the introduction.
 There are some more constraints than needed on the function inputs, but, as they are easily enforceable, following them may provide a better code structure in the end.
