@@ -1,3 +1,11 @@
+---
+layout: post
+title: An exercise in Futility - cometRename
+date: 2019-01-14
+categories: ramblings
+tags: python maya script qt ramblings
+---
+
 ## An exercise in futility
 
 Many weeks ago I found a post, from someone in my Facebook network, about reimplementing the iconic *cometRename* tool.
