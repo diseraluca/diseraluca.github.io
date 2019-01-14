@@ -127,8 +127,20 @@ The way the rename policies are loaded is by inspecting a specific module in the
 
 The main problem I have with this method, apart from the fact that, to respect the time limits and the prototype structure of the project, it was made in a barebone-like way, without much-needed restrictions, adding additional way to shoot oneself in the foot,
 is the fact that it couples some namespaces together in an unclear way while adding some, unlogical, restrictions on the way a source file should be handled.
-For example, in this particular case, polluting the * ldsRename.Core.RenamePolicies * namespace with any non-RenamePolicy-returning function has to be treated as undefined behaviour.
-For those who don't see how dangerous it is, a problem can arise from something as simple and normal as an * from ... import ... * statement.
+For example, in this particular case, polluting the 
+
+~~~python
+ldsRename.Core.RenamePolicies 
+~~~
+
+namespace with any non-RenamePolicy-returning function has to be treated as undefined behaviour.
+For those who don't see how dangerous it is, a problem can arise from something as simple and normal as an  
+
+~~~python
+from ... import ...  
+~~~
+
+statement.
 
 While all of this can be made obvious with good comments, external documentation and a good test suite, it still remains an unneeded unintuitive, inflexible, limitation.
 I'm sure that a more thoroughly developed method similar to this can have a better chance of actually be not as cancerous in a real work environment, but, nonetheless, there are so many good alternatives that I would be amazed if this would actually become the de-facto method of any product.
