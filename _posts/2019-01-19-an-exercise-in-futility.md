@@ -98,7 +98,8 @@ $$ SE $$ be, such that $$ SE \subset S $$, the set of all strings that refers to
 shortest unique name referring to an existing dag node in the current scene 
 and Let $$ A $$ be the set of all possible tuples containing a mixed collection of values that are needed by a particular rename method.
 Then, a rename method $$ r $$ is a function from $$ SE \times A $$ to $$ S $$ as follows:
-$$ r(x) \colon SE\timesA \mapsto S $$
+
+> $$ r(x) \colon SE \times A \mapsto S $$
 
 This definition defines the way in which I've seen rename methods implemented in the *cometRename* remake I've talked in the introduction.
 There are some more constraints than needed on the function inputs, but, as they are easily enforceable, following them may provide a better code structure in the end.
