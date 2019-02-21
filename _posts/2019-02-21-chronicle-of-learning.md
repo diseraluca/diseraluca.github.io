@@ -150,7 +150,7 @@ Breaking this down we have:
 * The "::" define operator that opens the definition for a TM.
 * The identifier that will be used to reference the TM { odd in this case }. An identifier starts with a lowercase letter and is composed of any number of characters.
 * The input alphabet that the TM will accept, in this case ['0', '1'].
-* The tape alphabet, defined as the union between two alphabets $$ A $$ and $$ B $$, where $$ \card{B} = 1 $$ and $$ x \in B $$ is the character representing the blank character on the tape {e.g the absence of a character on the tape }. It is an error to have the blank character appear in the input alphabet or to have a tape alphabet that isn't of the form $$ A + [a] $$.
+* The tape alphabet, defined as the union between two alphabets $$ A $$ and $$ B $$, where $$ | B | = 1 $$ and $$ x \in B $$ is the character representing the blank character on the tape {e.g the absence of a character on the tape }. It is an error to have the blank character appear in the input alphabet or to have a tape alphabet that isn't of the form $$ A + [a] $$.
 * The transition table defined as a block starting with "{" and ending with "}" with a series of comma-separated transition declarations in it.
 
 A transition declaration has the form:
@@ -164,7 +164,7 @@ Where:
 * "state" is a state identifier of the form [a-zA-z0-9]
 * "alphabet" is an alphabet $$ A $$ such that $$ A \subseteq B$$ where $$ B $$ is the tape alphabet of the TM
 * The "->" transition operator
-* A triplet of values composed as (new-state, write, direction) where "new-state" is the state identifier that refers to the state that the TM will transition to, "write" is a character $$c \in B$$, where $$ B $$ is the tape alphabet of the TM and direction is a symbol $$ s \in \set{R, L, ^} $$, defining the direction that the head should move. $$ R $$ move the head to the right while $$ L $$ move the head to the left.
+* A triplet of values composed as (new-state, write, direction) where "new-state" is the state identifier that refers to the state that the TM will transition to, "write" is a character $$c \in B$$, where $$ B $$ is the tape alphabet of the TM and direction is a symbol $$ s \in \{ R , L , ^ \} $$, defining the direction that the head should move. $$ R $$ move the head to the right while $$ L $$ move the head to the left.
 
 
 The special move direction symbol '^', leaves the head where it currently is.
@@ -181,7 +181,7 @@ N A   -> (N2, s, >)
 N2 A1 -> (N1, _, <)
 ~~~
 
-where $$ A \subseteq A1 $$, $$ s \in A1 $$ and $$ A1 $$ is the tape alphabet of the TM.
+where $$ A \subseteq A_1 $$, $$ s \in A_1 $$ and $$ A_1 $$ is the tape alphabet of the TM.
 
 This is mostly equivalent to actually having the head be able to stay put in the first place.
 But there is an edge case where the character to the right of the head is not a valid character in the alphabet, meaning that, as per Tummys' rules, the machine would halt immediately. If the head was effectively never moved that character may not have been encountered.
