@@ -347,7 +347,7 @@ M M1 M2 M3 M4 ... MN
 Each expression, no matter where it appears, is firstly compacted and then compiled.
 The process for which an expression is compacted is through the conjunction of TMs.
 
-Given any two turing machines $$ M = ( Q , \Sigma , \Gamma , \delta , q_0 , q_a , q_r ) $$ and $$ M^' = ( Q^' , \Sigma^' , \Gamma^' , \delta^ ', q_0^' , q_a^' , q_r^' ) $$, for which $$ Q $$ and $$ Q^' $$ are disjoint, their conjuction $$ M \cup M^' $$ is the turing machine
+Given any two turing machines $$ M = ( Q , \Sigma , \Gamma , \delta , q_0 , q_a , q_r ) $$ and $$ M ^ \prime = ( Q ^ \prime , \Sigma ^ \prime , \Gamma ^ \prime , \delta ^ \prime , q_0 ^ \prime , q_a ^ \prime , q_r ^ \prime ) $$, for which $$ Q $$ and $$ Q^' $$ are disjoint, their conjuction $$ M \cup M^' $$ is the turing machine
 $$ M^\cup = ( Q \cup Q^' \cup Q^\cup , \Sigma \cup \Sigma^', \Gamma \cup \Gamma^', \delta \cup \delta^' \cup \delta^\cup \setminus \delta_{ar}, q_0, q_a^', q_r^' ) $$, where $$ Q^\cup $$ is the set of additional states that are needed for the conjuction
 and $$ \delta^\cup $$ is a transiction table with the additional entries needed for the conjuction and $$ \delta_{ar} $$ is a transiction table $$ \subset \delta $$ that contains only the transiction to the accepting or rejecting states.
 
