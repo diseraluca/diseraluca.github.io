@@ -299,20 +299,20 @@ Delegating Transitions are a way of reusing TMs by executing them from another T
 Given a TM $$ M $$ with a tape alphabet $$ A + [ a ] $$ that has one or more delegating transictions to other TMs $$ M_1 , M_2 , ... M_n $$ with tape alphabets $$ A_1 + [a_1] , A_2 + [a_2], ... A_n + [a_n] $$,
 the tape alphabet of $$ M $$ is considered to be $$ [A] + ( A_1 + [a_1] ) + ( A_2 + [a_2] ) + ... + ( A_n + [a_n] ) + [a] $$ where $$ [a] $$ is the blank symbol for $$ M $$.
 
-Lastly, Tummys supports a second type of TMs, parametrized TMs.
+Lastly, *Tummys* supports a second type of TMs, parametrized TMs.
 Parametrized TMs are inspired by C++ templates and C's macros and are a mean to generate a series of similar TMs that differ in some way.
-For example, let's say we are making a program that requires two TMs: $$M$$ that substitutes the first blank character for the character '#' and $$M'$$ that substitutes the first blank character for the character '*'.
+For example, let's say we are making a program that requires two TMs: $$ M $$, that substitutes the first blank character for the character '#', and $$ M' $$, that substitutes the first blank character for the character '*'.
 A way they can be defined is as follows:
 
 ~~~
 :: M A A+['#']+[a] {
-    S A -> (S, _, >),
-    S [a]-> (ACC, '#', >)
+    S A -> (S, _, R),
+    S [a]-> (ACC, '#', R)
 }
 
 :: M' A A+['*']+[a] {
-    S B -> (S, _, >),
-    S [b] -> (ACC, '*', >)
+    S B -> (S, _, R),
+    S [b] -> (ACC, '*', R)
 }
 ~~~
 
@@ -321,9 +321,11 @@ As you can see they differ only in what they append to the tape. Instead of repl
 ~~~
 
 :: <c> append A A+[c]+[a] {
-     S A -> (S, _, >),
-    S [a]-> (A, c, >)
+     S A -> (S, _, R),
+    S [a]-> (A, c, R)
 }
+
+~~~
 
 append can then be used in an expression as follows:
 
