@@ -292,7 +292,7 @@ We use an intermediary transition that leaves the tape and head unchanged, inste
 
 Each transition that would transition to $$ ACC $$ or $$ REJ $$ transitions to $$ N \prime \prime $ instead.
 
-$$ N \prime \prime $$ is an intermediate state that for every character $ c \in A \prime $$ will transition to $$ N \prime $$ with the transition triple $$ ( N \prime , . . . ) $$.
+$$ N \prime \prime $$ is an intermediate state that for every character $$ c \in A \prime $$ will transition to $$ N \prime $$ with the transition triple $$ ( N \prime , . . . ) $$.
 
 Delegating Transitions are a way of reusing TMs by executing them from another TM.
 
