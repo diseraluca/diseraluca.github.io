@@ -295,8 +295,9 @@ Each transition that would transition to $$ ACC $$ or $$ REJ $$ transitions to $
 $$ N'' $$ is an intermediate state that for every character $ c \in A' $$ will transition to $$ N' $$ with the transition triple $$ ( N' , . . . ) $$.
 
 Delegating Transitions are a way of reusing TMs by executing them from another TM.
-Given a TM $$M$$ with a tape alphabet $$A+[a]$$ that has one or more delegating transictions to other TMs $$M_1, M_2, ... M_n$$ with tape alphabets $$A_1+[a_1], A_2+[a_2], ... A_n+[a_n]$$,
-the tape alphabet of $$M$$ is considered to be $$[A]+(A_1+[a_1])+(A_2+[a_2])+ ... +(A_n+[a_n]) + [a]$$ where $$[a]$$ is the blank symbol for $$M$$.
+
+Given a TM $$ M $$ with a tape alphabet $$ A + [ a ] $$ that has one or more delegating transictions to other TMs $$ M_1 , M_2 , ... M_n $$ with tape alphabets $$ A_1 + [a_1] , A_2 + [a_2], ... A_n + [a_n] $$,
+the tape alphabet of $$ M $$ is considered to be $$ [A] + ( A_1 + [a_1] ) + ( A_2 + [a_2] ) + ... + ( A_n + [a_n] ) + [a] $$ where $$ [a] $$ is the blank symbol for $$ M $$.
 
 Lastly, Tummys supports a second type of TMs, parametrized TMs.
 Parametrized TMs are inspired by C++ templates and C's macros and are a mean to generate a series of similar TMs that differ in some way.
