@@ -262,8 +262,8 @@ Let's say we have the following *Tummy*'s TM definition:
 }
 ~~~
 
-This is a TM that moves the tape to the right three times and writes three times the character $$ a \in A ' $$.
-Now let's say we are defining the TM $$ M $$, that at some point in its execution has to do the same steps as $$ M ' $$, instead of rewriting the logic we can delegate to $$ M ' $$:
+This is a TM that moves the tape to the right three times and writes three times the character $$ a \in A \prime $$.
+Now let's say we are defining the TM $$ M $$, that at some point in its execution has to do the same steps as $$ M \prime $$, instead of rewriting the logic we can delegate to $$ M \prime $$:
 
 ~~~
 :: M A A' {
@@ -272,7 +272,7 @@ Now let's say we are defining the TM $$ M $$, that at some point in its executio
     ...
 ~~~
 
-This is equivalent to expanding the transition table of $$ M' $$ in $$ M $$ at the point of the delegating transition as follows:
+This is equivalent to expanding the transition table of $$ M \prime $$ in $$ M $$ at the point of the delegating transition as follows:
 
 ~~~
 :: M A A' {
@@ -290,9 +290,9 @@ We basically inline the TM that is the result of expression'.
 First, the machine transitions to the initial state of the delegated to TM.
 We use an intermediary transition that leaves the tape and head unchanged, instead of expanding the original delegating transition directly to the starting state transition declaration of the delegated to machine, to avoid problems with multiple starting state declaration or multiple delegating declarations on different alphabets.
 
-Each transition that would transition to $$ ACC $$ or $$ REJ $$ transitions to $$ N'' $ instead.
+Each transition that would transition to $$ ACC $$ or $$ REJ $$ transitions to $$ N \prime \prime $ instead.
 
-$$ N'' $$ is an intermediate state that for every character $ c \in A' $$ will transition to $$ N' $$ with the transition triple $$ ( N' , . . . ) $$.
+$$ N \prime \prime $$ is an intermediate state that for every character $ c \in A \prime $$ will transition to $$ N \prime $$ with the transition triple $$ ( N \prime , . . . ) $$.
 
 Delegating Transitions are a way of reusing TMs by executing them from another TM.
 
