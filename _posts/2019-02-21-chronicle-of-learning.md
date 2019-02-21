@@ -164,7 +164,7 @@ Where:
 * "state" is a state identifier of the form [a-zA-z0-9]
 * "alphabet" is an alphabet $$ A $$ such that $$ A \subseteq B$$ where $$ B $$ is the tape alphabet of the TM
 * The "->" transition operator
-* A triplet of values composed as (new-state, write, direction) where "new-state" is the state identifier that refers to the state that the TM will transition to, "write" is a character $$c \in B$$, where $$ B $$ is the tape alphabet of the TM and direction is a symbol $$ s \in \{ R , L , ^ \} $$, defining the direction that the head should move. $$ R $$ move the head to the right while $$ L $$ move the head to the left.
+* A triplet of values composed as (new-state, write, direction) where "new-state" is the state identifier that refers to the state that the TM will transition to, "write" is a character $$c \in B$$, where $$ B $$ is the tape alphabet of the TM and direction is a symbol $$ s \in \{ R , L , \^ \} $$, defining the direction that the head should move. $$ R $$ move the head to the right while $$ L $$ move the head to the left.
 
 
 The special move direction symbol '^', leaves the head where it currently is.
