@@ -177,8 +177,8 @@ N A -> (N1, s, ^)
 is equivalent to:
 
 ~~~
-N A   -> (N2, s, >)
-N2 A1 -> (N1, _, <)
+N A   -> (N2, s, R)
+N2 A1 -> (N1, _, L)
 ~~~
 
 where $$ A \subseteq A_1 $$, $$ s \in A_1 $$ and $$ A_1 $$ is the tape alphabet of the TM.
@@ -192,41 +192,45 @@ Unfortunately, this too has an edge case where there was no prior movement to a 
 Tummys, for consistency reasons, will always expand to a right-left move.
 
 A special write character _ is used to denote that no character has to be written, leaving the character that was already there.
-For example the transiction declaration:
+For example the transition declaration:
 
 ~~~
-S ['0', '1'] -> (S, _, >)
+S [a1, a2, ... , an] -> (S1, _, d)
 ~~~
 
-is equivalent to the two transiction declaration:
+is equivalent to the following transition declarations:
 
 ~~~
-S['0'] -> (S, '0', >),
-S['1'] -> (S, '1', >)
+S[a1] -> (S1, a1, d),
+S[a2] -> (S1, a2, d),
+...
+S[an] -> (S1, an, d)
 ~~~
 
 This is true whenever the _ symbol appears in a transition declaration, independent of where it appears.
 This means that a delegating transition to a parametrized Turing machine ( which we will see in a bit ) on which the _ is used as a parameter, such as the following:
 
 ~~~
-N ['0', '1'] -> M<_> -> (...)
+S [a1, a2, ... , an] -> M<_> -> (...)
 ~~~
 
 is expanded to:
 
 ~~~
-N ['0'] -> M<'0'> -> (...),
-N ['1'] -> M<'1'> -> (...),
+S [a1] -> M<a1> -> (...),
+S [a2] -> M<a2> -> (...),
+...
+S [an] -> M<an> -> (...)
 ~~~
 
-S, REJ and ACC are special state identifier referring to the starting state, the reject state and the accepting state. 
-At least a transition declaration from state S must be present in each TM declaration. The REJ and ACC state are implicitly defined.
+$$ S $$, $$ REJ $$ and $$ ACC $$ are special state identifier referring to the starting state, the reject state and the accepting state. 
+At least a transition declaration from state $$ S $$ must be present in each TM definition. The $$ REJ $$ and $$ ACC $$ state are implicitly defined and have no transition from them.
 While some transition declaration may be given for them, the TM will halt as soon as they will be reached making those declarations useless.
 
-At least one transition to the REJ or ACC states must be present in any TM definition.
+At least one transition to the $$ REJ $$ or $$ ACC $$ states must be present in any TM definition.
 
-A state identifier is implicitly defined the first time it is encountered in a transition table for the given TM.
-If a transiction declaration from $$A$$ on the alphabet $$X$$ comes after a transiction declaration from $$A$$ on the alphabet $$Y$$ and $$X\capY$$ is non-empty, the transiction from $$A$$ on $$\allz\elemX\capY$$ wil follow $$B$$ the transiction declaration $$A$$ on $$X$$.
+A state identifier is implicitly defined the first time it is encountered in a transition table for a given TM.
+If a transiction declaration from $$ A $$ on the alphabet $$ X $$ comes after a transiction declaration from $$ A $$ on the alphabet $$ Y $$ and $$ X \cap Y$$ is non-empty, the transiction from $$ A $$ on $$ \forall z \in ( X \cap Y ) $$ wil follow $$ B $$ the transiction declaration $$ A $$ on $$ X $$.
 
 When a character for which no state transition exists is met, the TM halts on the rejecting state immediately.
 
