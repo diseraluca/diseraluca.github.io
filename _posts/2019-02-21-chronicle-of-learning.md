@@ -398,144 +398,144 @@ First, we change the name of their states so that the two set of states are disj
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
-    S [0]   -> (ACC, '0', >),
-    S [1]   -> (ACC, '0', >),
-    S [' '] -> (ACC, '0', >)
+    S [0]   -> (ACC, '0', R),
+    S [1]   -> (ACC, '0', R),
+    S [' '] -> (ACC, '0', R)
 }
 
 :: M' [0, 1] [0, 1]+[' '] {
-    S' [0]   -> (1, '0', >),
-    S' [1]   -> (1, '1', >),
-    S' [' '] -> (1, ' ', >),
-    1 [0]   -> (ACC', '1', >),
-    1 [1]   -> (ACC', '1', >),
-    1 [' '] -> (ACC', '1', >)
+    S' [0]   -> (1, '0', R),
+    S' [1]   -> (1, '1', R),
+    S' [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC', '1', R),
+    1 [1]   -> (ACC', '1', R),
+    1 [' '] -> (ACC', '1', R)
 }
 ~~~
 
-then start defining $$M^{''}$$ with the transiction table of $$M$$:
+then start defining $$ M ^ { \prime \prime } $$ with the transiction table of $$ M $$:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
-    S [0]   -> (ACC, '0', >),
-    S [1]   -> (ACC, '0', >),
-    S [' '] -> (ACC, '0', >)
+    S [0]   -> (ACC, '0', R),
+    S [1]   -> (ACC, '0', R),
+    S [' '] -> (ACC, '0', R)
 }
 
 :: M' [0, 1] [0, 1]+[' '] {
-    S' [0]   -> (1, '0', >),
-    S' [1]   -> (1, '1', >),
-    S' [' '] -> (1, ' ', >),
-    1 [0]   -> (ACC', '1', >),
-    1 [1]   -> (ACC', '1', >),
-    1 [' '] -> (ACC', '1', >)
+    S' [0]   -> (1, '0', R),
+    S' [1]   -> (1, '1', R),
+    S' [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC', '1', R),
+    1 [1]   -> (ACC', '1', R),
+    1 [' '] -> (ACC', '1', R)
 }
 
 :: M'' [0, 1] [0, 1]+[' '] {
-    S [0]   -> (ACC, '0', >),
-    S [1]   -> (ACC, '0', >),
-    S [' '] -> (ACC, '0', >)
+    S [0]   -> (ACC, '0', R),
+    S [1]   -> (ACC, '0', R),
+    S [' '] -> (ACC, '0', R)
 }
 ~~~
 
-Then we expand $$M''$$ so that each transiction to $$ACC$$ or $$REJ$$ transitions to a new states that starts the rewind process and add the necessary transiction declarations to rewind the tape:
+Then we expand $$ M ^ { \prime \prime } $$ so that each transiction to $$ ACC $$ or $$ REJ $$ will transition to a new state that starts the rewind process and we add the necessary transiction declarations to rewind the tape:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
-    S [0]   -> (ACC, '0', >),
-    S [1]   -> (ACC, '0', >),
-    S [' '] -> (ACC, '0', >)
+    S [0]   -> (ACC, '0', R),
+    S [1]   -> (ACC, '0', R),
+    S [' '] -> (ACC, '0', R)
 }
 
 :: M' [0, 1] [0, 1]+[' '] {
-    S' [0]   -> (1, '0', >),
-    S' [1]   -> (1, '1', >),
-    S' [' '] -> (1, ' ', >),
-    1 [0]   -> (ACC', '1', >),
-    1 [1]   -> (ACC', '1', >),
-    1 [' '] -> (ACC', '1', >)
+    S' [0]   -> (1, '0', R),
+    S' [1]   -> (1, '1', R),
+    S' [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC', '1', R),
+    1 [1]   -> (ACC', '1', R),
+    1 [' '] -> (ACC', '1', R)
 }
 
 :: M'' [0, 1] [0, 1]+[' '] {
-    S [0]   -> (REWIND, '0', >),
-    S [1]   -> (REWIND, '0', >),
-    S [' '] -> (REWIND, '0', >),
+    S [0]   -> (REWIND, '0', R),
+    S [1]   -> (REWIND, '0', R),
+    S [' '] -> (REWIND, '0', R),
     
-    REWIND [0, 1, ' '] -> (REWIND2, _, <),
-    REWIND2 [0, 1] -> (REWIND2, _, <),
-    REWIND2 [' '] -> (ACC, _, >)
+    REWIND [0, 1, ' '] -> (REWIND2, _, L),
+    REWIND2 [0, 1] -> (REWIND2, _, L),
+    REWIND2 [' '] -> (ACC, _, R)
 }
 ~~~
 
 The rewind TM first moves once to the opposite direction of the last movement ( or stays put if the last movement was '^' or its equivalent expansion), then moves to the left until a blank character is encountered.
 On the first blank character, the tape gets moved to the right to the last encountered non-blank characters and the rewind machine halts.
 
-We then expands $$M''$$ alphabets with the alphabet from $$M^'$$:
+We then expands $$  M ^ { \prime \prime } $$ 's alphabet with the alphabet from $$ M ^ \prime $$:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
-    S [0]   -> (ACC, '0', >),
-    S [1]   -> (ACC, '0', >),
-    S [' '] -> (ACC, '0', >)
+    S [0]   -> (ACC, '0', R),
+    S [1]   -> (ACC, '0', R),
+    S [' '] -> (ACC, '0', R)
 }
 
 :: M' [0, 1] [0, 1]+[' '] {
-    S' [0]   -> (1, '0', >),
-    S' [1]   -> (1, '1', >),
-    S' [' '] -> (1, ' ', >),
-    1 [0]   -> (ACC', '1', >),
-    1 [1]   -> (ACC', '1', >),
-    1 [' '] -> (ACC', '1', >)
+    S' [0]   -> (1, '0', R),
+    S' [1]   -> (1, '1', R),
+    S' [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC', '1', R),
+    1 [1]   -> (ACC', '1', R),
+    1 [' '] -> (ACC', '1', R)
 }
 
 :: M'' [0, 1]+[0, 1] [0, 1]+[' ']+[0, 1]+[' '] {
-    S [0]   -> (REWIND, '0', >),
-    S [1]   -> (REWIND, '0', >),
-    S [' '] -> (REWIND, '0', >)
+    S [0]   -> (REWIND, '0', R),
+    S [1]   -> (REWIND, '0', R),
+    S [' '] -> (REWIND, '0', R)
     
-    REWIND [0, 1, ' '] -> (REWIND2, _, <),
-    REWIND2 [0, 1] -> (REWIND2, _, <),
-    REWIND2 [' '] -> (ACC, _, >)
+    REWIND [0, 1, ' '] -> (REWIND2, _, L),
+    REWIND2 [0, 1] -> (REWIND2, _, L),
+    REWIND2 [' '] -> (ACC, _, R)
 }
 ~~~
 
-We add the states and transictions of $$M'$$ to $$M'$$ and connect the accepting state of the rewind machine to the starting state of $$M'$$:
+We add the states and transiction declarations of $$ M ^ \prime $$ to $$  M ^ { \prime \prime } $$ and connect the accepting state of the rewind machine to the starting state of $$ M ^ \prime $$:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
-    S [0]   -> (ACC, '0', >),
-    S [1]   -> (ACC, '0', >),
-    S [' '] -> (ACC, '0', >)
+    S [0]   -> (ACC, '0', R),
+    S [1]   -> (ACC, '0', R),
+    S [' '] -> (ACC, '0', R)
 }
 
 :: M' [0, 1] [0, 1]+[' '] {
-    S' [0]   -> (1, '0', >),
-    S' [1]   -> (1, '1', >),
-    S' [' '] -> (1, ' ', >),
-    1 [0]   -> (ACC', '1', >),
-    1 [1]   -> (ACC', '1', >),
-    1 [' '] -> (ACC', '1', >)
+    S' [0]   -> (1, '0', R),
+    S' [1]   -> (1, '1', R),
+    S' [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC', '1', R),
+    1 [1]   -> (ACC', '1', R),
+    1 [' '] -> (ACC', '1', R)
 }
 
 :: M'' [0, 1]+[0, 1] [0, 1]+[' ']+[0, 1]+[' '] {
-    S [0]   -> (REWIND, '0', >),
-    S [1]   -> (REWIND, '0', >),
-    S [' '] -> (REWIND, '0', >),
+    S [0]   -> (REWIND, '0', R),
+    S [1]   -> (REWIND, '0', R),
+    S [' '] -> (REWIND, '0', R),
     
-    REWIND [0, 1, ' '] -> (REWIND2, _, <),
-    REWIND2 [0, 1] -> (REWIND2, _, <),
-    REWIND2 [' '] -> (S', _, >),
+    REWIND [0, 1, ' '] -> (REWIND2, _, L),
+    REWIND2 [0, 1] -> (REWIND2, _, L),
+    REWIND2 [' '] -> (S', _, R),
     
-    S' [0]   -> (1, '0', >),
-    S' [1]   -> (1, '1', >),
-    S' [' '] -> (1, ' ', >),
-    1 [0]   -> (ACC', '1', >),
-    1 [1]   -> (ACC', '1', >),
-    1 [' '] -> (ACC', '1', >)
+    S' [0]   -> (1, '0', R),
+    S' [1]   -> (1, '1', R),
+    S' [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC', '1', R),
+    1 [1]   -> (ACC', '1', R),
+    1 [' '] -> (ACC', '1', R)
 }
 ~~~
 
-And with this, we are done. $$ACC'$$ is the new accepting state. In this particular case, we have the TM that, on any valid input, writes '0' in the first cell, and '1' in the second cell then halts.
+And with this, we are done. $$ ACC ^ prime $$ is the new accepting state. In this particular case, we have the TM that, on any valid input, writes '0' in the first cell, and '1' in the second cell then halts.
 
 The unary expression of the form:
 
@@ -543,10 +543,10 @@ The unary expression of the form:
 M
 ~~~
 
-is compacted to $$M$$ itself.
+is compacted to $$ M $$ itself.
 
 A compacted expression is evaluated to the final tape state resulting from the application of the empty input on the resulting TM.
-This is a remnant of a previous iteration of Tummys and is now unnecessary.
+This is a remnant of a previous iteration of *Tummys* and is now unnecessary.
 
 ### Special Turing Machines
 
