@@ -116,8 +116,8 @@ This is the same alphabet as above.
 
 Given two alphabets $$A$$ and $$B$$ Tummys provides the following operation on them:
 
-$$A\capB$$ trough the binary operator '-'
-$$A\cupB$$ trough the binary operator '+'
+* \(A\capB\) trough the binary operator '-'
+* \(A\cupB\) trough the binary operator '+'
 
 Alphabets can be assigned to an identifier as follows:
 
@@ -125,8 +125,9 @@ Alphabets can be assigned to an identifier as follows:
 #BINARY ['0', '1']
 ~~~
 
-The identifier must be a sequence of characters that are elements of [A-Z].
+The identifier must be a sequence of characters that are elements of **[A-Z]**.
 After an alphabet is assigned to an identifier, the identifier acts as an alias for the alphabet and the two can be replaced by one another without changing the meaning of the program. 
+Assigning to the same identifier more than once is an error.
 
 ## Creating and executing TMs
 
