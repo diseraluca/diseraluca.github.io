@@ -116,8 +116,8 @@ This is the same alphabet as above.
 
 Given two alphabets $$A$$ and $$B$$ Tummys provides the following operation on them:
 
-* \(A\capB\) trough the binary operator '-'
-* \(A\cupB\) trough the binary operator '+'
+* $$ A \cap B $$ trough the binary operator '-'
+* $$ A \cupB $$ trough the binary operator '+'
 
 Alphabets can be assigned to an identifier as follows:
 
