@@ -563,23 +563,24 @@ In Tummys, a string literal is a collection of characters between two double quo
 ~~~
 
 String literals are themselves Turing Machines.
-In fact, given any string literal $$S$$, we build a corresponding TM $$M$$ that writes something to its tape and halts independent of its input tape.
+In fact, given any string literal $$ S $$, we build a corresponding TM $$ M $$ that writes something to its tape and halts independent of its input tape, as long as it is valid.
 
-Any string literal of the form "$$c_1c_2c_3c_4...c_n$$" is equivalent to a turing machine of the form:
+Any string literal of the form " $$ c_1 c_2 c_3 c_4 ... c_n $$ " is equivalent to a turing machine of the form:
 
 ~~~
 
 :: M A A+[a] {
-    S A+[a] -> (1, c1, >),
-    1 A+[a] -> (2, c2, >),
-    2 A+[a] -> (3, c3, >),
-    3 A+[a] -> (4, c4, >),
+    S A+[a] -> (1, c1, R),
+    1 A+[a] -> (2, c2, R),
+    2 A+[a] -> (3, c3, R),
+    3 A+[a] -> (4, c4, R),
     
     ....
     
-    N A+[a] -> (ACC, cn, >)
+    N A+[a] -> (ACC, cn, R)
 }
 
+~~~
 
 it follows that the unary expression:
 
@@ -593,7 +594,7 @@ is equivalent to the expression of the form:
 S'
 ~~~
 
-where $$M$$ is the Turing machine that writes $$S$$ to its tape and $$S'$$ is a string literal of the form "S".
+where $$ M $$ is the Turing machine that writes $$ S $$ to its tape and $$ S ^ \prime $$ is a string literal of the form " $$ S $$ ".
 
 String literals are the idiomatic way of building input tapes. An expression of the form:
 
@@ -601,15 +602,15 @@ String literals are the idiomatic way of building input tapes. An expression of 
 M1 ... MN S'
 ~~~
 
-where $$M1 ... MN$$ are Turing Machines and $$S^'$$ is a string literal of the form $$"S"$$, is equivalent to running the compacted Turing machine:
+where $$ M1 ... MN $$ are Turing Machines and $$ S ^ \prime $$ is a string literal of the form " $$ S $$ ", is equivalent to running the compacted Turing machine:
 
 ~~~
 M'
 ~~~
 
-compacted from the expression $$M1 ... MN$$ on the input tape which has written $$S$$ on its cells, starting at some cell $$c_i$$, with the head of $$M'$$ initially pointing at $$c_i$$.
+that is compacted from the expression $$ M1 ... MN $$ on the input tape which has written $$ S $$ on its cells, starting at some cell $$ c_i $$, with the head of $$ M ^ \prime $$ initially pointing at $$ c_i $$.
 
-The second idiomatic use of a string literal is to streamline input-state independent write operation on some tape $$T$$ through the use of a delegating transition:
+The second idiomatic use of a string literal is to streamline input-state independent write operation on some tape $$ T $$ through the use of a delegating transition:
 
 ~~~
 ...
@@ -618,7 +619,7 @@ N A+[a] -> "Hello World" -> (N', _, <)
 ~~~
  
 is the same as adding a series of states that writes "Hello World" on the TMs tape starting at the cell that is currently pointed to by the head, ending on the cell containing the last written character, "d" in this case,
-and transitioning to state $$N'$$.
+and transitioning to state $$ N ^ \prime $$.
 
 ## Side Effect TMs
 
@@ -626,25 +627,26 @@ and transitioning to state $$N'$$.
 
 A sequence of special Turing machine is provided for input/output purposes.
 
-The $$I$$ TM is a special Turing machine that reads a line of input from the user and writes it to its tape halting afterwards.
-The $$IC$$ TM is a special Turing machine that reads a single character of input from the user and writes it to its tape halting afterwards.
+The $$ I $$ TM is a special Turing machine that reads a line of input from the user and writes it to its tape halting afterwards.
+The $$ IC $$ TM is a special Turing machine that reads a single character of input from the user and writes it to its tape halting afterwards.
 
-The $$O$$ TM is a special Turing machine that writes all the contents of its tape, starting at the leftmost non-blank character, to the output and then halts, leaving its tape and read-write head unchanged.
+The $$ O $$ TM is a special Turing machine that writes all the contents of its tape, starting at the leftmost non-blank character, to the output and then halts, leaving its tape and read-write head unchanged.
 
 # State machine
 
-The state machine $$S$$ is a special Turing machine that, when composed with another machine, writes 'A' to its tape if the machine it was composed with, when run, ends on the accepting state and 'R' otherwise.
-As with everything in Tummys, non-halting Turing machines are considered undefined behaviour.
+The state machine $$ S $$ is a special Turing machine that, when composed with another machine, writes 'A' to its tape if the machine it was composed with, when run, ends on the accepting state and 'R' otherwise.
+As with everything in *Tummys*, non-halting Turing machines are considered undefined behaviour.
 
 # Debugging and Inspecting machines
 
 This is a category of machines that I'm still unsure about. They would provide a way to attach a debugger to a TM so that information about its execution can be shown to the user.
-For example, the $$D$$ machine would run a given TM until the $$D$$ starting state is met, outputting information about the tape, state and followed transition at each step to the user.
+
+For example, the $$ D $$ machine would run a given TM until the $$ D $$ starting state is met, outputting information about the tape, state and followed transition at each step to the user.
 
 Inspecting machines would be similar but would give information about a machine configuration, alphabet or particular transition.
-For example, $$\delta$$ would print to the user the expanded transition table of a given machine.
+For example, $$ \delta $$ would print to the user the expanded transition table of a given machine.
 
-I'm unsure about it as it may be better to provide such functionalities through the Tummys environment ( eg. its compiler or interpreter or other tools ) than directly as language constructs.
+I'm unsure about it as it may be better to provide such functionalities through the *Tummys* environment ( eg. its compiler or interpreter or other tools ) than directly as language constructs.
 
 ### Some examples
 
