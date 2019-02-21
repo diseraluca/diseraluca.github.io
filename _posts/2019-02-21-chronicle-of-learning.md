@@ -1,6 +1,6 @@
 ---
 layout: post
-title: The chronicle of self-learning: mov, Turing Machines and Compilers
+title: The chronicle of self-learning - mov, Turing Machines and Compilers
 date: 2019-02-21
 categories: abstract
 tags: compilers design turing-machines abstract ramblings
