@@ -150,7 +150,7 @@ Breaking this down we have:
 * The "::" define operator that opens the definition for a TM.
 * The identifier that will be used to reference the TM { odd in this case }. An identifier starts with a lowercase letter and is composed of any number of characters.
 * The input alphabet that the TM will accept, in this case ['0', '1'].
-* The tape alphabet, defined as the union between two alphabets $$ A $$ and $$ B $$, where $$ | B | = 1 $$ and $$ x \in B $$ is the character representing the blank character on the tape {e.g the absence of a character on the tape }. It is an error to have the blank character appear in the input alphabet or to have a tape alphabet that isn't of the form $$ A + [a] $$.
+* The tape alphabet, defined as the union between two alphabets $$ A $$ and $$ B $$, where $$ \middle B \middle = 1 $$ and $$ x \in B $$ is the character representing the blank character on the tape {e.g the absence of a character on the tape }. It is an error to have the blank character appear in the input alphabet or to have a tape alphabet that isn't of the form $$ A + [a] $$.
 * The transition table defined as a block starting with "{" and ending with "}" with a series of comma-separated transition declarations in it.
 
 A transition declaration has the form:
