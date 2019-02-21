@@ -349,7 +349,7 @@ The process for which an expression is compacted is through the conjunction of T
 
 Given any two turing machines $$ M = ( Q , \Sigma , \Gamma , \delta , q_0 , q_a , q_r ) $$ and $$ M ^ \prime = ( Q ^ \prime , \Sigma ^ \prime , \Gamma ^ \prime , \delta ^ \prime , q_0 ^ \prime , q_a ^ \prime , q_r ^ \prime ) $$, for which $$ Q $$ and $$ Q ^ \prime $$ are disjoint, their conjuction $$ M \cup M ^ \prime $$ is the turing machine
 $$ M ^ \cup = ( Q \cup Q ^ \prime \cup Q ^ \cup , \Sigma \cup \Sigma ^ \prime , \Gamma \cup \Gamma ^ \prime , \delta ^ \cup , q_0 , q_a ^ \prime , q_r ^ \prime ) $$, where $$ Q ^ \cup $$ is the set of additional states that are needed for the conjuction
-and $$ \delta ^ \cup $$ is a transiction function $$ \from ( Q \cup Q ^ \prime \cup Q ^ \cup ) \cross ( \Gamma \cup \Gamma ^ \prime ) \mapto ( Q \cup Q ^ \prime \cup Q ^ \cup ) \cross ( \Gamma \cup \Gamma ^ \prime ) \cross \{ L , R \} $$ that describes the new transiction table derived from the original TMs.
+and $$ \delta ^ \cup $$ is a transiction function with signature $$ ( Q \cup Q ^ \prime \cup Q ^ \cup ) \times ( \Gamma \cup \Gamma ^ \prime ) \mapsto ( Q \cup Q ^ \prime \cup Q ^ \cup ) \times ( \Gamma \cup \Gamma ^ \prime ) \times \{ L , R \} $$ that describes the new transiction table derived from the original TMs.
 
 Each transition to the rejecting or accepting state in $$ \delta $$ is substituted to a transition to a state $$ q_{ \delta ^ \cup } $$ that start the process of rewinding the tape.
 
@@ -535,7 +535,7 @@ We add the states and transiction declarations of $$ M ^ \prime $$ to $$  M ^ { 
 }
 ~~~
 
-And with this, we are done. $$ ACC ^ prime $$ is the new accepting state. In this particular case, we have the TM that, on any valid input, writes '0' in the first cell, and '1' in the second cell then halts.
+And with this, we are done. $$ ACC ^ \prime $$ is the new accepting state. In this particular case, we have the TM that, on any valid input, writes '0' in the first cell, and '1' in the second cell then halts.
 
 The unary expression of the form:
 
