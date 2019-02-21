@@ -248,22 +248,22 @@ An image can help us understand this concept.
 ![delegating transiction]({{ "/assets/TUMMY_delegating_transiction.png" | absolute_url }})
 
 Basically, we have this TM $$M$$ that is executing on the tape $$T$$. $$M$$ is currently at state $$n$$ when it encounters a delegating transition. The transition is delegated to $$M'$$, which is a TM
-that writes two 5s to the tape and the halts. $$M'$$ is executed on the original tape $$T$$ with its head starting at the position where the head of $$M$$ was when it encountered the delegating transition.
+that writes two 5s to the tape and then halts. $$M'$$ is executed on the original tape $$T$$ with its head starting at the position where the head of $$M$$ was when it encountered the delegating transition.
 After $$M'$$ halts the original TM continues its execution on tape $T$ with its head moved to where $$M'$$ left it.
 
 This is a shortcut for the following situation.
-Let's say we have the following Tummy's TM definition:
+Let's say we have the following *Tummy*'s TM definition:
 
 ~~~
 :: M' A A' {
-    S A''' -> (1, a, >),
-    1 A''' -> (2, a, >),
-    2 A''' -> (ACC, a, >),
+    S A''' -> (1, a, R),
+    1 A''' -> (2, a, R),
+    2 A''' -> (ACC, a, R)
 }
 ~~~
 
-This is a TM that moves the tape to the right three times and writes three times the character $$a\elemA''$$.
-Now let's say we are defining the TM $$M$$, that at some point in its execution has to do the same steps as $$M'$$:
+This is a TM that moves the tape to the right three times and writes three times the character $$ a \in A ' $$.
+Now let's say we are defining the TM $$ M $$, that at some point in its execution has to do the same steps as $$ M ' $$, instead of rewriting the logic we can delegate to $$ M ' $$:
 
 ~~~
 :: M A A' {
@@ -272,25 +272,29 @@ Now let's say we are defining the TM $$M$$, that at some point in its execution 
     ...
 ~~~
 
-This is equivalent to expanding the transition table of $$M'$$ in $$M$$ at the point of the delegating transition as follows:
+This is equivalent to expanding the transition table of $$ M' $$ in $$ M $$ at the point of the delegating transition as follows:
 
 ~~~
 :: M A A' {
     ...
     N A''   -> (M'S, _, ^),
-    M'S A''' -> (1, a, >)
-    M'1 A''' -> (M'2, a, >),
-    M'2 A''' -> (N'', a, >),
+    M'S A''' -> (1, a, R)
+    M'1 A''' -> (M'2, a, R),
+    M'2 A''' -> (N'', a, R),
     N'' A' -> (N', ...),
     ...
 ~~~
     
-We basically inline the TM that is the result of expression'. Each transition that would transition to $$ACC$$ or $$REJ$$ transitions to $$N''$ instead.
-First, the machine transitions to the initial state of the delegated to TM.
-We use an intermediary transition that leaves the tape and head unchanged instead of expanding the original delegating transition directly to the starting state transition declaration of the delegated to machine to avoid problems with multiple starting state declaration or multiple delegating declarations on different alphabets.
-$$N''$$ is an intermediate state that transition that for every character $c\elemA'$$ will transition to $$N'$$ with the transition triple $$(N', ...).
+We basically inline the TM that is the result of expression'. 
 
-Delegating Transition are a way of composing TMs from other TMs.
+First, the machine transitions to the initial state of the delegated to TM.
+We use an intermediary transition that leaves the tape and head unchanged, instead of expanding the original delegating transition directly to the starting state transition declaration of the delegated to machine, to avoid problems with multiple starting state declaration or multiple delegating declarations on different alphabets.
+
+Each transition that would transition to $$ ACC $$ or $$ REJ $$ transitions to $$ N'' $ instead.
+
+$$ N'' $$ is an intermediate state that for every character $ c \in A' $$ will transition to $$ N' $$ with the transition triple $$ ( N' , . . . ) $$.
+
+Delegating Transitions are a way of reusing TMs by executing them from another TM.
 Given a TM $$M$$ with a tape alphabet $$A+[a]$$ that has one or more delegating transictions to other TMs $$M_1, M_2, ... M_n$$ with tape alphabets $$A_1+[a_1], A_2+[a_2], ... A_n+[a_n]$$,
 the tape alphabet of $$M$$ is considered to be $$[A]+(A_1+[a_1])+(A_2+[a_2])+ ... +(A_n+[a_n]) + [a]$$ where $$[a]$$ is the blank symbol for $$M$$.
 
