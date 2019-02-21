@@ -184,12 +184,12 @@ N2 A1 -> (N1, _, L)
 where $$ A \subseteq A_1 $$, $$ s \in A_1 $$ and $$ A_1 $$ is the tape alphabet of the TM.
 
 This is mostly equivalent to actually having the head be able to stay put in the first place.
-But there is an edge case where the character to the right of the head is not a valid character in the alphabet, meaning that, as per Tummys' rules, the machine would halt immediately. If the head was effectively never moved that character may not have been encountered.
+But there is an edge case where the character to the right of the head is not a valid character in the alphabet, meaning that, as per *Tummys*' rules, the machine would halt immediately. If the head was effectively never moved that character may not have been encountered.
 A way to partially resolve this is to have the head move to the opposite direction of the last made movement and then to the opposite of that.
 This is so that we can be sure that we will not encounter an unknown character as we pass in a place where the head has already been.
 
 Unfortunately, this too has an edge case where there was no prior movement to a stay-put transition. In that case, a direction must be chosen, at random or in a fixed way.
-Tummys, for consistency reasons, will always expand to a right-left move.
+*Tummys*, for consistency reasons, will always expand to a right-left move.
 
 A special write character _ is used to denote that no character has to be written, leaving the character that was already there.
 For example the transition declaration:
@@ -223,6 +223,8 @@ S [a2] -> M<a2> -> (...),
 S [an] -> M<an> -> (...)
 ~~~
 
+A _ symbol appearing in the "transition" part of any type of transition declaration is always resolved after every other expansion is complete.
+
 $$ S $$, $$ REJ $$ and $$ ACC $$ are special state identifier referring to the starting state, the reject state and the accepting state. 
 At least a transition declaration from state $$ S $$ must be present in each TM definition. The $$ REJ $$ and $$ ACC $$ state are implicitly defined and have no transition from them.
 While some transition declaration may be given for them, the TM will halt as soon as they will be reached making those declarations useless.
@@ -230,9 +232,9 @@ While some transition declaration may be given for them, the TM will halt as soo
 At least one transition to the $$ REJ $$ or $$ ACC $$ states must be present in any TM definition.
 
 A state identifier is implicitly defined the first time it is encountered in a transition table for a given TM.
-If a transiction declaration from $$ A $$ on the alphabet $$ X $$ comes after a transiction declaration from $$ A $$ on the alphabet $$ Y $$ and $$ X \cap Y$$ is non-empty, the transiction from $$ A $$ on $$ \forall z \in ( X \cap Y ) $$ wil follow $$ B $$ the transiction declaration $$ A $$ on $$ X $$.
+If a transiction declaration from $$ A $$ on the alphabet $$ X $$ comes after a transiction declaration from $$ A $$ on the alphabet $$ Y $$ and $$ X \cap Y$$ is non-empty, the transiction from $$ A $$ on $$ \forall z \in ( X \cap Y ) $$ wil follow $$ B $$, the transiction declaration $$ A $$ on $$ X $$.
 
-When a character for which no state transition exists is met, the TM halts on the rejecting state immediately.
+When a character for which no transition from the current state exists is met, the TM halts on the rejecting state immediately.
 
 The second type of transition declaration is the delegating transition of the form:
 
@@ -240,10 +242,10 @@ The second type of transition declaration is the delegating transition of the fo
 state alphabet -> expression -> transition
 ~~~
 
-Where "state", "alphabet" and "transiction" are defined as above. "expression" is a valid Tummy expression ( e.g given a sequence of TMs $$M1, M2, ... MN$$, ~~~ M1 M2 ... MN ~~~ ).
+Where "state", "alphabet" and "transiction" are defined as above. "expression" is a valid Tummy expression ( e.g a sequence of TMs $$M1, M2, ... MN$$ ).
 An image can help us understand this concept.
 
-![delegating transiction]({{ "/assets/TUMMY_delegating_transiction.jpg" | absolute_url }})
+![delegating transiction]({{ "/assets/TUMMY_delegating_transiction.png" | absolute_url }})
 
 Basically, we have this TM $$M$$ that is executing on the tape $$T$$. $$M$$ is currently at state $$n$$ when it encounters a delegating transition. The transition is delegated to $$M'$$, which is a TM
 that writes two 5s to the tape and the halts. $$M'$$ is executed on the original tape $$T$$ with its head starting at the position where the head of $$M$$ was when it encountered the delegating transition.
