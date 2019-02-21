@@ -116,8 +116,9 @@ This is the same alphabet as above.
 
 Given two alphabets $$A$$ and $$B$$ Tummys provides the following operation on them:
 
-* $$ A \cap B $$ trough the binary operator '-'
-* $$ A \cupB $$ trough the binary operator '+'
+* $$ A \cap B $$ trough the binary operator '|'
+* $$ A \cup B $$ trough the binary operator '+'
+* $$ A \setminus B $$ trough the binary operator '-'
 
 Alphabets can be assigned to an identifier as follows:
 
@@ -131,8 +132,8 @@ Assigning to the same identifier more than once is an error.
 
 ## Creating and executing TMs
 
-First of all, we have to have TMs to work with for Tummys to make sense. While Tymmys will provide some default TMs, it gives us the chance to define our own.
-This is how a TMs definition looks like in Tummys:
+First of all, we have to have TMs to work with for *Tummys* to make sense. While *Tummys* will provide some default TMs, it gives us the chance to define our own.
+This is how a TMs definition looks like in *Tummys*:
 
 ~~~
 :: odd ['0', '1'] ['0', '1']+[' '] { 
@@ -143,13 +144,13 @@ This is how a TMs definition looks like in Tummys:
 }
 ~~~
 
-This is a Turing Machine on the alphabet ['0', '1'] ( Binary ) that accepts if the input string represents an odd number.
+This is a Turing Machine on the alphabet **['0', '1']** ( Binary ) that accepts if the input string represents an odd number.
 Breaking this down we have:
 
 * The "::" define operator that opens the definition for a TM.
 * The identifier that will be used to reference the TM { odd in this case }. An identifier starts with a lowercase letter and is composed of any number of characters.
 * The input alphabet that the TM will accept, in this case ['0', '1'].
-* The tape alphabet defined has the union between an alphabet $$A$$ and $$B$$, where $$|B| = 1$$ and $$x\elemB$$ is the character representing the blank character on the tape {e.g the absence of a character on the tape }. It is an error to have the blank character appear both in the input alphabet and the tape alphabet.
+* The tape alphabet, defined as the union between two alphabets $$ A $$ and $$ B $$, where $$ \card {B} = 1 $$ and $$ x \in B $$ is the character representing the blank character on the tape {e.g the absence of a character on the tape }. It is an error to have the blank character appear in the input alphabet or to have a tape alphabet that isn't of the form $$ A + [a] $$.
 * The transition table defined as a block starting with "{" and ending with "}" with a series of comma-separated transition declarations in it.
 
 A transition declaration has the form:
@@ -160,13 +161,13 @@ state alphabet -> transition
 
 Where:
 
-* "state" is a state identifier of the form ([SRA] | [a-zA-z0-9]+ )
-* "alphabet" is an alphabet A such that $$A\subsetB$$ where $$B$$ is the tape alphabet of the TM
+* "state" is a state identifier of the form [a-zA-z0-9]
+* "alphabet" is an alphabet $$ A $$ such that $$ A \subseteq B$$ where $$ B $$ is the tape alphabet of the TM
 * The "->" transition operator
-* A triplet of values composed as (new-state, write, direction) where "new-state" is the state identifier that refers to the state that the TM will transition to, "write" is a character $$\elemB$$, where $$B$$ is the tape alphabet of the TM and direction is a symbol$$\elem{R, L, ^}, defining the direction that the head should move. R move the head to the right while L move the head to the left. '^' is a special character that leaves the head in place.
+* A triplet of values composed as (new-state, write, direction) where "new-state" is the state identifier that refers to the state that the TM will transition to, "write" is a character $$c \in B$$, where $$ B $$ is the tape alphabet of the TM and direction is a symbol $$ s \in \set {R, L, ^} $$, defining the direction that the head should move. $$ R $$ move the head to the right while $$ L $$ move the head to the left.
 
 
-A special move direction symbol is '^', that leaves the head where it is.
+The special move direction symbol '^', leaves the head where it currently is.
 A transition declaration of the form:
 
 ~~~
@@ -179,6 +180,8 @@ is equivalent to:
 N A   -> (N'', s, >)
 N'' A' -> (N', _, <)
 ~~~
+
+where $$ A \subseteq A^'$$, $$ s \in A^' $$ and $$ A' $$ is the tape alphabet of the TM.
 
 This is mostly equivalent to actually having the head be able to stay put in the first place.
 But there is an edge case where the character to the right of the head is not a valid character in the alphabet, meaning that, as per Tummys' rules, the machine would halt immediately. If the head was effectively never moved that character may not have been encountered.
