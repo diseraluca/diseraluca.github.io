@@ -44,9 +44,9 @@ And so comes *Tummys*
 
 ## They're comin' outta the goddamn walls!
 
-So, what the hell is a Tummys?
-Well, Tummys is my will-be { or so I hope } toy language that acts as a DSL for deterministic Turing Machines.
-There are some design seeds that I chose for Tummys:
+So, what the hell is a *Tummys*?
+Well, *Tummys* is my will-be { or so I hope } toy language that acts as a DSL for deterministic **Turing Machines**.
+There are some design seeds that I chose for *Tummys*:
 
 * { Almost } everything is a TM.
 * The basic programming paradigm is based on TMs'composition, akin to functional composition.
@@ -55,8 +55,8 @@ While bare, they were enough to start designing the language.
 
 ### How are our TMs defined
 
-For Tummys we are mostly using the classic intuition of a TM with a configuration, a read-write head and a tape.
-A TM reads a symbol from the current tape's cell under the read-write head at each step and writes a symbol on that cell, moves either left or right and set to a new state. These actions are chosen in accordance with the TM's configuration.
+For *Tummys* we are mostly using the classic intuition of a TM with a configuration, a read-write head and a tape.
+A TM reads a symbol from the current tape's cell under the read-write head at each step and writes a symbol on that cell, moves either left or right and sets to a new state. These actions are chosen in accordance with the TM's configuration.
 A TM stops its execution when it reaches a halt state in its configuration.
 Our tapes are one-dimensional and infinite in both directions. Each cell of the tape has either a character from the input alphabet or the blank character written on it at each step.
 
@@ -93,13 +93,13 @@ The TM in Tummys works like any classic TM you can think about given these const
 
 ## A, b, c, d, e ...
 
-> This section was pretty mangled. In the beginning, this post was about a dozen times larger. I iteratively simplified Tummys as I was adding far too much-unneded complexity.
+> This section was pretty mangled. In the beginning, this post was about a dozen times larger. I iteratively simplified *Tummys* as I was adding far too much-unneded complexity.
 > This is one of the things I cut from the most.
 > At the start Tummy had a kind of type system based on alphabets. Furthermore, I was designing some things around another entity that modelled languages.
 > In the end, most of this was scrapped off, so that alphabets are pretty bare.
 > I decided to still keep a minimal iteration of them to use in the definition of TMs as I think they can provide a useful way for the compiler to spot some logical errors.
 
-One of the basic building blocks of Tummys is alphabets. Alphabets are a collection of unique comma-separated characters between a pair of braces, as follows:
+One of the basic building blocks of *Tummys* is **alphabets**. Alphabets are a collection of unique comma-separated characters ( between a pair of single quotes ) between a pair of braces, as follows:
 
 ~~~
 ['0', '1'] 
@@ -116,8 +116,8 @@ This is the same alphabet as above.
 
 Given two alphabets $$A$$ and $$B$$ Tummys provides the following operation on them:
 
-* $$A\capB$$ trough the binary operator '-'
-* $$A\cupB$$ trough the binary operator '+'
+$$A\capB$$ trough the binary operator '-'
+$$A\cupB$$ trough the binary operator '+'
 
 Alphabets can be assigned to an identifier as follows:
 
