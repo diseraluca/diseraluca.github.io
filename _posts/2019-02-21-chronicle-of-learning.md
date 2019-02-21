@@ -347,13 +347,13 @@ M M1 M2 M3 M4 ... MN
 Each expression, no matter where it appears, is firstly compacted and then compiled.
 The process for which an expression is compacted is through the conjunction of TMs.
 
-Given any two turing machines $$ M = ( Q , \Sigma , \Gamma , \delta , q_0 , q_a , q_r ) $$ and $$ M ^ \prime = ( Q ^ \prime , \Sigma ^ \prime , \Gamma ^ \prime , \delta ^ \prime , q_0 ^ \prime , q_a ^ \prime , q_r ^ \prime ) $$, for which $$ Q $$ and $$ Q^' $$ are disjoint, their conjuction $$ M \cup M^' $$ is the turing machine
-$$ M^\cup = ( Q \cup Q^' \cup Q^\cup , \Sigma \cup \Sigma^', \Gamma \cup \Gamma^', \delta \cup \delta^' \cup \delta^\cup \setminus \delta_{ar}, q_0, q_a^', q_r^' ) $$, where $$ Q^\cup $$ is the set of additional states that are needed for the conjuction
-and $$ \delta^\cup $$ is a transiction table with the additional entries needed for the conjuction and $$ \delta_{ar} $$ is a transiction table $$ \subset \delta $$ that contains only the transiction to the accepting or rejecting states.
+Given any two turing machines $$ M = ( Q , \Sigma , \Gamma , \delta , q_0 , q_a , q_r ) $$ and $$ M ^ \prime = ( Q ^ \prime , \Sigma ^ \prime , \Gamma ^ \prime , \delta ^ \prime , q_0 ^ \prime , q_a ^ \prime , q_r ^ \prime ) $$, for which $$ Q $$ and $$ Q ^ \prime $$ are disjoint, their conjuction $$ M \cup M ^ \prime $$ is the turing machine
+$$ M ^ \cup = ( Q \cup Q ^ \prime \cup Q ^ \cup , \Sigma \cup \Sigma ^ \prime , \Gamma \cup \Gamma ^ \prime , \delta ^ \cup , q_0 , q_a ^ \prime , q_r ^ \prime ) $$, where $$ Q ^ \cup $$ is the set of additional states that are needed for the conjuction
+and $$ \delta ^ \cup $$ is a transiction function $$ \from ( Q \cup Q ^ \prime \cup Q ^ \cup ) \cross ( \Gamma \cup \Gamma ^ \prime ) \mapto ( Q \cup Q ^ \prime \cup Q ^ \cup ) \cross ( \Gamma \cup \Gamma ^ \prime ) \cross \{ L , R \} $$ that describes the new transiction table derived from the original TMs.
 
 Each transition to the rejecting or accepting state in $$ \delta $$ is substituted to a transition to a state $$ q_{ \delta ^ \cup } $$ that start the process of rewinding the tape.
 
-When we go from a state $$ s \in Q $$ to a state $$ s^' \in Q^' $$, a series of additional steps are added to move the tape head to the leftmost cell that is not blank so that the execution of the states of the second TM starts from the perceived start of the tape.
+When we go from a state $$ s \in Q $$ to a state $$ s ^ \prime \in Q ^ \prime $$, a series of additional steps are added to move the tape head to the leftmost cell that is not blank so that the execution of the states of the second TM starts from the perceived start of the tape.
 This means that the conjunction of a Turing machine $$ M $$ that moves $$ n $$ elements to the right without modifying the tape, writes a blank symbol, and then moves one element to the right, effectively moves the perceived start of the tape $$ n $$ cells to the right.
 
 An expression of the form:
@@ -365,7 +365,7 @@ M M1 M2 M3 M4 ... MN
 
 is equivalent to $$ ( ( ( ( ( M_N \cup ... ) \cup M_4 ) \cup M_3 ) \cup M_2 ) \cup M_1 ) \cup M ) $$
 
-In a more practical way, we follow the following process.
+In a more practical way, we apply the following algorithm.
 
 Let's suppose that we have the following two TMs:
 
@@ -377,11 +377,11 @@ Let's suppose that we have the following two TMs:
 }
 
 :: M' [0, 1] [0, 1]+[' '] {
-    S [0]   -> (1, '0', R)
-    S [1]   -> (1, '1', R)
-    S [' '] -> (1, ' ', R)
-    1 [0]   -> (ACC, '1', R)
-    1 [1]   -> (ACC, '1', R)
+    S [0]   -> (1, '0', R),
+    S [1]   -> (1, '1', R),
+    S [' '] -> (1, ' ', R),
+    1 [0]   -> (ACC, '1', R),
+    1 [1]   -> (ACC, '1', R),
     1 [' '] -> (ACC, '1', R)
 }
 ~~~
@@ -392,9 +392,9 @@ The expression:
 M' M
 ~~~
 
-is compacted to a new Turing machine $$ M^{''} $$ by the following process.
+is compacted to a new Turing machine $$  M ^ { \prime \prime } $$ by the following process.
 
-First, we change the name of their states so that the two set of states are disjoint ( this is true for implicitly declared states and transitions like the REJ state).
+First, we change the name of their states so that the two set of states are disjoint ( this is true for implicitly declared states and transitions like the REJ state too).
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
