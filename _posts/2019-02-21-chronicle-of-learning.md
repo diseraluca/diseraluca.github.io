@@ -19,7 +19,7 @@ I've tried many books at that, but either they skip some important information f
 
 On the topic at hand, as I do with most books I complete, I have to devise some kind of exciting exercise for reinforcement learning.
 As always, it should help me revise the topics of the books on a more personal note, it should be practical and it should contain some chance to deepen some topics.
-While sometimes it can be difficult to find the concept of such an exercise, it is straightforward that is should be some kind of compiler { a bytecode + simple virtual machine one as in the second half of the book at that }.
+While sometimes it can be difficult to find the concept of such an exercise, it is straightforward that it should be some kind of compiler { a bytecode + simple virtual machine one as in the second half of the book at that }.
 But the problem is: Which language should I implement?
 
 > BTW, for those who recognized the title reference, I have a small story.
