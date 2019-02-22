@@ -93,7 +93,7 @@ The TM in Tummys works like any classic TM you can think about given these const
 
 ## A, b, c, d, e ...
 
-> This section was pretty mangled. In the beginning, this post was about a dozen times larger. I iteratively simplified *Tummys* as I was adding far too much-unneded complexity.
+> This section was pretty mangled. In the beginning, this post was about a dozen times larger. I iteratively simplified *Tummys* as I was adding far too much-unneeded complexity.
 > This is one of the things I cut from the most.
 > At the start Tummy had a kind of type system based on alphabets. Furthermore, I was designing some things around another entity that modelled languages.
 > In the end, most of this was scrapped off, so that alphabets are pretty bare.
@@ -726,20 +726,22 @@ Let's look at this in small bits.
 First, we have toEnd, we already know her ( I'm not sure why but I think of Turing machines as females ) from the previous exercise.
 
 We then have two small, simple, TMs : *write* and *moveRight*.
-They both encapsulate a core behaviour of a TM. In fact they do a single operation that is part of a normal transition, writing a character to the current cell and moving the head ( to the right in this case ). 
+They both encapsulate a core behaviour of a TM. 
+In fact, they do a single operation that is part of a normal transition, writing a character to the current cell and moving the head ( to the right in this case ). 
 
 Now, why would we have to define TMs that do a core operation that can be expressed more easily as a transition?
 
 This is more understandable by looking at the most important difference between a transition of the form (N, a, d) and a transition bit composed by *moveRight* and *write*, that is : a transition of the form (N, a, d) is **not** an expression.
 
-*Tummys* composition is primarily built on delegating transion, and as such expanding the functionality of a TM by the reuse of an expression, and parametrized TMs that can build a plethora of similar machine from a logical template.
+*Tummys* composition is primarily built on delegating transitions, and as such expanding the functionality of a TM by the reuse of an expression, and parametrized TMs that can build a plethora of similar machine from a logical template.
 
-The fact that a composition of bits of a transition can be built by TMs mean that we can delegate to them, effectively adding a transition trough a parametrized TM.
+The fact that a composition of bits of a transition can be built by TMs means that we can delegate to them, effectively adding a transition through a parametrized TM.
 
-Before we look at a pattern that use this concept, we add the simple TM *compose*.
+Before we look at a pattern that uses this concept, we add the simple TM *compose*.
 *compose* encapsulate the generic idea of building two sequential instruction paths to form a bigger computation.
+
 This is similar to a normal double delegation but done with a single TM that can be plugged everywhere an expression can.
-The difference between a *compose*d expression and a normal compacted expression of two TMs, that would execute the same logic as the two expression in the *compose*d one, is that by, senquentially, delegating we don't rewind the tape.
+The difference between a *compose*d expression and a normal compacted expression of two TMs, that would execute the same logic as the two expressions in the *compose*d one, is that by, sequentially, delegating we don't rewind the tape.
 
 Now, let's look at *hold*. 
 This is the main part of the machine we are trying to build. 
@@ -765,8 +767,8 @@ United with another tool that *Tummys* offer, the _ symbol, we can scale vertica
 
 Furthermore, this enables us to think of our TMs at a higher level of abstraction and in smaller pieces.
 
-Those last few points completely encaplsulate what *Tummys* compositional tools are designed for.
-They provide the same structural advantage of functions in other languages, be it maintanability or scalability.
+Those last few points completely encapsulate what *Tummys* compositional tools are designed for.
+They provide the same structural advantage of functions in other languages, be it maintanaibility or scalability.
 
 Now, what we said before, about the important difference between transition being expressable as expression and being described in a declaration, should make more sense.
 For the algorithm we are using to shift the input, the diverging instruction path we have to follow is exactly a transition, write a blank and then move right.
@@ -836,7 +838,7 @@ We start expanding the parametrized TM that we delegate too. In the case of nest
 }
 ~~~
 
-I have added the two hold definition that were created to help in the visualization. Please refer back to the section on delegating transition if the expansion is not clear.
+I have added the two hold definitions that were created to help in the visualization. Please refer back to the section on delegating transition if the expansion is not clear.
 We now expand the next outermost parametrized TM, compose.
 
 ~~~
@@ -1094,29 +1096,29 @@ As an example piece, I found this level of granularity interesting enough to be 
 
 While it was really funny to think about *Tummys*, I'm not completely satisfied by the current state of its design.
 
-One glaring issue is that the expanded TMs that *Tummys* declares are much more tangled and riddled with unnecesary steps than the one we would write.
+One glaring issue is that the expanded TMs that *Tummys* declares are much more tangled and riddled with unnecessary steps than the one we would write.
 With each level of indirection that we add, we add even more intermediary do-nothing steps.
 
-Many of this are from "don't move the head" expansions that is there because of the model we use for our transitions. But most of those "don't move" transitions are derived from the expansions of all the delegations we do and their intermediary steps.
+Many of this are from "don't move the head" expansions that are there because of the model we use for our transitions. But most of those "don't move" transitions are derived from the expansions of all the delegations we do and their intermediary steps.
 
-When I will get to work on *Tummys* I will surely check some of the expansion rules again. With many things removed from the core of the language, some of the intermediary steps we take feels unnecessary now.
+When I will get to work on *Tummys* I will surely check some of the expansion rules again. With many things removed from the core of the language, some of the intermediary steps we take feel unnecessary now.
 
 Adding all those steps means making the TMs less performant too, as they do a larger number of steps than they need. 
 
-For example the rightShift machine that we saw in the exercise can be easily written with about 5 states.
+For example, the rightShift machine that we saw in the exercise can be easily written with about 5 states.
 Part of this can be easily solved in the compiler by doing some optimization passes that removes many do nothing steps.
-But, nonetheless, I still think that this can be solved at the root by remodeling some expansion rules.
+But, nonetheless, I still think that this can be solved at the root by remodelling some expansion rules.
 
 The second thing I can't feel happy about is the way in which the programming with *Tummys* feels.
 TMs are, by nature, imperative, mutating, state machine with side effects.
 I would have liked to be able, with *Tummys*, to abstract away the kind of imperative mentality that naturally comes by working on a turing machine configuration.
 
-While I tried to provide abstractions that would lead towards some different mentality state, I don't think this was successfull enough.
+While I tried to provide abstractions that would lead towards some different mentality state, I don't think this was successful enough.
 
-While working trough the example you saw here, and other experimental programs, I did not feel like I was allowed to think with the paradigm I was trying to express nor at the abstraction level I wanted.
+While working through the examples you saw here, and other experimental programs, I did not feel like I was helped in thinking with the paradigm I was trying to express nor at the abstraction level I wanted.
 
 At the same time, and in some way contrarily to what a research of such abstractions should bring, I feel there is a kind conflict between the tools *Tummys* provides and the way a TM can be easily reasoned about.
-Many times during the writing of these examples I felt that the complexity those abstraction create was completely unneccesary and as much as a, I dare say, disadvantage over the more concrete way TMs can be expressed.
+Many times during the writing of these examples I felt that the complexities those abstractions create were completely unnecessary and as much as a, I dare say, disadvantage over the more concrete way TMs can be expressed.
 
 I'm still not sure how those feelings should be addressed but I wouldn't mind looking at *Tummys* from the inside out again when I will have more experience with this kind of things.
 
@@ -1125,7 +1127,7 @@ I'm still not sure how those feelings should be addressed but I wouldn't mind lo
 Going back to the start, I said that Tummys was chosen because of [this paper](https://www.cl.cam.ac.uk/~sd601/papers/mov.pdf).
 For those that do not want to read it, the TLDR is that the x86 MOV instruction is Turing complete on its own ( and a single JMP instruction and four registers {or less for some programs}).
 
-What this has to do with *Tummys*, is that *Tummys* was made because the real exercise I wanted to tackle was to build a bytecode VM wich basically supports only a MOV-like instruction, and then build a compiler for some language $$ X $$ that compiled to that VM bytecode.
+What this has to do with *Tummys*, is that *Tummys* was made because the real exercise I wanted to tackle was to build a bytecode VM which basically supports only a MOV-like instruction, and then build a compiler for some language $$ X $$ that compiled to that VM bytecode.
 A language that worked with actual TMs seemed easier to translate than some other language with other constructs.
 
 While this is what spawned this exercise, this is probably the thing that makes it the most inaccessible to me right now. 
