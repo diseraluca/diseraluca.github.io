@@ -231,7 +231,7 @@ While some transition declaration may be given for them, the TM will halt as soo
 At least one transition to the $$ REJ $$ or $$ ACC $$ states must be present in any TM definition.
 
 A state identifier is implicitly defined the first time it is encountered in a transition table for a given TM.
-If a transiction declaration from $$ A $$ on the alphabet $$ X $$ comes after a transiction declaration from $$ A $$ on the alphabet $$ Y $$ and $$ X \cap Y$$ is non-empty, the transiction from $$ A $$ on $$ \forall z \in ( X \cap Y ) $$ wil follow $$ B $$, the transiction declaration $$ A $$ on $$ X $$.
+If a transition declaration from $$ A $$ on the alphabet $$ X $$ comes after a transition declaration from $$ A $$ on the alphabet $$ Y $$ and $$ X \cap Y$$ is non-empty, the transition from $$ A $$ on $$ \forall z \in ( X \cap Y ) $$ wil follow $$ B $$, the transition declaration $$ A $$ on $$ X $$.
 
 When a character for which no transition from the current state exists is met, the TM halts on the rejecting state immediately.
 
@@ -241,7 +241,7 @@ The second type of transition declaration is the delegating transition of the fo
 state alphabet -> expression -> transition
 ~~~
 
-Where "state", "alphabet" and "transiction" are defined as above. "expression" is a valid Tummy expression ( e.g a sequence of TMs $$M1, M2, ... MN$$ ).
+Where "state", "alphabet" and "transition" are defined as above. "expression" is a valid Tummy expression ( e.g a sequence of TMs $$M1, M2, ... MN$$ ).
 An image can help us understand this concept.
 
 ![delegating transiction]({{ "/assets/TUMMY_delegating_transiction.png" | absolute_url }})
@@ -295,7 +295,7 @@ $$ N \prime \prime $$ is an intermediate state that for every character $$ c \in
 
 Delegating Transitions are a way of reusing TMs by executing them from another TM.
 
-Given a TM $$ M $$ with a tape alphabet $$ A + [ a ] $$ that has one or more delegating transictions to other TMs $$ M_1 , M_2 , ... M_n $$ with tape alphabets $$ A_1 + [a_1] , A_2 + [a_2], ... A_n + [a_n] $$,
+Given a TM $$ M $$ with a tape alphabet $$ A + [ a ] $$ that has one or more delegating transitions to other TMs $$ M_1 , M_2 , ... M_n $$ with tape alphabets $$ A_1 + [a_1] , A_2 + [a_2], ... A_n + [a_n] $$,
 the tape alphabet of $$ M $$ is considered to be $$ [A] + ( A_1 + [a_1] ) + ( A_2 + [a_2] ) + ... + ( A_n + [a_n] ) + [a] $$ where $$ [a] $$ is the blank symbol for $$ M $$.
 
 Lastly, *Tummys* supports a second type of TMs, parametrized TMs.
@@ -348,7 +348,7 @@ The process for which an expression is compacted is through the conjunction of T
 
 Given any two turing machines $$ M = ( Q , \Sigma , \Gamma , \delta , q_0 , q_a , q_r ) $$ and $$ M ^ \prime = ( Q ^ \prime , \Sigma ^ \prime , \Gamma ^ \prime , \delta ^ \prime , q_0 ^ \prime , q_a ^ \prime , q_r ^ \prime ) $$, for which $$ Q $$ and $$ Q ^ \prime $$ are disjoint, their conjuction $$ M \cup M ^ \prime $$ is the turing machine
 $$ M ^ \cup = ( Q \cup Q ^ \prime \cup Q ^ \cup , \Sigma \cup \Sigma ^ \prime , \Gamma \cup \Gamma ^ \prime , \delta ^ \cup , q_0 , q_a ^ \prime , q_r ^ \prime ) $$, where $$ Q ^ \cup $$ is the set of additional states that are needed for the conjuction
-and $$ \delta ^ \cup $$ is a transiction function with signature $$ ( Q \cup Q ^ \prime \cup Q ^ \cup ) \times ( \Gamma \cup \Gamma ^ \prime ) \mapsto ( Q \cup Q ^ \prime \cup Q ^ \cup ) \times ( \Gamma \cup \Gamma ^ \prime ) \times \{ L , R \} $$ that describes the new transiction table derived from the original TMs.
+and $$ \delta ^ \cup $$ is a transition function with signature $$ ( Q \cup Q ^ \prime \cup Q ^ \cup ) \times ( \Gamma \cup \Gamma ^ \prime ) \mapsto ( Q \cup Q ^ \prime \cup Q ^ \cup ) \times ( \Gamma \cup \Gamma ^ \prime ) \times \{ L , R \} $$ that describes the new transition table derived from the original TMs.
 
 Each transition to the rejecting or accepting state in $$ \delta $$ is substituted to a transition to a state $$ q_{ \delta ^ \cup } $$ that start the process of rewinding the tape.
 
@@ -412,7 +412,7 @@ First, we change the name of their states so that the two set of states are disj
 }
 ~~~
 
-then start defining $$ M ^ { \prime \prime } $$ with the transiction table of $$ M $$:
+then start defining $$ M ^ { \prime \prime } $$ with the transition table of $$ M $$:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
@@ -437,7 +437,7 @@ then start defining $$ M ^ { \prime \prime } $$ with the transiction table of $$
 }
 ~~~
 
-Then we expand $$ M ^ { \prime \prime } $$ so that each transiction to $$ ACC $$ or $$ REJ $$ will transition to a new state that starts the rewind process and we add the necessary transiction declarations to rewind the tape:
+Then we expand $$ M ^ { \prime \prime } $$ so that each transition to $$ ACC $$ or $$ REJ $$ will transition to a new state that starts the rewind process and we add the necessary transition declarations to rewind the tape:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
@@ -498,7 +498,7 @@ We then expands $$  M ^ { \prime \prime } $$ 's alphabet with the alphabet from 
 }
 ~~~
 
-We add the states and transiction declarations of $$ M ^ \prime $$ to $$  M ^ { \prime \prime } $$ and connect the accepting state of the rewind machine to the starting state of $$ M ^ \prime $$:
+We add the states and transition declarations of $$ M ^ \prime $$ to $$  M ^ { \prime \prime } $$ and connect the accepting state of the rewind machine to the starting state of $$ M ^ \prime $$:
 
 ~~~
 :: M [0, 1] [0, 1]+[' '] {
@@ -877,7 +877,7 @@ We now expand the next outermost parametrized TM, compose.
 }
 ~~~
 
-We do this a few times until all the delegting transiction are expanded:
+We do this a few times until all the delegting transition are expanded:
 
 ~~~
 :: write ['0', '1'] ['0', '1']+[' '] {
