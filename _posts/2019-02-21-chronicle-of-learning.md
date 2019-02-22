@@ -6,7 +6,7 @@ categories: abstract
 tags: compilers design turing-machines abstract ramblings
 ---
 
-### "And so for a time it looked as if all the adventures were coming to an end, but that was not to be"
+# "And so for a time it looked as if all the adventures were coming to an end, but that was not to be"
 
 Another adventure is coming to its end as I'm finally reaching the last few chapters of the [Crafting Interpreters book](http://craftinginterpreters.com/), from [Bob Nystrom](http://journal.stuffwithstuff.com/).
 I already liked the author's [previous book](http://gameprogrammingpatterns.com/){ Which I have never completed tough }, but I found that this one was by far more interesting { Probably because languages and compilers are by far more compelling to me }.
@@ -29,7 +29,7 @@ But the problem is: Which language should I implement?
 > I'm not sure where my three copies { Oh the Irony of having 3 copies of one of my most hated books and zero copies of some of my most loved ones } are, but I hope that they're burning in hell.
 > Anyway, the idea of referencing that book came to me as I vividly felt a kind of uneasiness that brought me back to that time as I was laying out the details of this upcoming exercise.
 
-### MOVing along
+# MOVing along
 
 We don't need another useless, badly designed, horribly implemented toy language. This was the first thing I felt when I started designing this exercise. There are many existing languages that
 are perfect for a first compiler.
@@ -52,7 +52,7 @@ There are some design seeds that I chose for *Tummys*:
 
 While bare, they were enough to start designing the language.
 
-### How are our TMs defined
+# How are our TMs defined
 
 For *Tummys* we are mostly using the classic intuition of a TM with a configuration, a read-write head and a tape.
 A TM reads a symbol from the current tape's cell under the read-write head at each step and writes a symbol on that cell, moves either left or right and sets to a new state. These actions are chosen in accordance with the TM's configuration.
@@ -622,7 +622,7 @@ and transitioning to state $$ N ^ \prime $$.
 
 ## Side Effect TMs
 
-# I/O TMs
+### I/O TMs
 
 A sequence of special Turing machine is provided for input/output purposes.
 
@@ -632,12 +632,12 @@ The $$ IC $$ TM is a special Turing machine that reads a single character of inp
 
 The $$ O $$ TM is a special Turing machine that writes all the contents of its tape, starting at the leftmost non-blank character, to the output and then halts, leaving its tape and read-write head unchanged.
 
-# State machine
+### State machine
 
 The state machine $$ S $$ is a special Turing machine that, when composed with another machine, writes 'A' to its tape if the machine it was composed with, when run, ends on the accepting state and 'R' otherwise.
 As with everything in *Tummys*, non-halting Turing machines are considered undefined behaviour.
 
-# Debugging and Inspecting machines
+### Debugging and Inspecting machines
 
 This is a category of machines that I'm still unsure about. They would provide a way to attach a debugger to a TM so that information about its execution can be shown to the user.
 
@@ -648,12 +648,12 @@ For example, $$ \delta $$ would print to the user the expanded transition table 
 
 I'm unsure about it as it may be better to provide such functionalities through the *Tummys* environment ( eg. its compiler or interpreter or other tools ) than directly as language constructs.
 
-### Some examples
+# Some examples
 
 Here there are some examples of valid Tummys programs. I prepared a [Github gist](https://gist.github.com/diseraluca/33b5238e524cb715b9191b0dddbe141e) with some snippets of code that can be run on [turing-machine.io](http://turingmachine.io/) to graphically see the TMs in action.
 For practical reasons, not every state is expanded completely ( for example a state that in Tummys would be expanded to states over the whole alphabet may be simplified on the blank character that is the character we are expecting to be there ).
 
-# Is divisible by 10?
+## Is divisible by 10?
 
 ~~~
 #DIGITS ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
@@ -1121,7 +1121,7 @@ Many times during the writing of these examples I felt that the complexities tho
 
 I'm still not sure how those feelings should be addressed but I wouldn't mind looking at *Tummys* from the inside out again when I will have more experience with this kind of things.
 
-### MOV MOV MOV MOV MOV MOV MOV MOV
+# MOV MOV MOV MOV MOV MOV MOV MOV
 
 Going back to the start, I said that Tummys was chosen because of [this paper](https://www.cl.cam.ac.uk/~sd601/papers/mov.pdf).
 For those that do not want to read it, the TLDR is that the x86 MOV instruction is Turing complete on its own ( and a single JMP instruction and four registers {or less for some programs}).
@@ -1133,7 +1133,7 @@ While this is what spawned this exercise, this is probably the thing that makes 
 
 This is all speculative though, it may happen that it is actually an easy implementation to do and parsing *Tummys* becomes the actually hard part who knows.
 
-### "All shall be done, but it may be harder than you think."
+# "All shall be done, but it may be harder than you think."
 
 This is what I consider a cool exercise to try. Nonetheless, I'm not sure if I will tackle it right away. Unfortunately, my current study routine is completely packed by rotating between 2 programming books, 1 math book { which is slowing me down the most }, 2 MOOCs and a practical exercise where I bang my head against the wall while implementing a Bitmapped Vector Trie in C++.
 It is far more realistic that after completing the [Crafting Interpreters book](http://craftinginterpreters.com/) I will try my hand at something like the [PL\0](https://en.wikipedia.org/wiki/PL/0) at first.
