@@ -677,6 +677,8 @@ This is a valid *Tummys* program that takes as input a line from the user and wr
 We first define the #DIGITS alphabet that contains the digits character from which a positive natural number can be formed. While alphabet and languages were mostly removed from *Tummys* now, it is still important to use basic alphabets so that we naturally reject an incorrect input.
 In fact, one of the rules of *Tummys* is that any unrecognized character that is met automatically halts the TM execution on the rejecting state.
 
+This example would have been interesting for some language related mechanics like decision and recognition, but all of those things were removed from *Tummys* for complexity reasons.
+
 *toEnd* is a convenience TM, that is designed to be delegated to, that moves a TM head to the right until the first blank character is met, on which it stops.
 
 We then have *divisibleBy10* which is the main TM of this program. It works on the DIGITS alphabet and accepts any input on the DIGITS alphabet that is divisible by ten. This is done by going to the end of the input and then checking if it is a '0'.
@@ -732,11 +734,17 @@ This is more understandable by looking at the most important difference between 
 
 *Tummys* composition is primarily built on delegating transion, and as such expanding the functionality of a TM by the reuse of an expression, and parametrized TMs that can build a plethora of similar machine from a logical template.
 
-The fact that a composition of bits of a transition can be built by TMs mean that we can delegate to them, effectively adding a transiction trough a parametrized TM.
+The fact that a composition of bits of a transition can be built by TMs mean that we can delegate to them, effectively adding a transition trough a parametrized TM.
 
 Before we look at a pattern that use this concept, we add the simple TM *compose*.
 *compose* encapsulate the generic idea of building two sequential instruction paths to form a bigger computation.
 This is similar to a normal double delegation but done with a single TM that can be plugged everywhere an expression can.
+The difference between a *compose*d expression and a normal compacted expression of two TMs that would execute the same logic as the two expression in the *compose*d one is that by senquentially delegating we don't rewind the tape.
+
+Now, let's look at *hold*. *hold* is the generalization of a pattern where we want to execute an instruction path from a state and then write the character that was met before transitioning from that initial state.
+
+![delegating transiction]({{ "/assets/TUMMY_hold.png" | absolute_url }})
+
 
 
 
