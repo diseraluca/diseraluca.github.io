@@ -628,6 +628,7 @@ and transitioning to state $$ N ^ \prime $$.
 A sequence of special Turing machine is provided for input/output purposes.
 
 The $$ I $$ TM is a special Turing machine that reads a line of input from the user and writes it to its tape halting afterwards.
+
 The $$ IC $$ TM is a special Turing machine that reads a single character of input from the user and writes it to its tape halting afterwards.
 
 The $$ O $$ TM is a special Turing machine that writes all the contents of its tape, starting at the leftmost non-blank character, to the output and then halts, leaving its tape and read-write head unchanged.
@@ -650,7 +651,7 @@ I'm unsure about it as it may be better to provide such functionalities through 
 
 ### Some examples
 
-Here there are some examples of valid Tummys programs. I prepared a [Github gist] with some snippets of code that can be run on [turing-machine.io](http://turingmachine.io/) to graphically see the TMs in action.
+Here there are some examples of valid Tummys programs. I prepared a [Github gist](https://gist.github.com/diseraluca/33b5238e524cb715b9191b0dddbe141e) with some snippets of code that can be run on [turing-machine.io](http://turingmachine.io/) to graphically see the TMs in action.
 For practical reasons, not every state is expanded completely ( for example a state that in Tummys would be expanded to states over the whole alphabet may be simplified on the blank character that is the character we are expecting to be there ).
 
 # Is divisible by 10?
@@ -672,16 +673,16 @@ For practical reasons, not every state is expanded completely ( for example a st
 O S divisibleBy10 I
 ~~~
 
-This is a valid Tummy program that takes as input a line from the user and writes A back if the input represents a number $$n\elemZ^*$$ such that $$n$$ is divisible by 10 or R otherwise.
-We first define the #DIGITS alphabet that contains the digits character from which a positive natural number can be formed. While alphabet and languages were mostly removed from Tummys now, it is still important to use basic alphabets so that we naturally reject an incorrect input.
-In fact, one of the rules of Tummys is that any unrecognized character that is met automatically halts the TM execution on the rejecting state.
+This is a valid *Tummys* program that takes as input a line from the user and writes A back if the input represents a number $$ n \in Z ^ * $$ such that $$ n $$ is divisible by 10, or R otherwise.
+We first define the #DIGITS alphabet that contains the digits character from which a positive natural number can be formed. While alphabet and languages were mostly removed from *Tummys* now, it is still important to use basic alphabets so that we naturally reject an incorrect input.
+In fact, one of the rules of *Tummys* is that any unrecognized character that is met automatically halts the TM execution on the rejecting state.
 
-toEnd is a convenience TM, that is designed to be delegated to, that moves a TM head to the right until the first blank character is met, on which it stops.
+*toEnd* is a convenience TM, that is designed to be delegated to, that moves a TM head to the right until the first blank character is met, on which it stops.
 
-We then have divisibleBy10 which is the main TM of this program. It works on the DIGITS alphabet and accepts any input on the DIGITS alphabet that is divisible by ten. This is done by going to the end of the input and then checking if it is a '0'.
+We then have *divisibleBy10* which is the main TM of this program. It works on the DIGITS alphabet and accepts any input on the DIGITS alphabet that is divisible by ten. This is done by going to the end of the input and then checking if it is a '0'.
 If the input has unknown characters the machine will reject as soon as that is encountered.
 
-This is all wrapped in the OSI idiom ( $$O S M_1 ... M_N I$$ ) that is Tummys way of checking if a given composition of Turing machines accepts or reject a given input.
+This is all wrapped in the **OSI** idiom ( $$ O S M_1 ... M_N I $$ ) that is *Tummys* way of checking if a given composition of Turing machines accepts or reject a given input.
 
 ## Right shift
 
@@ -696,7 +697,7 @@ This is all wrapped in the OSI idiom ( $$O S M_1 ... M_N I$$ ) that is Tummys wa
 }
 
 :: <A, A', a> moveRight A A'+[a] {
-    S A'+[a] -> (ACC, _, >)
+    S A'+[a] -> (ACC, _, R)
 }
     
 :: <A, A', a, e1, e2> compose A A'+[a] {
@@ -716,11 +717,28 @@ This is all wrapped in the OSI idiom ( $$O S M_1 ... M_N I$$ ) that is Tummys wa
 }
 ~~~
 
-This is a bit more abstract and difficult to untangle. Here we see the general programming paradigm of parametrized TMs and the functional aspect of composition in Tummys.
-You can look at an example of a right shift machine on the binary alphabet in the [Github gist]. I suggest you do so to better understand the idioms we are using here.
+This is a bit more abstract and difficult to untangle. Here we see the general programming paradigm of parametrized TMs and the functional aspect of composition in *Tummys*.
+You can look at an example of a right shift machine on the binary alphabet in the [Github gist](https://gist.github.com/diseraluca/33b5238e524cb715b9191b0dddbe141e). I suggest you do so to better understand the idioms we are using here.
 
 Let's look at this in small bits.
 First, we have toEnd, we already know her ( I'm not sure why but I think of Turing machines as females ) from the previous exercise.
+
+We then have two small, simple, TMs : *write* and *moveRight*.
+They both encapsulate a core behaviour of a TM. In fact they do a single operation that is part of a normal transition, writing a character to the current cell and moving the head ( to the right in this case ). 
+
+Now, why would we have to define TMs that do a core operation that can be expressed more easily as a transition?
+
+This is more understandable by looking at the most important difference between a transition of the form (N, a, d) and a transition bit composed by *moveRight* and *write*, that is : a transition of the form (N, a, d) is **not** an expression.
+
+*Tummys* composition is primarily built on delegating transion, and as such expanding the functionality of a TM by the reuse of an expression, and parametrized TMs that can build a plethora of similar machine from a logical template.
+
+The fact that a composition of bits of a transition can be built by TMs mean that we can delegate to them, effectively adding a transiction trough a parametrized TM.
+
+Before we look at a pattern that use this concept, we add the simple TM *compose*.
+*compose* encapsulate the generic idea of building two sequential instruction paths to form a bigger computation.
+This is similar to a normal double delegation but done with a single TM that can be plugged everywhere an expression can.
+
+
 
 Then we have the first new bit, the write TM. This is a parametrized TM that is perfect to meet first as it is easy to grasp while providing an important insight into what parametrized TMs and delegating transition are designed for: Generalizing and reusing patterns.
 Writing something to a cell is a part of the core of a TM. write does exactly that. 
