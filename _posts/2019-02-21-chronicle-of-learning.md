@@ -4,7 +4,6 @@ title: The chronicle of self-learning - mov, Turing Machines and Compilers
 date: 2019-02-21
 categories: abstract
 tags: compilers design turing-machines abstract ramblings
-draft: true
 ---
 
 ### "And so for a time it looked as if all the adventures were coming to an end, but that was not to be"
