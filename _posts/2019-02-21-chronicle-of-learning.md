@@ -741,48 +741,34 @@ Before we look at a pattern that use this concept, we add the simple TM *compose
 This is similar to a normal double delegation but done with a single TM that can be plugged everywhere an expression can.
 The difference between a *compose*d expression and a normal compacted expression of two TMs that would execute the same logic as the two expression in the *compose*d one is that by senquentially delegating we don't rewind the tape.
 
-Now, let's look at *hold*. *hold* is the generalization of a pattern where we want to execute an instruction path from a state and then write the character that was met before transitioning from that initial state.
+Now, let's look at *hold*. 
+This is actually the main part of the machine we are trying to build. To shift right on a Turing machine, we move to the end of the input, move left to the last character, blank it and move right, write the character that we just blanked and move left, move left to the next character, repeat until a blank is encountered.
 
-![delegating transiction]({{ "/assets/TUMMY_hold.png" | absolute_url }})
+But how do we know which character we blanked? Turing Machines don't have any memory of this kind of things.
 
+![hold pattern]({{ "/assets/TUMMY_hold.png" | absolute_url }})
 
+This is done like in the image. We create a path, doing the same thing, for each character but moving to different states so that we can write, in the end, the character which started the path by specifying it directly. 
 
+This is what *hold* does.
+*hold* is the generalization of a pattern where we want to execute an instruction path from a state and then write the character that was met before transitioning from that initial state.
 
-Then we have the first new bit, the write TM. This is a parametrized TM that is perfect to meet first as it is easy to grasp while providing an important insight into what parametrized TMs and delegating transition are designed for: Generalizing and reusing patterns.
-Writing something to a cell is a part of the core of a TM. write does exactly that. 
-With the way delegating transition are written in Tummys, we can use the transition after the delegation to move the head right or left. This effectively let us use write as a way to define a transition.
-While this is not needed in a concrete case, encapsulating this behaviour in a TM will provide us with a way of composing expression that builds transitions.
+Essentially "remembering" that character or "holding" it in a buffer.
 
-This is the first important insight on how TMs as parametrizable, expandable, first-class citizens will let us provide a functional approach to the mutating, stateful world of Turing Machines.
+While this is not necessarily useful for a small machine with a small alphabet, like the rightShift on the binary alphabet would be, *hold* gives us the possibility of scaling the pattern horizontally: in the length of the instruction path to follow.
+This is thanks to the fact that we can delegate to any expression, be it a single big Turing machine or a compacted Turing Machine made of a sequence of small TMs.
 
-Write on itself has no particular use. Let's move a little bit down.
+United with another tool that *Tummys* offer, the _ symbol, we can scale vertically over an alphabet of any size, be it the whole tape alphabet or a subset of it, by writing a single instruction.
 
-We encounter moveRight. Again this is a parametrized TM that encapsulates one of the core behaviours of a Turing machine.
-It does exactly what it says, move the head to the right.
+Furthermore, this enables us to think of our TMs at a higher level of abstraction and in smaller pieces.
 
-Now meet compose. Compose sequentially executes two expressions. The most important difference between the composition of compose and the compacting of an expression is that there is no rewind in-between.
-This means that with compose we are effectively creating two sequential states that do some operation without changing the state of the head in between.
-This is the core pattern of transitioning between two states in a Turing machine.
+Those last few points completely encaplsulate what *Tummys* compositional tools are designed for.
+They provide the same structural advantage of functions in other languages, be it maintanability or scalability.
 
-With compose we can, for example, and as will see later, compose the two core behaviour of writing something to the tape and moving right into a single machine.
-But why go to such length for something that is built into the language?
+Now, what we said before, about the important difference between transition being expressable as expression and being described in a declaration, should make more sense.
+For the algorithm we are using to move right, the diverging instruction path we have to follow is exactly a transition, write a blank and then move right.
 
-This, in fact, does not make sense without another piece of this program. hold.
-hold is the first higher-level pattern that we are meeting in Tummys.
-
-First, what pattern is hold?
-hold is a pattern where we remember a value from a state to the next.
-
-This does not make sense without an example. A small part of shifting a whole input one to the right is to blank a cell and rewrite its character to the right.
-In a Turing machine this is doable by writing a series of states that transition in the same way for each character we want to remember.
-
-![delegating transiction]({{ "/assets/TUMMY_hold.png" | absolute_url }})
-
-By doing this we can "remember" the last met character and write it again.
-hold is doing exactly that. It parametrizes an expression to delegate to and then writes the character that was passed to it in the next transition. By staying put we can model the direction and states for the end transition with the transition of hold-caller delegating transition.
-Using hold with _ as the "c" parameter, we can expand a series of equal paths to the same state that varies in the character written in the last transition over an entire alphabet.
-
-As this may not make too much sense we will look at the expansion that happens in the rightShift TM.
+This should make sense by now, in case it wasn't already understandable before, but, to further increment the teaching value of this example, we will look at the expansion that happens in the rightShift TM.
 We'll see a concrete case with the following expression:
 
 ~~~
@@ -802,7 +788,7 @@ First we concretize rightShift with the given parameters:
 
 We won't expand the toEnd delegation as that is easily understood.
 
-As we know, in a transition declaration the first thing that gets expanded is the _ symbol.
+As we know, in a delegating transition, the first thing that gets expanded is the _ symbol.
 
 ~~~
 ::  rightShift ['0', '1'] ['0', '1']+[' '] {
@@ -847,7 +833,7 @@ We start expanding the parametrized TM that we delegate too. In the case of nest
 }
 ~~~
 
-I have added the two hold definition that were created to help in the visualization. Please refer back to the section on delegating declaration if the expansion is not clear.
+I have added the two hold definition that were created to help in the visualization. Please refer back to the section on delegating transition if the expansion is not clear.
 We now expand the next outermost parametrized TM, compose.
 
 ~~~
@@ -895,7 +881,7 @@ We do this a few times until all the delegting transiction are expanded:
 }
 
 :: moveRight ['0', '1'] ['0', '1']+[' '] {
-    S ['0', '1']+[' '] -> (ACC, _, >)
+    S ['0', '1']+[' '] -> (ACC, _, R)
 }
 
 ::  rightShift ['0', '1'] ['0', '1']+[' '] {
@@ -913,7 +899,7 @@ We do this a few times until all the delegting transiction are expanded:
     
     compose01 ['0', '1']+[' '] -> (moveRightS0, _, ^)
     
-    moveRightS0 ['0', '1']+[' '] -> (moveRightIntermediate0, _, >)
+    moveRightS0 ['0', '1']+[' '] -> (moveRightIntermediate0, _, R)
     
     moveRightIntermediate0 ['0', '1']+[' '] -> (composeIntermediate0, _, ^)
     
@@ -933,7 +919,7 @@ We do this a few times until all the delegting transiction are expanded:
     
     compose11 ['0', '1']+[' '] -> (moveRightS1, _, ^)
     
-    moveRightS1 ['0', '1']+[' '] -> (moveRightIntermediate1, _, >)
+    moveRightS1 ['0', '1']+[' '] -> (moveRightIntermediate1, _, R)
     
     moveRightIntermediate1 ['0', '1']+[' '] -> (composeIntermediate1, _, ^)
     
@@ -953,161 +939,188 @@ We now expand the _ and ^ symbols to have our final TM:
 ::  rightShift ['0', '1'] ['0', '1']+[' '] {
     S ['0', '1'] -> toEnd<['0', '1'], ['0', '1'], ' '> -> (1, _, L),
     
-    1 ['0'] -> (stay10, '0', >),
-    stay10 ['0'] -> (holdS0, '0', <)
-    stay10 ['1'] -> (holdS0, '1', <)
-    stay10 [' '] -> (holdS0, ' ', <)
+    1 ['0'] -> (stay10, '0', R),
+    stay10 ['0'] -> (holdS0, '0', L)
+    stay10 ['1'] -> (holdS0, '1', L)
+    stay10 [' '] -> (holdS0, ' ', L)
     
-    holdS0 ['0'] -> (stayHoldS0, '0', >),
-    stayHoldS0 ['0'] -> (composeS0, '0', <)
-    stayHoldS0 ['1'] -> (composeS0, '1', <)
-    stayHoldS0 [' '] -> (composeS0, ' ', <)
+    holdS0 ['0'] -> (stayHoldS0, '0', R),
+    stayHoldS0 ['0'] -> (composeS0, '0', L)
+    stayHoldS0 ['1'] -> (composeS0, '1', L)
+    stayHoldS0 [' '] -> (composeS0, ' ', L)
     
-    composeS0  ['0'] -> (stayComposeS0, '0', >),
-    composeS0  ['1'] -> (stayComposeS0, '1', >),
-    composeS0  [' '] -> (stayComposeS0, ' ', >),
+    composeS0  ['0'] -> (stayComposeS0, '0', R),
+    composeS0  ['1'] -> (stayComposeS0, '1', R),
+    composeS0  [' '] -> (stayComposeS0, ' ', R),
     
-    stayComposeS0 ['0'] -> (writeS0, '0', <)
-    stayComposeS0 ['1'] -> (writeS0, '1', <)
-    stayComposeS0 [' '] -> (writeS0, ' ', <)
+    stayComposeS0 ['0'] -> (writeS0, '0', L)
+    stayComposeS0 ['1'] -> (writeS0, '1', L)
+    stayComposeS0 [' '] -> (writeS0, ' ', L)
     
-    writeS0 ['0', '1']+[' '] -> (stayWriteS0, ' ', >),
+    writeS0 ['0', '1']+[' '] -> (stayWriteS0, ' ', R),
     
-    stayWriteS0 ['0'] -> (writeIntermediate0, '0', <)
-    stayWriteS0 ['1'] -> (writeIntermediate0, '1', <)
-    stayWriteS0 [' '] -> (writeIntermediate0, ' ', <)
+    stayWriteS0 ['0'] -> (writeIntermediate0, '0', L)
+    stayWriteS0 ['1'] -> (writeIntermediate0, '1', L)
+    stayWriteS0 [' '] -> (writeIntermediate0, ' ', L)
     
-    writeIntermediate0 ['0'] -> (stayWriteIntermediate0, '0', >)
-    writeIntermediate0 ['1'] -> (stayWriteIntermediate0, '1', >)
-    writeIntermediate0 [' '] -> (stayWriteIntermediate0, ' ', >)
+    writeIntermediate0 ['0'] -> (stayWriteIntermediate0, '0', R)
+    writeIntermediate0 ['1'] -> (stayWriteIntermediate0, '1', R)
+    writeIntermediate0 [' '] -> (stayWriteIntermediate0, ' ', R)
     
-    stayWriteIntermediate0 ['0'] -> (compose01, '0', <)
-    stayWriteIntermediate0 ['1'] -> (compose01, '1', <)
-    stayWriteIntermediate0 [' '] -> (compose01, ' ', <)
+    stayWriteIntermediate0 ['0'] -> (compose01, '0', L)
+    stayWriteIntermediate0 ['1'] -> (compose01, '1', L)
+    stayWriteIntermediate0 [' '] -> (compose01, ' ', L)
     
-    compose01 ['0'] -> (stayCompose01, '0', >)
-    compose01 ['1'] -> (stayCompose01, '1', >)
-    compose01 [' '] -> (stayCompose01, ' ', >)
+    compose01 ['0'] -> (stayCompose01, '0', R)
+    compose01 ['1'] -> (stayCompose01, '1', R)
+    compose01 [' '] -> (stayCompose01, ' ', R)
     
-    stayCompose01 ['0'] -> (moveRightS0, '0', <)
-    stayCompose01 ['1'] -> (moveRightS0, '1', <)
-    stayCompose01 [' '] -> (moveRightS0, ' ', <)
+    stayCompose01 ['0'] -> (moveRightS0, '0', L)
+    stayCompose01 ['1'] -> (moveRightS0, '1', L)
+    stayCompose01 [' '] -> (moveRightS0, ' ', L)
     
-    moveRightS0 ['0'] -> (moveRightIntermediate0, '0', >)
-    moveRightS0 ['1'] -> (moveRightIntermediate0, '1', >)
-    moveRightS0 [' '] -> (moveRightIntermediate0, ' ', >)
+    moveRightS0 ['0'] -> (moveRightIntermediate0, '0', R)
+    moveRightS0 ['1'] -> (moveRightIntermediate0, '1', R)
+    moveRightS0 [' '] -> (moveRightIntermediate0, ' ', R)
     
-    moveRightIntermediate0 ['0'] -> (stayMoveRightIntermediate0, '0', >)
-    moveRightIntermediate0 ['1'] -> (stayMoveRightIntermediate0, '1', >)
-    moveRightIntermediate0 [' '] -> (stayMoveRightIntermediate0, ' ', >)
+    moveRightIntermediate0 ['0'] -> (stayMoveRightIntermediate0, '0', R)
+    moveRightIntermediate0 ['1'] -> (stayMoveRightIntermediate0, '1', R)
+    moveRightIntermediate0 [' '] -> (stayMoveRightIntermediate0, ' ', R)
     
-    stayMoveRightIntermediate0 ['0'] -> (composeIntermediate0, '0', <)
-    stayMoveRightIntermediate0 ['1'] -> (composeIntermediate0, '1', <)
-    stayMoveRightIntermediate0 [' '] -> (composeIntermediate0, ' ', <)
+    stayMoveRightIntermediate0 ['0'] -> (composeIntermediate0, '0', L)
+    stayMoveRightIntermediate0 ['1'] -> (composeIntermediate0, '1', L)
+    stayMoveRightIntermediate0 [' '] -> (composeIntermediate0, ' ', L)
     
-    composeIntermediate0 ['0'] -> (stayComposeIntermediate0, '0', >)
-    composeIntermediate0 ['1'] -> (stayComposeIntermediate0, '1', >)
-    composeIntermediate0 [' '] -> (stayComposeIntermediate0, ' ', >)
+    composeIntermediate0 ['0'] -> (stayComposeIntermediate0, '0', R)
+    composeIntermediate0 ['1'] -> (stayComposeIntermediate0, '1', R)
+    composeIntermediate0 [' '] -> (stayComposeIntermediate0, ' ', R)
     
-    stayComposeIntermediate0 ['0'] -> (holdIntermediate0, '0', <)
-    stayComposeIntermediate0 ['1'] -> (holdIntermediate0, '1', <)
-    stayComposeIntermediate0 [' '] -> (holdIntermediate0, ' ', <)
+    stayComposeIntermediate0 ['0'] -> (holdIntermediate0, '0', L)
+    stayComposeIntermediate0 ['1'] -> (holdIntermediate0, '1', L)
+    stayComposeIntermediate0 [' '] -> (holdIntermediate0, ' ', L)
     
     holdIntermediate0 ['0'] -> (1, '0', L),
     holdIntermediate0 ['1'] -> (1, '1', L),
     holdIntermediate0 [' '] -> (1, ' ', L),
     
-    1 ['1'] -> (stay11, '1', <),
+    1 ['1'] -> (stay11, '1', L),
     
-    stay11 ['0'] -> (holdS1, '0', >)
-    stay11 ['1'] -> (holdS1, '1', >)
-    stay11 [' '] -> (holdS1, ' ', >)
+    stay11 ['0'] -> (holdS1, '0', R)
+    stay11 ['1'] -> (holdS1, '1', R)
+    stay11 [' '] -> (holdS1, ' ', R)
     
-    holdS1 ['1'] -> (stayHoldS1, '1', >),
+    holdS1 ['1'] -> (stayHoldS1, '1', R),
     
-    stayHoldS1 ['0'] -> (holdS1, '0', <)
-    stayHoldS1 ['1'] -> (holdS1, '1', <)
-    stayHoldS1 [' '] -> (holdS1, ' ', <)
+    stayHoldS1 ['0'] -> (holdS1, '0', L)
+    stayHoldS1 ['1'] -> (holdS1, '1', L)
+    stayHoldS1 [' '] -> (holdS1, ' ', L)
     
-    composeS1  ['0'] -> (stayComposeS1, '0', >),
-    composeS1  ['1'] -> (stayComposeS1, '1', >),
-    composeS1  [' '] -> (stayComposeS1, ' ', >),
+    composeS1  ['0'] -> (stayComposeS1, '0', R),
+    composeS1  ['1'] -> (stayComposeS1, '1', R),
+    composeS1  [' '] -> (stayComposeS1, ' ', R),
     
-    stayComposeS1 ['0', '1']+[' '] -> (writeS1, '0', <)
-    stayComposeS1 ['0', '1']+[' '] -> (writeS1, '1', <)
-    stayComposeS1 ['0', '1']+[' '] -> (writeS1, ' ', <)
+    stayComposeS1 ['0', '1']+[' '] -> (writeS1, '0', L)
+    stayComposeS1 ['0', '1']+[' '] -> (writeS1, '1', L)
+    stayComposeS1 ['0', '1']+[' '] -> (writeS1, ' ', L)
     
-    writeS1 ['0', '1']+[' '] -> (stayWriteS1, ' ', >),
+    writeS1 ['0', '1']+[' '] -> (stayWriteS1, ' ', R),
     
-    stayWriteS1 ['0'] -> (writeIntermediate1, '0', <)
-    stayWriteS1 ['1'] -> (writeIntermediate1, '1', <)
-    stayWriteS1 [' '] -> (writeIntermediate1, ' ', <)
+    stayWriteS1 ['0'] -> (writeIntermediate1, '0', L)
+    stayWriteS1 ['1'] -> (writeIntermediate1, '1', L)
+    stayWriteS1 [' '] -> (writeIntermediate1, ' ', L)
 
-    writeIntermediate1 ['0'] -> (stayWriteIntermediate1, '0', >)
-    writeIntermediate1 ['1'] -> (stayWriteIntermediate1, '1', >)
-    writeIntermediate1 [' '] -> (stayWriteIntermediate1, ' ', >)
+    writeIntermediate1 ['0'] -> (stayWriteIntermediate1, '0', R)
+    writeIntermediate1 ['1'] -> (stayWriteIntermediate1, '1', R)
+    writeIntermediate1 [' '] -> (stayWriteIntermediate1, ' ', R)
     
-    stayWriteIntermediate1 ['0'] -> (compose11, '0', <)
-    stayWriteIntermediate1 ['1'] -> (compose11, '1', <)
-    stayWriteIntermediate1 [' '] -> (compose11, ' ', <)
+    stayWriteIntermediate1 ['0'] -> (compose11, '0', L)
+    stayWriteIntermediate1 ['1'] -> (compose11, '1', L)
+    stayWriteIntermediate1 [' '] -> (compose11, ' ', L)
     
-    compose11 ['0'] -> (stayCompose11, '0', >)
-    compose11 ['1'] -> (stayCompose11, '1', >)
-    compose11 [' '] -> (stayCompose11, ' ', >)
+    compose11 ['0'] -> (stayCompose11, '0', R)
+    compose11 ['1'] -> (stayCompose11, '1', R)
+    compose11 [' '] -> (stayCompose11, ' ', R)
     
-    stayCompose11 ['0'] -> (moveRightS1, '0', <)
-    stayCompose11 ['1'] -> (moveRightS1, '1', <)
-    stayCompose11 [' '] -> (moveRightS1, ' ', <)
+    stayCompose11 ['0'] -> (moveRightS1, '0', L)
+    stayCompose11 ['1'] -> (moveRightS1, '1', L)
+    stayCompose11 [' '] -> (moveRightS1, ' ', L)
     
-    moveRightS1 ['0'] -> (moveRightIntermediate1, '0', >)
-    moveRightS1 ['1'] -> (moveRightIntermediate1, '1', >)
-    moveRightS1 [' '] -> (moveRightIntermediate1, ' ', >)
+    moveRightS1 ['0'] -> (moveRightIntermediate1, '0', R)
+    moveRightS1 ['1'] -> (moveRightIntermediate1, '1', R)
+    moveRightS1 [' '] -> (moveRightIntermediate1, ' ', R)
     
-    moveRightIntermediate1 ['0'] -> (stayMoveRightIntermediate1, '0', >)
-    moveRightIntermediate1 ['1'] -> (stayMoveRightIntermediate1, '1', >)
-    moveRightIntermediate1 [' '] -> (stayMoveRightIntermediate1, ' ', >)
+    moveRightIntermediate1 ['0'] -> (stayMoveRightIntermediate1, '0', R)
+    moveRightIntermediate1 ['1'] -> (stayMoveRightIntermediate1, '1', R)
+    moveRightIntermediate1 [' '] -> (stayMoveRightIntermediate1, ' ', R)
     
-    stayMoveRightIntermediate1 ['0'] -> (composeIntermediate1, '0', <)
-    stayMoveRightIntermediate1 ['1'] -> (composeIntermediate1, '1', <)
-    stayMoveRightIntermediate1 [' '] -> (composeIntermediate1, ' ', <)
+    stayMoveRightIntermediate1 ['0'] -> (composeIntermediate1, '0', L)
+    stayMoveRightIntermediate1 ['1'] -> (composeIntermediate1, '1', L)
+    stayMoveRightIntermediate1 [' '] -> (composeIntermediate1, ' ', L)
     
-    composeIntermediate1 ['0'] -> (stayComposeIntermediate1, '0', >)
-    composeIntermediate1 ['1'] -> (stayComposeIntermediate1, '1', >)
-    composeIntermediate1 [' '] -> (stayComposeIntermediate1, ' ', >)
+    composeIntermediate1 ['0'] -> (stayComposeIntermediate1, '0', R)
+    composeIntermediate1 ['1'] -> (stayComposeIntermediate1, '1', R)
+    composeIntermediate1 [' '] -> (stayComposeIntermediate1, ' ', R)
     
-    stayComposeIntermediate1 ['0'] -> (holdIntermediate1, '0', <)
-    stayComposeIntermediate1 ['1'] -> (holdIntermediate1, '1', <)
-    stayComposeIntermediate1 [' '] -> (holdIntermediate1, ' ', <)
+    stayComposeIntermediate1 ['0'] -> (holdIntermediate1, '0', L)
+    stayComposeIntermediate1 ['1'] -> (holdIntermediate1, '1', L)
+    stayComposeIntermediate1 [' '] -> (holdIntermediate1, ' ', L)
     
     holdIntermediate1 ['0'] -> (1, '0', L),
     holdIntermediate1 ['1'] -> (1, '1', L),
     holdIntermediate1 [' '] -> (1, ' ', L),
 
-    1 [' '] -> (stay1Blank, ' ', >)
+    1 [' '] -> (stay1Blank, ' ', R)
     
-    stay1Blank ['0'] -> (ACC, '0', <)
-    stay1Blank ['1'] -> (ACC, '1', <)
-    stay1Blank [' '] -> (ACC, ' ', <)
+    stay1Blank ['0'] -> (ACC, '0', L)
+    stay1Blank ['1'] -> (ACC, '1', L)
+    stay1Blank [' '] -> (ACC, ' ', L)
     
     2 [' '] -> (1, ' ', L)
 }
 ~~~
 
-And this is the final turing machine that we end up with. You can see it in action on [turing-machine.io]().
+And this is the final turing machine that we end up with. You can see it in action on [turing-machine.io](http://turingmachine.io/).
 
 And if you're wondering, like I would, if this expansion was done by hand, then yes it was! And I would not inflict this on my greatest enemy! 
+
+### My Tummy(s) is hurting!
+
+While it was really funny to think about *Tummys*, I'm not completely satisfied by the current state of its design.
+One glaring issue is that the expanded TMs that *Tummys* declare are much more tangled and riddled with unnecesary steps.
+With each level of indirection that we add, we add even more intermediary do-nothing steps.
+
+Many of this are from "don't move the head" expansions that is there because of the model we use for our transitions. But most of those don't move transitions are derived from the expansion of all the delegation we do and their intermediary steps.
+
+When I will get to work on *Tummys* I will surely check some of the expansion rules again. With many things removed from the core of the language many of the intermediary steps we take are proably unneded now.
+
+Adding all those steps means making the TMs less performant too, as they do a larger number of steps than they need. For example the rightShift machine that we saw in the exercise can be easily written with about 5 states.
+Part of this can be easily solved in the compiler by doing some optimization passes that removes many do nothing steps.
+But, nonetheless, I still think that this can be solved at the root by remodeling some expansion rules.
+
+The second thing I can't feel happy about is the way in which the programming with *Tummys* feels.
+TMs are, by nature, imperative, mutating, state machine with side effects.
+I would have liked to be able, with *Tummys*, to abstract away the kind of imperative mentality that naturally comes by working on a turing machine configuration.
+
+While I tried to provide abstractions that would lead towards some different mentality state, I don't think this was successfull enough.
+
+While working trough the example you saw here, and other experimental programs, I did not feel like I was allowed to think with the paradigm I was trying to express nor at the abstraction level I wanted.
+
+At the same time, and in some way contrarily to what a research of such abstractions should bring, I feel there is a kind conflict between the tools *Tummys* provide and the way a TM can be easily reasoned about.
+Many times during the writing of these examples I felt that the complexity those abstraction creates was completely unneccesary and as much as a, I dare say, disadvantage over the more concrete way TMs can be expressed.
+
+I still not sure how those feelings should be addressed but I wouldn't mind looking at *Tummys* from the inside out again when I will have more experience with this kind of things.
 
 ### MOV MOV MOV MOV MOV MOV MOV MOV
 
 Going back to the start, I said that Tummys was chosen because of [this paper](https://www.cl.cam.ac.uk/~sd601/papers/mov.pdf).
 For those that do not want to read it, the TLDR is that the x86 MOV instruction is Turing complete on its own ( and a single JMP instruction and four registers {or less for some programs}).
 
-What this has to do with Tummys, is that Tummys was made because the real exercise I wanted to tackle was to build a bytecode VM witch basically supports only MOV, and then build a compiler for some language $$X$$ that compiled to that VM bytecode.
+What this has to do with *Tummys*, is that *Tummys* was made because the real exercise I wanted to tackle was to build a bytecode VM wich basically supports only a MOV-like instruction, and then build a compiler for some language $$ X $$ that compiled to that VM bytecode.
 A language that worked with actual TMs seemed easier to translate than some other language with other constructs.
 
 While this is what spawned this exercise, this is probably the thing that makes it the most inaccessible to me right now. 
 
-This is all speculative though, it may happen that it is actually an easy implementation to do and parsing Tummys becomes the actually hard part who knows.
+This is all speculative though, it may happen that it is actually an easy implementation to do and parsing *Tummys* becomes the actually hard part who knows.
 
 ### "All shall be done, but it may be harder than you think."
 
@@ -1118,9 +1131,9 @@ So, why write all this?
 
 Mostly because writing about this exercise was an exercise in itself ( and I needed to relax a little after some all-nighters and getting the damn Cold ). Basically, right now, a great focus of my studies is to
 build a better Math and CS foundation and Turing Machines were themselves something that I looked at again recently in more depth than the last time I studied them.
-It was really helpful brainstorming on this as an excuse to revise some TM concepts while at the same time looking at some of the learning I did on [Crafting Interpreters](http://craftinginterpreters.com/) from another angle.
+It was really helpful brainstorming on this as an excuse to revise some TM concepts while, at the same time, looking at some of the learning I did on [Crafting Interpreters](http://craftinginterpreters.com/) from another angle.
 How I would parse this, Is this as expressive as it can, How would I define a Turing Machine that does X and such were all interesting question to explore this way.
 
-At the same time, it helped me a little with trying to use a more rigorous and formal thinking and writing process. Anyone with real experience and knowledge is surely able to point me to thousands of things that I failed at in this regard, but this small steps are helping me a lot with slowly filling the gaps of a completely self-taught education that sometimes weights too much { My greatest regret is probably that I was not able to follow a normal academic path }.
+At the same time, it helped me a little with trying to use a more rigorous and formal thinking and writing process. Anyone with real experience and knowledge is surely able to point me to thousands of things that I failed at in this regard, but this small steps are helping me a lot with slowly filling the gaps of a completely self-taught education that sometimes weights too much { My second greatest regret is probably that I was not able to follow a normal academic path }.
 
-I hope this was at least a little bit interesting to someone else, I will probably try to write down a formal grammar for Tummys in my free-time-from-my-free-time for the time being while hoping to tackle this as soon as possible.
+I hope this was at least a little bit interesting to someone else, I will probably try to write down a formal grammar for *Tummys* in my free-time-from-my-free-time for the time being while hoping to tackle this as soon as possible.
