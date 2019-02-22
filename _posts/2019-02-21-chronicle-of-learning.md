@@ -739,10 +739,12 @@ The fact that a composition of bits of a transition can be built by TMs mean tha
 Before we look at a pattern that use this concept, we add the simple TM *compose*.
 *compose* encapsulate the generic idea of building two sequential instruction paths to form a bigger computation.
 This is similar to a normal double delegation but done with a single TM that can be plugged everywhere an expression can.
-The difference between a *compose*d expression and a normal compacted expression of two TMs that would execute the same logic as the two expression in the *compose*d one is that by senquentially delegating we don't rewind the tape.
+The difference between a *compose*d expression and a normal compacted expression of two TMs, that would execute the same logic as the two expression in the *compose*d one, is that by, senquentially, delegating we don't rewind the tape.
 
 Now, let's look at *hold*. 
-This is actually the main part of the machine we are trying to build. To shift right on a Turing machine, we move to the end of the input, move left to the last character, blank it and move right, write the character that we just blanked and move left, move left to the next character, repeat until a blank is encountered.
+This is the main part of the machine we are trying to build. 
+
+To shift right on a Turing machine, we move to the end of the input, move left to the last character, blank it and move right, write the character that we just blanked and move left, move left to the next character, repeat until a blank is encountered.
 
 But how do we know which character we blanked? Turing Machines don't have any memory of this kind of things.
 
@@ -751,6 +753,7 @@ But how do we know which character we blanked? Turing Machines don't have any me
 This is done like in the image. We create a path, doing the same thing, for each character but moving to different states so that we can write, in the end, the character which started the path by specifying it directly. 
 
 This is what *hold* does.
+
 *hold* is the generalization of a pattern where we want to execute an instruction path from a state and then write the character that was met before transitioning from that initial state.
 
 Essentially "remembering" that character or "holding" it in a buffer.
@@ -766,7 +769,7 @@ Those last few points completely encaplsulate what *Tummys* compositional tools 
 They provide the same structural advantage of functions in other languages, be it maintanability or scalability.
 
 Now, what we said before, about the important difference between transition being expressable as expression and being described in a declaration, should make more sense.
-For the algorithm we are using to move right, the diverging instruction path we have to follow is exactly a transition, write a blank and then move right.
+For the algorithm we are using to shift the input, the diverging instruction path we have to follow is exactly a transition, write a blank and then move right.
 
 This should make sense by now, in case it wasn't already understandable before, but, to further increment the teaching value of this example, we will look at the expansion that happens in the rightShift TM.
 We'll see a concrete case with the following expression:
@@ -1083,17 +1086,24 @@ And this is the final turing machine that we end up with. You can see it in acti
 
 And if you're wondering, like I would, if this expansion was done by hand, then yes it was! And I would not inflict this on my greatest enemy! 
 
+Some things could be split-up in smaller pieces, or compacted in bigger ones, but the granularity of the pieces depends on the context we are doing this in.
+
+As an example piece, I found this level of granularity interesting enough to be observed.
+
 ### My Tummy(s) is hurting!
 
 While it was really funny to think about *Tummys*, I'm not completely satisfied by the current state of its design.
-One glaring issue is that the expanded TMs that *Tummys* declare are much more tangled and riddled with unnecesary steps.
+
+One glaring issue is that the expanded TMs that *Tummys* declares are much more tangled and riddled with unnecesary steps than the one we would write.
 With each level of indirection that we add, we add even more intermediary do-nothing steps.
 
-Many of this are from "don't move the head" expansions that is there because of the model we use for our transitions. But most of those don't move transitions are derived from the expansion of all the delegation we do and their intermediary steps.
+Many of this are from "don't move the head" expansions that is there because of the model we use for our transitions. But most of those "don't move" transitions are derived from the expansions of all the delegations we do and their intermediary steps.
 
-When I will get to work on *Tummys* I will surely check some of the expansion rules again. With many things removed from the core of the language many of the intermediary steps we take are proably unneded now.
+When I will get to work on *Tummys* I will surely check some of the expansion rules again. With many things removed from the core of the language, some of the intermediary steps we take feels unnecessary now.
 
-Adding all those steps means making the TMs less performant too, as they do a larger number of steps than they need. For example the rightShift machine that we saw in the exercise can be easily written with about 5 states.
+Adding all those steps means making the TMs less performant too, as they do a larger number of steps than they need. 
+
+For example the rightShift machine that we saw in the exercise can be easily written with about 5 states.
 Part of this can be easily solved in the compiler by doing some optimization passes that removes many do nothing steps.
 But, nonetheless, I still think that this can be solved at the root by remodeling some expansion rules.
 
@@ -1105,10 +1115,10 @@ While I tried to provide abstractions that would lead towards some different men
 
 While working trough the example you saw here, and other experimental programs, I did not feel like I was allowed to think with the paradigm I was trying to express nor at the abstraction level I wanted.
 
-At the same time, and in some way contrarily to what a research of such abstractions should bring, I feel there is a kind conflict between the tools *Tummys* provide and the way a TM can be easily reasoned about.
-Many times during the writing of these examples I felt that the complexity those abstraction creates was completely unneccesary and as much as a, I dare say, disadvantage over the more concrete way TMs can be expressed.
+At the same time, and in some way contrarily to what a research of such abstractions should bring, I feel there is a kind conflict between the tools *Tummys* provides and the way a TM can be easily reasoned about.
+Many times during the writing of these examples I felt that the complexity those abstraction create was completely unneccesary and as much as a, I dare say, disadvantage over the more concrete way TMs can be expressed.
 
-I still not sure how those feelings should be addressed but I wouldn't mind looking at *Tummys* from the inside out again when I will have more experience with this kind of things.
+I'm still not sure how those feelings should be addressed but I wouldn't mind looking at *Tummys* from the inside out again when I will have more experience with this kind of things.
 
 ### MOV MOV MOV MOV MOV MOV MOV MOV
 
