@@ -72,17 +72,17 @@ Most of what we need to access the C API is stored in the header file *Python.h*
 There are a few "catches" with this header file that are of note.
 
 1. It brings with it some standard headers, precisely:
-    * <stdio.h> 
-	* <string.h>
-    * <errno.h> 
-	* <stdlib.h>
+    * stdio.h 
+    * string.h
+    * errno.h 
+    * stdlib.h
   if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
 2. This header file can define some pre-processor definitions that changes the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
 
 All *Python.h* user-visible names, be it of function, macros or structure, have the prefix *Py* or *PY* and it is strongly advised to never use this prefixes in our code to avoid any kind of confusion.
 
 Another useful header is [structmember.h](https://github.com/python/cpython/blob/master/Include/structmember.h) which contains what we need to map our C structure representation of objects to Python's object attributes.
-It brings *<stddef.h>* with it to provide *offsetof* that we need when we define our attributes.
+It brings *stddef.h* with it to provide *offsetof* that we need when we define our attributes.
 
 ## Reference Counting
 
@@ -678,7 +678,7 @@ The most important one for modules, as it is specific to them, is the difference
 
 Going top to bottom,  we have three things to talk about before initialization:
 
-Docstrings:
+***Docstrings***:
 
 Everyone who used Python will know what docstrings are. From a C API point of view, we can relate a docstring to a module, function or anything else thanks to the doc member we can find in many definition structures.
   
@@ -701,3 +701,6 @@ if WITH_DOC_STRING is not defined in pyconfig.h
   
 */
 ~~~
+
+***The PyMethodDef structure***:
+
