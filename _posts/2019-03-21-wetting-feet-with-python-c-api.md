@@ -76,6 +76,7 @@ There are a few "catches" with this header file that are of note.
     * string.h
     * errno.h 
     * stdlib.h
+    
   if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
 2. This header file can define some pre-processor definitions that changes the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
 
@@ -703,4 +704,95 @@ if WITH_DOC_STRING is not defined in pyconfig.h
 ~~~
 
 ***The PyMethodDef structure***:
+
+The [PyMethodDef structure](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/methodobject.h#L56) is used to define a python method.
+
+It only has a few members:
+
+| Type              | Member     | Use                                                    |
+|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| 
+| const char*       | ml_name    | The name of the method |
+| PyCFunction       | ml_meth    | Pointer the function implementation |
+| int               | ml_flags   | Bits-flag indicating how Python should construct the call for this method. See below for more informations |
+| const char*       | ml_doc     | Docstring for the method |
+
+There are two interesting bits here, the PyCFunction type and ml_flags.
+[PyCFunction](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/methodobject.h#L18) is a typedefed function pointer to a function that returns a PyObject* and accepts two PyObject* as parameters.
+This is the basic signature for C Function that are callable by python.
+
+The first PyObject*, usually called self, is actually the self object ( the same you would get in a Python instance method ). For a module-level function this is the module instance itself.
+The second parameter, ususally called args, is a PyTuple object that contains all the arguments of the function. Again, you can see the parallelism with Python.
+
+Extending on this is [PyCFunctionWithKeywords](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/methodobject.h#L20), which adds a third PyObject* paramater that, as you probably guessed, is a PyDictionary containing the named arguments passed to the function.
+We will look at how to deal with both the args and kwargs arguments later.
+
+The ml_meth field has to be a PyCFunction pointer or a pointer to another function that is castable, and casted, to it.
+Python bases the way in which the arguments are passed to this function, when called, on the ml_flags parameter.
+There are a few flags we can use:
+
+| Flag              | Meaning                 |
+|:-------------------------------------------:| 
+| METH_VARARGS      | This is the standard calling convention. It passes a self and args argument and expect the method to be of the PyCFucntion type |
+| METH_KEYWORDS     | This is for PyCFunctionWithKeywords types. It passes self and args as METH_VARARGS but adds a third dictionary argument on top of them |
+| METH_NOARGS       | This is for function that expects no arguments. The ml_meth should still be of the PyCFunction type but the second parameter will always bbe passed aas NULL |
+| METH_O            | This is a commodity flags for PyCFunctions that expects a single PyObject as argument. Instead of passing a tuple the second argument is passed directly as the object that would be the sole element of the tuple. |
+
+Of all this flags only *METH_VARARGS* and *METH_KEYWORDS* can be combined togheter.
+There are two more flags,called binding flags, that can be combined with any of the previously described flags but are exclusive between themselves.
+
+| Flag              | Meaning                 |
+|:-------------------------------------------:| 
+| METH_CLASS        | The self parameter will be the type object of the instance instead of the instance itself. This is used to create class methods |
+| METH_STATIC       | The self parameter will be NULL. Used to create static methods |
+
+An example to better wrap your head around this ( with some spoilers on arguments parsing ):
+
+~~~c
+static PyObject* simplePow(PyObject* self, PyObject* args) { // PyCFunction
+    PyObject* base = NULL;
+    PyObject* exponent = NULL;
+    PyObject* result = NULL;
+    
+    if (!PyArg_UnpackTuple(args, __FUNCTION__, 2, 2, &base, &exponent)) { // This is one of the ways to parse the tuple arguments
+        return NULL;
+    }
+    
+    Py_INCREF(base); Py_INCREF(exponent); // We got borrowed references from the tuple. We increment the refcount for good meassure.
+    
+    if (!PyNumber_CHECK(base) || !PyNumber_CHECK(exponent)) { // We check if the passed object implements the Number Protocol otherwise we raise an exception
+       PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(base)->tp_name, Py_TYPE(exponent)->tp_name);
+       
+       Py_DECREF(base); Py_DECREF(exponent); // Remember to decrement the reference count in each path!
+       return NULL; 
+    }
+    
+    result = PyNumber(base, exponent, Py_None); // We should probably check if any error happened here but for this example we won't
+
+    Py_DECREF(base); Py_DECREF(exponent); // We have to decrement the refcount of the borrowed references
+
+    return result; // result is new reference that we are passing to the caller to handle
+}
+
+// Check https://pythonextensionpatterns.readthedocs.io/en/latest/canonical_function.html for another way we could structure this ( and any other ) function.
+// Furthermore, you will see a good goto use in a C program ( This pattern is used troughout some of the CPython source code too )
+
+static PyMethodDef custom_methods[] = {
+   { "simplePow", simplePow, METH_VARARGS, "" }, // Our method entry
+   { NULL, NULL, 0, NULL} // A sentinel to know when we are at the end
+}
+
+static struct PyModuleDef custom_module = {
+   PyModuleDef_HEAD_INIT,
+   "custom",
+   NULL,
+   -1,
+   custom_methods
+};
+
+PyMODINIT_FUNC
+PyInit_spam(void)
+{
+    return PyModule_Create(&custom_module);
+}
+~~~
 
