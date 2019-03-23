@@ -796,3 +796,15 @@ PyInit_spam(void)
 }
 ~~~
 
+## m_traverse, m_clear and GC Support
+
+As said before, on top of the reference counting system Python ships with a an [optional-use garbage collector](https://rushter.com/blog/python-garbage-collector/) to deal, specifically, with cycles.
+To quote the API reference:
+
+> Python’s support for detecting and collecting garbage which involves circular references requires support from object types which are > “containers” for other objects which may also be containers. Types which do not store references to other objects, or which only store > references to atomic types (such as numbers or strings), do not need to provide any explicit support for garbage collection.
+
+The array structure we are building should actually implement GC support. I must say that in the few days I studied the API I never really implemented GC support nor looked into it much.
+While I can't give you any personal experience "insight", I can at least provide you with pointers to how such a support is added and where to look for informations on it.
+
+Implementing GC support doesn't seem to require too much.
+First we have to provide the traverse function ( we will see later that the same GC support function appears for object types too ),
