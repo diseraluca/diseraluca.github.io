@@ -807,4 +807,24 @@ The array structure we are building should actually implement GC support. I must
 While I can't give you any personal experience "insight", I can at least provide you with pointers to how such a support is added and where to look for informations on it.
 
 Implementing GC support doesn't seem to require too much.
-First we have to provide the traverse function ( we will see later that the same GC support function appears for object types too ),
+First we have to provide the traverse function, we will see later that the same GC support functions appear for object types too, which has a [traverseproc](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L158:15) signature.
+
+If needed we have to provide a tp_clear function, which is of the [inquiry](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L148).
+Going by the reference, the discriminator factor for needing a tp_clear function is the fact that the container we are garbage-collecting is mutable ( in which case we need on ) or not.
+Nonetheless it seems a bit tricky to provide one and I advise you to read the [reference entry](https://docs.python.org/3/c-api/typeobj.html#c.PyTypeObject.tp_traverse) on it if interested.
+
+The other [things](https://docs.python.org/3/c-api/gcsupport.html#supporting-cyclic-garbage-collection) we have to ensure are that, quoting the reference:
+
+1. The memory for the object must be allocated using PyObject_GC_New() or PyObject_GC_NewVar().
+2. Once all the fields which may contain references to other containers are initialized, it must call PyObject_GC_Track() { which we will later untrack }.
+
+Furthermore, to actually enable the GC for the object, we need to add the [Py_TPFLAGS_HAVE_GC](https://docs.python.org/3/c-api/typeobj.html#Py_TPFLAGS_HAVE_GC) flag to its type.
+
+To start working with the GC the best resource seems to be the [GC-support tutorial]()https://docs.python.org/3/extending/newtypes_tutorial.html#supporting-cyclic-garbage-collection in the [Extending and Embedding the Python Interpreter](https://docs.python.org/3/extending/index.html) guide.
+
+# Single-phase initialization and Multi-phase initiliazation
+
+With those out of the way, the last thing we are interested in is the difference between the two types of module initialization.
+I've found the [PEP 489](https://www.python.org/dev/peps/pep-0489/) to be a really cool read on this argument. The reference advises to read [PEP 3121](https://www.python.org/dev/peps/pep-3121/) for more details on the sense of the m_size field.
+
+
