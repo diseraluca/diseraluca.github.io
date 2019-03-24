@@ -809,9 +809,9 @@ While I can't give you any personal experience "insight", I can at least provide
 Implementing GC support doesn't seem to require too much.
 First we have to provide the traverse function, we will see later that the same GC support functions appear for object types too, which has a [traverseproc](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L158:15) signature.
 
-If needed we have to provide a tp_clear function, which is of the [inquiry](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L148).
-Going by the reference, the discriminator factor for needing a tp_clear function is the fact that the container we are garbage-collecting is mutable ( in which case we need on ) or not.
-Nonetheless it seems a bit tricky to provide one and I advise you to read the [reference entry](https://docs.python.org/3/c-api/typeobj.html#c.PyTypeObject.tp_traverse) on it if interested.
+If needed we have to provide a tp_clear function, which is of the [inquiry](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L148) type.
+Going by the reference, the discriminator factor for needing a tp_clear function is the fact that the container we are garbage-collecting is mutable ( in which case we need one ) or not.
+Nonetheless, it seems a bit tricky to provide one and I advise you to read the [reference entry](https://docs.python.org/3/c-api/typeobj.html#c.PyTypeObject.tp_traverse) on it if interested.
 
 The other [things](https://docs.python.org/3/c-api/gcsupport.html#supporting-cyclic-garbage-collection) we have to ensure are that, quoting the reference:
 
@@ -827,4 +827,34 @@ To start working with the GC the best resource seems to be the [GC-support tutor
 With those out of the way, the last thing we are interested in is the difference between the two types of module initialization.
 I've found the [PEP 489](https://www.python.org/dev/peps/pep-0489/) to be a really cool read on this argument. The reference advises to read [PEP 3121](https://www.python.org/dev/peps/pep-3121/) for more details on the sense of the m_size field.
 
+Like the names may imply, the two strategies differ in the number of steps taken to initialize a module and the way in which those steps are carried.  
+With single-phase initialization, the module is created, populated and returned directly by the initiliazation function, uniting the creation and initialization process and generating a singleton module.
+As we can read from [PEP 489](https://www.python.org/dev/peps/pep-0489/), this process is different from how Python Modules are built and is specific to C's extension modules.
+
+Furthermore, as the initialization function receives no context, the initialization process lacks access to some informations and brings along some difficult to resolve problems, like the support for sub-interpreters.
+
+On a practical note, this is what our array is doing and how single-phase initialization is supported in the C API:
+
+~~~c
+PyMODINIT_FUNC
+PyInit_lds_array() {
+	PyObject* m;
+	if (PyType_Ready(&arrayType) < 0) {
+		return NULL;
+	}
+
+	m = PyModule_Create(&arraymodule);
+	if (m == NULL) {
+		return NULL;
+	}
+
+	Py_INCREF(&arrayType);
+	PyModule_AddObject(m, "array", (PyObject*)&arrayType);
+	return m;
+}
+~~~
+
+This is a way of initiliazing the module, where we create a module instance from its definition and the populate it trough the use of [supporting functions](https://docs.python.org/3/c-api/module.html#support-functions) like [PyModule_AddObject](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/modsupport.c#L615:1), that uses single-phase initialization.
+
+The code is pretty self-explicative so I won't explain it.
 
