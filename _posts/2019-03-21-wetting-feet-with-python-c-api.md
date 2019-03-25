@@ -858,3 +858,56 @@ This is a way of initiliazing the module, where we create a module instance from
 
 The code is pretty self-explicative so I won't explain it.
 
+Multi-phase initialization is a bit more interesting. Let's start by going practical.
+To request Multi-phase initialization, the Init function should return a PyModuleDef instance pointer for which the m_slots field is correctly set and non-empty.
+
+This should be done trough the use of the [PyModuleDef_Init](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/moduleobject.c#L44) function:
+
+~~~c
+PyMODINIT_FUNC
+PyInit_lds_array(void)
+{
+    return PyModuleDef_Init(&arraymodule);
+}
+~~~
+
+This will give our module def to Python wich will call the constructing functions provided trough the m_slots field.
+The structure connect our m_slots field should be an array of [PyModuleDef_slots](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L61) which has two fields:
+
+| Type              | Member     | Use                                                                |
+|:---------------------------------------------------------------------------------------------------:| 
+| int               | slot       | Defines the type of this slot. See below                           |
+| void*             | value      | The function for this slot whose meaning depends on the slot field |
+
+The slot field has two possible types.
+
+[Py_mod_create](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L66) and [Py_mod_exec](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L67).
+
+The first points to function of signature:
+
+~~~c
+PyObject* f(PyObject *spec, PyModuleDef *def)
+~~~
+
+which should create the module object and return it or set an error if it is not possible. This is the equivalent step to *__new__* in the module initialization.
+The second parameter will receive the *PyModuleDef* we return from the init function.
+The spec parameter is a bit more interesting. There is a lot to understand about the ModuleSpec object and I will point you to [PEP 451](https://www.python.org/dev/peps/pep-0451/) for more informations on it.
+
+If a creation slot is not provided, Python will create the module trough the [PyModule_New function](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/moduleobject.c#L114).
+I could not really find an example of a creation slot in the source code. It seems idiomatic to leave this part to Python.
+
+The second type points to a function with signature:
+
+~~~c
+int f(PyObject* module)
+~~~
+
+that should actually execute the module ( which is equivalent to actually evaluating the code in a module ). We should add classes, functions and so on to our module in this function.
+
+More than one execution can be provided. In this latter case they are executed sequentially in the order they appear in the PyModuleDef_slot array.
+
+If we wanted to rewrite our example code to support Multi-phase initialization, we could try something like the following:
+
+~~~c
+
+~~~
