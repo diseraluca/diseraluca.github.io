@@ -909,5 +909,39 @@ More than one execution can be provided. In this latter case they are executed s
 If we wanted to rewrite our example code to support Multi-phase initialization, we could try something like the following:
 
 ~~~c
+static int array_mod_exec(PyObject* module) {
+    if (PyType_Ready(&arrayType) < 0) {
+        return -1;
+    }
 
+    Py_INCREF(&arrayType);
+    if (PyModule_AddObject(module, "array", (PyObject *) &arrayType) < 0) {
+        // While I tought that we would need to decref &arrayType, every snippet of this code that I found in the CPython source doesn't
+	// I'm still not sure why
+        return -1;
+    }
+    
+    return 0;
+}
+
+static PyModuleDef_Slot[] arrayslots { // Our slots array
+    {Py_mod_exec, array_mod_exec}, // An exec function. We don't provide a create function and let Python do it for us
+    {0, NULL} // a sentinel
+}
+
+static PyModuleDef arraymodule = {
+	PyModuleDef_HEAD_INIT,
+	.m_name = "lds_array",
+	.m_doc = "C-like array module",
+	.m_size = -1,
+	.m_slots = arrayslots // We added our slots to the module def
+};
+
+PyMODINIT_FUNC
+PyInit_lds_array() {
+    return PyModuleDef_Init(&arraymodule); // We now return a PyModuleDef instance instead of the complete module
+}
 ~~~
+
+This is acutally pretty similar to what we had before, we mostly moved some things around.
+
