@@ -962,4 +962,4 @@ typedef struct {
 ~~~
 
 It doesn't have many fields.
-PyObject_HEAD
+[PyObject_HEAD]()
