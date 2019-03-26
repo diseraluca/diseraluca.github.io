@@ -962,4 +962,41 @@ typedef struct {
 ~~~
 
 It doesn't have many fields.
-[PyObject_HEAD]()
+[PyObject_HEAD](https://github.com/python/cpython/blob/130893debfd97c70e3a89d9ba49892f53e6b9d79/Include/object.h#L86:9) is boilerplate code that defines the initial segment of a PyObject. We always need it at the head of our custom objects.
+
+*data* Is where our references will be stored. We will allocate this memory in the __new__ method of our array.
+
+*size* tells us how big the array is. This is non-changing value that is decided on construction.
+[Py_ssize_t](https://github.com/python/cpython/blob/7a2368063f25746d4008a74aca0dc0b82f86ff7b/Include/pyport.h#L84) is a signed number type for which sizeof(size_t) == sizeof(Py_ssize_t) holds.
+
+*storedType* is a pointer to a Python Type ( which is a PyObject too ) we will use to provide some type-checks of inserted elements.
+
+One interesting thing is that, later, I've found out that Python provides a second type of PyObject specifically for objects that have a notion of length ( like containers ): the [PyVarObject](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L118) that adds a field to store the number of items in the object, *ob_size*.
+
+I think we may have used it for the array object but I haven't tried it. 
+
+To make an object a var object we have to use [PyObject_VAR_HEAD](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L101) instead of *PyObject_HEAD* and ensure that the last field of the struct is an array of length one where Python will malloc enough space for ob_size elements.
+Lastly, we have to make some changes to the type of the object that we will see soon enough.
+You can see an examle of this [here](https://github.com/python/cpython/blob/54ba556c6c7d8fd5504dc142c2e773890c55a774/Include/cpython/tupleobject.h#L9).
+
+~~~c
+static PyMemberDef array_members[] = {
+	{"size", T_PYSSIZET, offsetof(array, size), READONLY, "Describe how many elements are stored in the array"},
+	{NULL}
+};
+~~~
+
+[PyMemberDef](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/structmember.h#L18) describes the attribute of a type as a C struct member.
+It has [a few fields](https://docs.python.org/3/c-api/structures.html#c.PyMemberDef):
+
+| Type            | Member    | Use                                                                                      |
+|:----------------------------------------------------------------------------------------------------------------------:| 
+| const char*     | name      | The name of the attribute                                                                |
+| int             | type      | The type of the attribute. See below                                                     |
+| Py_ssize_t      | offset    | The offset in bytes that the member is located in the C struct. We use offsetof for this |
+| int             | flags     | Flags that defines the readability and writability of the attribute                      |
+| const char*     | doc       | The docstring for the attribute                                                          |
+
+Flags can either be 0 for Read-Write access or [READONLY](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/structmember.h#L60) going by the reference.
+We can see from the source code that there exist a restricted version of both read and write. They are used in just a few places in the code but I could not find what they exactly represent or if we should care about them.
+
