@@ -1000,3 +1000,26 @@ It has [a few fields](https://docs.python.org/3/c-api/structures.html#c.PyMember
 Flags can either be 0 for Read-Write access or [READONLY](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/structmember.h#L60) going by the reference.
 We can see from the source code that there exist a restricted version of both read and write. They are used in just a few places in the code but I could not find what they exactly represent or if we should care about them.
 
+We have a few possible [types](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/structmember.h#L27):
+
+| Macro | CType                    |
+|:--------------------------------:|
+| T_SHORT     | short              |
+| T_INT       | int                |
+| T_LONG      | long               |
+| T_FLOAT     | float              |
+| T_DOUBLE    | double             |
+| T_STRING    | const char*        |
+| T_OBJECT    | PyObject*          |
+| T_OBJECT_EX | PyObject*          |
+| T_CHAR      | char               |
+| T_BYTE      | char               |
+| T_UBYTE     | unsigned char      |
+| T_UINT      | unsigned int       |
+| T_USHORT    | unsigned short     |
+| T_ULONG     | unsigned long      |
+| T_BOOL      | char               |
+| T_LONGLONG  | long long          |
+| T_ULONGLOGN | unsigned long long |
+| T_PYSSIZET  | Py_ssize_t         |
+
