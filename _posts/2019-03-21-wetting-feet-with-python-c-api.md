@@ -945,3 +945,21 @@ PyInit_lds_array() {
 
 This is acutally pretty similar to what we had before, we mostly moved some things around.
 
+If you've read [PEP 489](https://www.python.org/dev/peps/pep-0489/), there seems to be quite a few advantage to it. I think this should be the preferred initialization for our extension modules.
+
+# The array object
+
+Moving on we should look at our array.
+First thing first, this is how we have defined the array:
+
+~~~c
+typedef struct {
+	PyObject_HEAD
+	PyObject** data;
+	Py_ssize_t size;
+	PyTypeObject* storedType;
+} array;
+~~~
+
+It doesn't have many fields.
+PyObject_HEAD
