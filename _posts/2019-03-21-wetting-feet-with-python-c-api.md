@@ -1023,3 +1023,13 @@ We have a few possible [types](https://github.com/python/cpython/blob/e42b705188
 | T_ULONGLOGN | unsigned long long |
 | T_PYSSIZET  | Py_ssize_t         |
 
+The difference between T_OBJECT and T_OBJECT_EX is that the first returns None if the member is NULL while the latter raises an AttributeError.
+The reference advises us to use the EX type because it handles the del statement more correctly.
+
+This NULL-terminated array of PyMemberDef structures is plugged into the array type to define the object attributes.
+There is no real reason to give read access to the size attribute as we support the Python's len trough the sequence protocol. Nonetheless, I was trying out attributes.
+
+Going forward we finally get to the core of the action of a PyObject: its type.
+
+~~~c
+~~~
