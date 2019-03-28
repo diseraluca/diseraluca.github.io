@@ -1032,4 +1032,25 @@ There is no real reason to give read access to the size attribute as we support 
 Going forward we finally get to the core of the action of a PyObject: its type.
 
 ~~~c
+static PyTypeObject arrayType = {
+	PyVarObject_HEAD_INIT(NULL, 0)
+	.tp_name = "lds_array.array",
+	.tp_doc = "A c-like array structure",
+	.tp_basicsize = sizeof(array),
+	.tp_itemsize = 0,
+	.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+	.tp_new = array_new,
+	.tp_init =  array_init,
+	.tp_dealloc = array_dealloc,
+	.tp_members = array_members,
+	.tp_as_sequence = &array_sq_methods,
+	.tp_str = array_str
+};
 ~~~
+
+Our array has a pretty bare type, but we have [a lot of possibilities to customize our types](https://docs.python.org/3/c-api/typeobj.html).
+
+Instead of rewriting them here I advise you to look at the [reference page](https://docs.python.org/3/c-api/typeobj.html).
+We will look specifically at out example.
+
+
