@@ -1029,7 +1029,7 @@ The reference advises us to use the EX type because it handles the del statement
 This NULL-terminated array of PyMemberDef structures is plugged into the array type to define the object attributes.
 There is no real reason to give read access to the size attribute as we support the Python's len trough the sequence protocol. Nonetheless, I was trying out attributes.
 
-Going forward we finally get to the core of the action of a PyObject: its type.
+Going forward we finally get to the core of the action of a PyObject: its [type](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/object.h#L346).
 
 ~~~c
 static PyTypeObject arrayType = {
@@ -1051,6 +1051,31 @@ static PyTypeObject arrayType = {
 Our array has a pretty bare type, but we have [a lot of possibilities to customize our types](https://docs.python.org/3/c-api/typeobj.html).
 
 Instead of rewriting them here I advise you to look at the [reference page](https://docs.python.org/3/c-api/typeobj.html).
-We will look specifically at out example.
+We will look specifically at our example.
 
+Some of those are already familiar like (tp_)name and (tp_)doc.
 
+tp_basicsize and tp_itemsize work in tandem to define how much space the object will need.
+tp_basicsize is the size of the actual structure.
+tp_itemsize should be 0 for all objects that aren't variable in size. For varObjects it represents the size of a single stored item. Togheter with the ob_size field it defines how much memory the stored elements occupy.
+
+tp_flags is used for various reasons. Usually it should have at least Py_TPFLAGS_DEFAULT set.
+We have a few [choices](https://github.com/python/cpython/blob/364f0b0f19cc3f0d5e63f571ec9163cf41c62958/Include/object.h#L294) here:
+
+| Flag | Use |
+|:----------:|
+| PY_TPFLAGS_HEAPTYPE | This has to be set to indicate that the type object itself is heap allocated |
+| Py_TPFLAGS_BASETYPE | This has to be set to enable the type to be subtyped |
+| Py_TPFLAGS_READY    | This gets set by PyType_Ready when the type has been fully initialized |
+| Py_TPFLAGS_READYING | This gets set by PyType_Ready when the type is being initialized       |
+| Py_TPFLAGS_HAVE_GC  | This has to be set if the object supports garbage collection           |
+| Py_TPFLAGS_DEFAULT  | |
+| Py_TPFLAGS_LONG_SUBCLASS ||
+| Py_TPFLAGS_LIST_SUBCLASS ||
+| Py_TPFLAGS_TUPLE_SUBCLASS ||
+| Py_TPFLAGS_BYTES_SUBCLASS |       see below |
+| Py_TPFLAGS_UNICODE_SUBCLASS | |
+| Py_TPFLAGS_DICT_SUBCLASS ||
+| Py_TPFLAGS_BASE_EXC_SUBCLASS ||
+| Py_TPFLAGS_TYPE_SUBCLASS ||
+| 
