@@ -1078,4 +1078,12 @@ We have a few [choices](https://github.com/python/cpython/blob/364f0b0f19cc3f0d5
 | Py_TPFLAGS_DICT_SUBCLASS ||
 | Py_TPFLAGS_BASE_EXC_SUBCLASS ||
 | Py_TPFLAGS_TYPE_SUBCLASS ||
-| 
+| Py_TPFLAGS_HAVE_FINALIZE | Set when the tp_finalize field is non-empty. See [PEP442](https://www.python.org/dev/peps/pep-0442/) for more informations |
+
+The subclass flags should be set when we inherit from one of the base types. They do not do anything special but they are used by the type-specific \*check macros to see if an object is a kind of type.
+
+tp_new, tp_init, tp_dealloc are, respectively, used to construct the instance, initialize the instance and destroy the instance internals. You are probably familiar with their use as they're exposed in Python as \_\_new\_\_, \_\_init\_\_ and \_\_del\_\_.
+
+tp_str is, again, familiar as it is exposed \_\_str\_\_ and is used to support str().
+
+tp_as_sequence is an interesting field. It is used to support the [sequence abstract protocol](https://docs.python.org/3/c-api/abstract.html).
