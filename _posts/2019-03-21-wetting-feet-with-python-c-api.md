@@ -1086,4 +1086,12 @@ tp_new, tp_init, tp_dealloc are, respectively, used to construct the instance, i
 
 tp_str is, again, familiar as it is exposed \_\_str\_\_ and is used to support str().
 
-tp_as_sequence is an interesting field. It is used to support the [sequence abstract protocol](https://docs.python.org/3/c-api/abstract.html).
+tp_as_sequence is an interesting field. It is used to support the [sequence abstract protocol](https://docs.python.org/3/c-api/sequence.html).
+There are quite a few [protocols](https://docs.python.org/3/c-api/abstract.html). They are not that much different from a Java-like interface in concept.
+
+With the sequence protocol we can support indexing operations and the expressions like len.
+As with many other protocols, we have to plug a in the type a reference to a specific structure that points to the requested implementations.
+For the sequence protocol this structure is [PySequenceMethods](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/cpython/object.h#L139).
+
+Again, there are a [few things](https://docs.python.org/3/c-api/typeobj.html#sequence-object-structures) we can implement for this structure:
+
