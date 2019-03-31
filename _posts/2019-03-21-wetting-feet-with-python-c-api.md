@@ -1095,3 +1095,5 @@ For the sequence protocol this structure is [PySequenceMethods](https://github.c
 
 Again, there are a [few things](https://docs.python.org/3/c-api/typeobj.html#sequence-object-structures) we can implement for this structure:
 
+sq_lenqth has signature [lenfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L149:22) and is used by [PySequence_size](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1518:1) and [PyObject_Size](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L46) which are both equivalent to Python's len.
+
