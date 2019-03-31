@@ -1114,4 +1114,8 @@ sq_ass_item is an [ssizeobjargproc](https://github.com/python/cpython/blob/e9a1d
 and [PyObject_DelItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L220) if the mp_subscript slot from the [mapping protocol](https://docs.python.org/3/c-api/mapping.html) is missing.
 It is equivalent to assigning an item at a certain index in a sequence.
 
-sq_contains is an [objobjproc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L156) that is called by [PySequence_Contains](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L2061)
+sq_contains is an [objobjproc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L156) that is called by [PySequence_Contains](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L2061).
+It is equivalent to the in keyword.
+If it is not present PySequence_Contains simply travels the sequence linearly to find if the item is contained.
+
+This i
