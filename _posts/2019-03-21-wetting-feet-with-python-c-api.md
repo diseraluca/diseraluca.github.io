@@ -1090,10 +1090,21 @@ tp_as_sequence is an interesting field. It is used to support the [sequence abst
 There are quite a few [protocols](https://docs.python.org/3/c-api/abstract.html). They are not that much different from a Java-like interface in concept.
 
 With the sequence protocol we can support indexing operations and the expressions like len.
-As with many other protocols, we have to plug a in the type a reference to a specific structure that points to the requested implementations.
+As with many, but not all, other protocols, we simply have to plug in the type a reference to a specific structure that points to the requested implementations.
 For the sequence protocol this structure is [PySequenceMethods](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/cpython/object.h#L139).
 
 Again, there are a [few things](https://docs.python.org/3/c-api/typeobj.html#sequence-object-structures) we can implement for this structure:
 
-sq_lenqth has signature [lenfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L149:22) and is used by [PySequence_size](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1518:1) and [PyObject_Size](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L46) which are both equivalent to Python's len.
+sq_lenqth has signature [lenfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L149:22) and is used by [PySequence_size](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1518:1) and [PyObject_Size](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L46) which are both equivalent to Python's len. It should return the sequence length.
 
+sq_length is used to handle negative indexes in sq_item and sq_ass_item. If a negative index is passed sq_length is called and its result is added to the negative index. If sq_length is missing the index is passed as is.
+
+sq_concat is a [binaryfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L146) that is called by [PySequence_Concat](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1551) and by the + operator if the nb_slot ( \_\_add\_\_ ) is missing.
+It should return a new sequence containing all elements from the left argument followed by all elements of the right argument.
+There is an inplace version of concat in sq_inplace_concat that modifies the first argument instead of creating a new sequence.
+
+sq_repeat is an [ssizeargfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L150) that is called by [PySequence_Repeat](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1576) and by the * operator if the nb_multiply (\_\_mul\_\_ ) slot is missing. 
+It should return a new sequence with the elements of the original sequence repeated n times.
+There is an inplace version of repeat in sq_inplace_repeat that modifies the sequence instead of creating a new one.
+
+sq_item is an ssizeargfunc that is called by [PySequence_GetItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1661) and [PyObject_GetItem]() which are equivalent to Python's index operator.
