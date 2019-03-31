@@ -1107,4 +1107,10 @@ sq_repeat is an [ssizeargfunc](https://github.com/python/cpython/blob/e9a1dcb423
 It should return a new sequence with the elements of the original sequence repeated n times.
 There is an inplace version of repeat in sq_inplace_repeat that modifies the sequence instead of creating a new one.
 
-sq_item is an ssizeargfunc that is called by [PySequence_GetItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1661) and [PyObject_GetItem]() which are equivalent to Python's index operator.
+sq_item is an ssizeargfunc that is called by [PySequence_GetItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1661) and [PyObject_GetItem](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L143) which are equivalent to Python's index operator. 
+It should return a new reference to the item at the requested index.
+
+sq_ass_item is an [ssizeobjargproc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L152) that is called by [PySequence_SetItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1714) that is called by [PyObject_SetItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L188) 
+and [PyObject_DelItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L220) if the mp_subscript slot from the [mapping protocol](https://docs.python.org/3/c-api/mapping.html) is missing.
+It is equivalent to assigning an item at a certain index in a sequence.
+
