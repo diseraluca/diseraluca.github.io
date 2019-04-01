@@ -1118,4 +1118,74 @@ sq_contains is an [objobjproc](https://github.com/python/cpython/blob/e9a1dcb423
 It is equivalent to the in keyword.
 If it is not present PySequence_Contains simply travels the sequence linearly to find if the item is contained.
 
-This i
+There are two more fields, sq_was_slice and sq_was_ass_slice, but I could not found how and if they are used.
+
+## The implementation
+
+The last thing we have to look at is the implementation of all those methods we talked about.
+As said before the implementation I did was pretty awkward for this first exercise. This is true both from a C API point of view and from a more general coding-style, logic, structure and elegance point of view.
+
+Starting from new:
+
+~~~c
+static PyObject* newArray(PyTypeObject* type, PyTypeObject* storedType, Py_ssize_t size) {
+	array* self;
+	self = (array*)type->tp_alloc(type, 0);
+	if (self == NULL) {
+		return NULL;
+	}
+
+	self->data = (PyObject**)PyMem_Calloc(sizeof(PyObject*), size);
+	if (self->data == NULL) {
+		Py_DECREF(self);
+		return NULL;
+	}
+
+	self->size = size;
+	self->storedType = storedType;
+
+	Py_INCREF(self->storedType);
+
+	return (PyObject*)self;
+}
+
+static PyObject* array_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
+	if (PyTuple_Size(args) < 2) {
+		PyErr_Format(PyExc_TypeError, "%s() takes at least 2 arguments (%i given)", __FUNCTION__, PyTuple_Size(args));
+		return NULL;
+	}
+
+	Py_ssize_t size = PyLong_AsSsize_t(PyTuple_GET_ITEM(args, 0));
+	PyObject* storedType = PyTuple_GET_ITEM(args, 1);
+
+	if (PyErr_Occurred() || !PyType_Check(storedType)) {
+		PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(PyTuple_GET_ITEM(args, 0))->tp_name, Py_TYPE(PyTuple_GET_ITEM(args, 1))->tp_name);
+		return NULL;
+	}
+
+	if (size <= 0) {
+		PyErr_Format(PyExc_ValueError, "The array size must be a positive integer greater than 0");
+		return NULL;
+	}
+
+	if (size > (PY_SSIZE_T_MAX / sizeof(PyObject*))) {
+		return PyErr_NoMemory();
+	}
+
+
+	return newArray(type, (PyTypeObject*)storedType, size);
+}
+~~~
+
+A new function has type [newfunc](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L175) and is expected to allocate a new instance and do the bare minumum initialization of its members.
+In the case of array, we allocate as much space for n pointers and set them to zero.
+
+To construct an array, I decided to require at least two arguments, a size and a type, and at most 2 + size arguments. The optional arguments are used to initialize the array values.
+While the first two arguments are needed to build the instance, the initialization of the values is deferred to the \_\_init\_\_ function.
+
+This is seen at the start of array_new, where we instantly raise an exception if there are less than two arguments.
+As a quick tangent, this is a good place to see how to parse arguments.
+
+As you can see, we are using PyTuple* macros and functions to access the args argument. As said before we are guaranteed that args is a tuple containing unnamed positional arguments ( or the first and only argument in the case of a method with the METH_O flag set ) and kwds is a dictionary containing the named arguments and their values.
+
+While we don't use them here, for reasons I will explain in a moment, we have a series of [helper functions](https://docs.python.org/3/c-api/arg.html#api-functions) to unpack the arguments.
