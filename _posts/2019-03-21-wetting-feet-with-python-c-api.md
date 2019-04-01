@@ -1189,3 +1189,13 @@ As a quick tangent, this is a good place to see how to parse arguments.
 As you can see, we are using PyTuple* macros and functions to access the args argument. As said before we are guaranteed that args is a tuple containing unnamed positional arguments ( or the first and only argument in the case of a method with the METH_O flag set ) and kwds is a dictionary containing the named arguments and their values.
 
 While we don't use them here, for reasons I will explain in a moment, we have a series of [helper functions](https://docs.python.org/3/c-api/arg.html#api-functions) to unpack the arguments.
+
+[PyArg_ParseTuple](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L123) and [PyArg_ParseTupleAndKeywords](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L1428) are the bread and butter of argument parsing.
+
+The former takes the args tuple, a format string and a variable number of arguments that are used to store the parsed arguments, similar to printf.
+The latter takes, additionally, the kwds object and a kewyword list as its second and third argument, after the args tuple and before the format string.
+A keyword list is a NULL-terminated array of char* that represents the named arguments' names.
+
+The format string for those functions has [quite a few options](https://docs.python.org/3/c-api/arg.html#strings-and-buffers).
+
+Both of those functions have a correspandant function that accepts a va_list instead of a variable number of arguments, [PyArg_VaParse]()
