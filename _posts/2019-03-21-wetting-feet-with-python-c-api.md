@@ -1193,9 +1193,57 @@ While we don't use them here, for reasons I will explain in a moment, we have a 
 [PyArg_ParseTuple](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L123) and [PyArg_ParseTupleAndKeywords](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L1428) are the bread and butter of argument parsing.
 
 The former takes the args tuple, a format string and a variable number of arguments that are used to store the parsed arguments, similar to printf.
-The latter takes, additionally, the kwds object and a kewyword list as its second and third argument, after the args tuple and before the format string.
+The latter takes, additionally, the kwds object and a kewyword list as its second and fourth argument, after the args tuple and then after the format string.
 A keyword list is a NULL-terminated array of char* that represents the named arguments' names.
 
 The format string for those functions has [quite a few options](https://docs.python.org/3/c-api/arg.html#strings-and-buffers).
 
-Both of those functions have a correspandant function that accepts a va_list instead of a variable number of arguments, [PyArg_VaParse]()
+Both of those functions have a correspandant function that accepts a va_list instead of a variable number of arguments, [PyArg_VaParse](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L173) and [PyArg_VaParseTupleAndKeywords](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L1478).
+
+We then have [PyArg_UnpackTuple](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L2738) which doesn't take a format string.
+It takes, instead, a tuple object, again it will useally be our args parameter, a const char* used as the name for error reporting, two Py_ssize_t min and max, and a variable number of arguments to store the values in.
+The tuple size should be at leat min and no more than max. All parsed arguments have to be stored in PyObject*s.
+
+All of these function return an int value that is true if it succeds and false if there was any error.
+
+Here are some examples:
+
+~~~c
+int size;
+PyObject* type = NULL;
+
+PyArg_ParseTuple(args, "iO", &size, &type); // We expect a Python Integer and a PyObject
+~~~
+
+~~~c
+const char* kwds_list[] = { "size", "type", NULL }
+
+PyObject* o1 = NULL;
+PyObject* o2 = NULL;
+
+int size;
+PyObject* type = NULL;
+
+// We expect two PyObject followed by two keyword argument, which are optional, one int and one PyObject.
+PyArg_ParseTupleAndKeyWords(args, kwds, "OO|$iO", kwds_list, &o1, &o2, &size, &type); 
+~~~
+
+~~~c
+PyObject* first = NULL;
+PyObject* second = NULL;
+
+// We expecta at least one argument and at most two
+PyArg_UnpackTuple(args, "test", 1, 2, &first, &second);
+~~~
+
+For array_new I've not used them as it was a little difficult working with a variable number of argument.
+For format string parser we should've had to build the string dinamycally as an error is returned if the args tuple length does not match the format we are giving or the input is not exausted.
+
+We can't use PyArg_UnpackTuple with a min of 2 and a max of 2 as it returns an error when the size of the tuple is smaller than the min or bigger than the max.
+We could do something like using a max that is the theoritical limit that an array can hold based on the size of a PyObject*, but we would need to provide as many PyObject* to store the arguments as there are arguments in the tuple, which isn't particularly feasible since we don't even know how many there are yet.
+
+If we really wanted to use them we could probably do something like [slicing the tuple](https://docs.python.org/3/c-api/tuple.html#c.PyTuple_GetSlice) but we would have to deal with a new reference. Furthermore, I think doing this by hand is clearer.
+
+In the end, while those helper functions are really really handy ( and they provide some form of error checking that we may otherwise do by hand ), args and kwds are still PyObjects that we can handle manually.
+
+While [PyTuple_GET_ITEM](https://github.com/python/cpython/blob/3191391515824fa7f3c573d807f1034c6a28fab3/Include/cpython/tupleobject.h#L27:9) returns a borrowed reference, and we don't have to manage it, we should probably expand the function to increase the borrowed refernces and decrease them again before exiting.
