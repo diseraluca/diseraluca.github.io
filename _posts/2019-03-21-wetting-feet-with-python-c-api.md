@@ -1247,3 +1247,26 @@ If we really wanted to use them we could probably do something like [slicing the
 In the end, while those helper functions are really really handy ( and they provide some form of error checking that we may otherwise do by hand ), args and kwds are still PyObjects that we can handle manually.
 
 While [PyTuple_GET_ITEM](https://github.com/python/cpython/blob/3191391515824fa7f3c573d807f1034c6a28fab3/Include/cpython/tupleobject.h#L27:9) returns a borrowed reference, and we don't have to manage it, we should probably expand the function to increase the borrowed refernces and decrease them again before exiting.
+
+[PyErr_Occurred](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/errors.c#L175) checks if an exception is currently set. We are using it to check if anything happened in [PyLong_AsSsize_t](https://github.com/python/cpython/blob/364f0b0f19cc3f0d5e63f571ec9163cf41c62958/Objects/longobject.c#L683).
+Beware that the PyTuple_GET_ITEM macro does no error or range checking contrary to its sister function [PyTuple_GetItem](https://github.com/python/cpython/blob/234531b4462b20d668762bd78406fd2ebab129c9/Objects/tupleobject.c#L150).
+
+[PyType_Check](https://github.com/python/cpython/blob/398bd27967690f2c1a8cbf8d47a5613edd9cfb2a/Include/object.h#L217:9) tells us if an object is of type "type" and is part of the family of \*\_Check macros.
+
+One thing we are doing here is actually hiding the real exception in case any occurred. I'm not sure this is a good choice, and before I said that it was suggested not to do so, but I think it may be ok here as the exception that should come from Py_AsSsize_t should be because of a wrong argument, making our message, possibly, more explicit.
+
+I must say that I'm not sure if we should actually check for a NULL argument here. While PyLong_AsSsize_t will raise an exception if the object is NULL, PyType_Check will try to do its thing and fail badly.
+It might actually be a good idea if we want to be on the secure side of things.
+
+After some more error checking we pass the ball to new_array.
+
+~~~c
+array* self;
+self = (array*)type->tp_alloc(type, 0);
+if (self == NULL) {
+	return NULL;
+}
+~~~
+
+This is something that you will see in most \_\_new\_\_ functions. We use the type's alloc function to create the instance and we check if it was actually created.
+
