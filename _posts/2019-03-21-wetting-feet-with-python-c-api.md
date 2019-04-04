@@ -1270,3 +1270,68 @@ if (self == NULL) {
 
 This is something that you will see in most \_\_new\_\_ functions. We use the type's alloc function to create the instance and we check if it was actually created.
 
+An alloc function [initializes the memory for the instance itself](https://docs.python.org/3/c-api/typeobj.html#c.PyTypeObject.tp_alloc).  We can provide a custom one, but we will usually fall on the standard Python's allocation strategy.
+
+With our instance in hand we simply have to initialize the needed memory for our array. We do this trough Python's [memory interface functions](https://docs.python.org/3/c-api/memory.html#memory-interface).
+The API provides our known malloc, free, etc...
+It does even provide a new for object allocation.
+
+I'm not sure we actually have to increase the reference count of a type object or if it is safe to do so. I could not find a definitive answer.
+
+Moving on, we have to complete the instance initialization with our \_\_init\_\_.
+
+~~~c
+static int array_init(array* self, PyObject* args, PyObject* kwds) {
+	static const Py_ssize_t MIN_ARGUMENTS = 2;
+	
+	Py_ssize_t argsSize = PyTuple_Size(args);
+
+	if (argsSize > (ARR_SIZE(self) + MIN_ARGUMENTS)) {
+		PyErr_Format(PyExc_TypeError, "%s() takes at most %i arguments for an array of size %i (%i given)", __FUNCTION__, ARR_SIZE(self) + MIN_ARGUMENTS, ARR_SIZE(self), argsSize);
+		return -1;
+	}
+
+	for (Py_ssize_t index = 2; index < argsSize; ++index) {
+		PyObject* tmp = PyTuple_GET_ITEM(args, index);
+		if (!ARR_CHECK_TYPE(self, tmp)) {
+			PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(self)->tp_name, Py_TYPE(tmp)->tp_name);
+			return -1;
+		}
+
+		Py_INCREF(tmp);
+		ARR_ASSIGN(self, index-MIN_ARGUMENTS, tmp);
+	}
+
+	return 0;
+}
+
+~~~
+
+You should probably know what is going on by now as we are using things we have already seen.
+As you can see, this time we return a negative number to signify errrors as expected from int-returning functions.
+
+The deallocator is pretty simple too:
+
+~~~c
+static void array_dealloc(array* self) {
+	for (Py_ssize_t index = 0; index < self->size; ++index) {
+		Py_XDECREF(ARR_GET(self, index));
+	}
+
+	PyMem_Free((void*)self->data);
+	Py_DECREF(ARR_STORED_TYPE(self));
+}
+~~~
+
+Most of the code should be understandable by now. It is pretty simple. There may be errors here and there that I haven't seen but I hope this is not the case.
+There are surely things that can be done in different ways, and maybe should. I particularly dislike the \_\_str\_\_ implementation I wrote which was a testing one that never got refactored ( and it should probably do some error checking by the way ).
+
+# Some afterwords
+
+Unfortunately, I used all the allotted time for this post and could not cover some interesting things that I learnt.
+Initially I wanted to produce a more tutorial-like post but I completely got lost in my ramblings and wrote more than I could handle on the time I had.
+I still hope this can be used as a beginner resource for starting out with the C API.
+
+I don't particularly like working with Python as a language. Nonetheless, working the C API was a really enjoyable experience that shed some lights on how some things works internally in Python and gave me some better tools to appreciate it and its usage.
+
+I'd really like to have the chance, later on, to write some interesting extension modules and to find a use-case for the C API.
