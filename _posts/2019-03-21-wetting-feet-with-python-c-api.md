@@ -16,10 +16,10 @@ the [From Nand To Tetris Course](https://www.coursera.org/learn/build-a-computer
 
 I will write about that exercise in a future post. For this one, instead, I'd like to provide a resource for some of the basics related to writing Python's extension modules.
 
-I must say, to my disdain, that to actually start and write something with the C API was a little bit more difficult that I initially tought.
+I must say, to my disdain, that to actually start and write something with the C API was a little bit more difficult than I initially thought.
 I could not find that many good resources on it and the best resource there is, the [Python/C API Reference Manual](https://docs.python.org/3/c-api/index.html) and the [Extending and Embedding the Python Interpreter Tutorial](https://docs.python.org/3/extending/index.html),
 while good, are not QT level good regarding documentation.
-Nonetheless with a bit of effort, combined with the [CPython source code](https://github.com/python/cpython), it is more than enough to start writing something.
+Nonetheless, with a bit of effort, combined with the [CPython source code](https://github.com/python/cpython), it is more than enough to start writing something.
 
 To have some code reference, I will use the first thing I build in this last few days, a static size array of references that is type-checked at runtime ( similar to a C array of pointers in some way but with some notable differences ).
 
@@ -52,7 +52,7 @@ Before we start looking at the C API, I'd like to say a few things.
 First, I don't particularly feel suitable to teach anyone anything about the C API.
 I used it for only a few days ( as this was the time I allotted for exercising with it ), and probably am not even at the level that I can write something decent without the risk of leaking memory or riddling it with bugs.
 
-For this reasons, I can't say that the code I will use in this post is a good example of the API usage nor that is correctly idiomatic in the way it is written.
+For these reasons, I can't say that the code I will use in this post is a good example of the API usage nor that is correctly idiomatic in the way it is written.
 So please take everything with a grain of salt.
 
 Furthermore, we will only look at using C code in Python and not at calling Python from C.
@@ -78,7 +78,7 @@ There are a few "catches" with this header file that are of note.
     * stdlib.h
     
   if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
-2. This header file can define some pre-processor definitions that changes the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
+2. This header file can define some pre-processor definitions that change the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
 
 All *Python.h* user-visible names, be it of function, macros or structure, have the prefix *Py* or *PY* and it is strongly advised to never use this prefixes in our code to avoid any kind of confusion.
 
@@ -91,10 +91,10 @@ Python manages the lifetime of its objects trough [Reference Counting](https://m
 While all the intricacies of this are hidden from a Python user, while working with the C API we have to manually manage references.
 Failure to do so would cause memory leaks in the program.
 
-While this may seem like a complicate matter ( and well it is, worse than managing C heap-allocated memory in my opinion ), the tool we use to accomplish this task are small and simple.
+While this may seem like a complicated matter ( and well it is, worse than managing C heap-allocated memory in my opinion ), the tools we use to accomplish this task are small and simple.
 *Py_INCREF*, *Py_DECREF* and *Py_XDECREF* are the three macros that *Python.h* provides us to control the refcount of PyObjects.
 
-Those three macros takes a *PyObject\** as their only argument.
+Those three macros take a *PyObject\** as their only argument.
 As you may imagine, *Py_INCREF* increments the count by one while *Py_DECREF* decrements it by one.
 
 Furthermore, if *Py_DECREF* decrements a refcount to 0, it frees the object memory, not directly but by calling the object destructor trough a function pointer which is stored in the *tp_deallocator* member of its *PyTypeObject*.
@@ -109,7 +109,7 @@ This reference is the one we are going to actually manage, deciding the object l
 
 In Python's ownership model, we can identify three types of references, each one with its own management tactic.
 
-Firstly, we have **new references**, for example the one returned by a PyObject-building function; e.g *Py_BuildValue* or *PyTuple_New*.
+Firstly, we have **new references**, for example, the one returned by a PyObject-building function; e.g *Py_BuildValue* or *PyTuple_New*.
 When we get hold of a *new reference*, as already said this usually happens when we construct a new object, we become its owner.
 As the owner of a *new reference* it is our job to dispose of it, by *Py_DECREF*ing it to 0 or to, otherwise, pass it to someone who will do it for, essentially giving up our ownership in the process.
 
@@ -120,14 +120,14 @@ For example:
 ~~~c
 static PyObject* square(long n) {
     PyObject* num = NULL;
-	PyObject* res = NULL;
-	
-	num = PyLong_FromLong(n); // Here we will get a new reference to a python int object we created from the original argument
-	res = PyNumber_Multiply(num, num); // Again we get a new reference that we have to manage
-	
-	Py_DECREF(num); // As we don't need it anymore we do our job and decrease the reference, deleting it
-	
-	return res; // Instead of res ourselves, we pass the ownership to the caller, which will need to eventually dispose of it or pass it along, as a new reference
+    PyObject* res = NULL;
+    
+    num = PyLong_FromLong(n); // Here we will get a new reference to a python int object we created from the original argument
+    res = PyNumber_Multiply(num, num); // Again we get a new reference that we have to manage
+    
+    Py_DECREF(num); // As we don't need it anymore we do our job and decrease the reference, deleting it
+    
+    return res; // Instead of res ourselves, we pass the ownership to the caller, which will need to eventually dispose of it or pass it along, as a new reference
 }
 ~~~ 
 
@@ -136,26 +136,26 @@ We have forgone any error checking here for the sake of the example readability 
 It may be tempting to simply write something along the line of:
 
 ~~~c
-static PyObject* square(long n) {	
-	return PyNumber_Multiply(PyLong_FromLong(n), PyLong_FromLong(n));
+static PyObject* square(long n) {    
+    return PyNumber_Multiply(PyLong_FromLong(n), PyLong_FromLong(n));
 ~~~
 
 But in this case, and every case where a *new reference*-returning function return value is used as a temporary object, we will leak both of the *PyLong_FromLong* created references as the *PyNumber_Multiply* function will only borrow them without taking on their ownership ( and as such, *Py_DECREF* them to zero ).
 
 The second type we can encounter are **stolen references**.
-*Stolen refernces* are usually encountered when compositing a reference we own with another object that manages it, e.g any kind of container.
+*Stolen references* are usually encountered when compositing a reference we own with another object that manages it, e.g any kind of container.
 When we deal with *stolen references* the obligation of managing the reference is left to the "thief".
 
 For example:
 
 ~~~c
 static PyObject* longToUnaryTuple(long n) {
-	PyObject* res = NULL;
-	
-	res = PyTuple_New(1); // We build a new tuple and own its reference
-	PyTuple_SetItem(res, 0, PyLong_FromLong(n)); // The PyLong_FromLong new reference gets stolen by SetItem and isn't our responsability anymore
-	
-	return res; // We pass ownership of the tuple reference to the caller
+    PyObject* res = NULL;
+    
+    res = PyTuple_New(1); // We build a new tuple and own its reference
+    PyTuple_SetItem(res, 0, PyLong_FromLong(n)); // The PyLong_FromLong new reference gets stolen by SetItem and isn't our responsability anymore
+    
+    return res; // We pass ownership of the tuple reference to the caller
 }
 ~~~
 
@@ -164,20 +164,20 @@ The one thing we have to be careful about is not mindlessly dabbling with a refe
 
 ~~~c
 static PyObject* longToUnaryTuple(long n) {
-	PyObject* res = NULL;
-	PyObject* num = PyLong_FromLong(n);
-	
-	res = PyTuple_New(1); 
-	PyTuple_SetItem(res, 0, num);
-	
-	Py_DECREF(num) // We don't really own the reference anymore and are potentially disrupting the tuple internals
-	
-	return res; 
+    PyObject* res = NULL;
+    PyObject* num = PyLong_FromLong(n);
+    
+    res = PyTuple_New(1); 
+    PyTuple_SetItem(res, 0, num);
+    
+    Py_DECREF(num) // We don't really own the reference anymore and are potentially disrupting the tuple internals
+    
+    return res; 
 }
 ~~~
 
 We should not decrement a reference refcount that we don't own without first incrementing it ( that we do if we need it to be surely available for a certain time or scope ).
-Usually we should have nothing to do with a reference that was stolen as it isn't our concern anymore in any way.
+Usually, we should have nothing to do with a reference that was stolen as it isn't our concern anymore in any way.
 
 Getting to the last type we encounter **borrowed references**.
 While they are pretty essential in their contract, we can use a *borrowed reference* but we aren't its owner, they have some tricky parts.
@@ -188,42 +188,42 @@ For example:
 
 ~~~c
 static void buggyTupleAccess(PyObject* o) {
-	if (PyTuple_Check(o)) {
-		PyObject* last = PyTuple_GetItem(o, PyTuple_Size(o)-1); // Here we get a borrowed reference to the last item in the tuple
+    if (PyTuple_Check(o)) {
+        PyObject* last = PyTuple_GetItem(o, PyTuple_Size(o)-1); // Here we get a borrowed reference to the last item in the tuple
 
-		PyTuple_SetItem(o, PyTuple_Size(o)-1, PyLong_FromLong(10000)); // Here we set a new item as the last element of the tuple
-		
-		// do something with last
-	}
+        PyTuple_SetItem(o, PyTuple_Size(o)-1, PyLong_FromLong(10000)); // Here we set a new item as the last element of the tuple
+        
+        // do something with last
+    }
 }
 ~~~  
 
 The problem with this snippet is that when we modify the last element of the list, setting a new one, the list, that manages the reference we borrowed, may as well ( and actually will ) *Py_DECREF* it, potentially freeing the object in the process.
-When we access last later in the code, we have no garantuee that it wasn't invalidated.
+When we access last later in the code, we have no guarantee that it wasn't invalidated.
 
-The trickiest part is that these type of bugs are not always obvious. Python can reuse memory addresses that were previosly freed, meaning that we won't necessarily get bogus values in the process.
+The trickiest part is that these type of bugs are not always obvious. Python can reuse memory addresses that were previously freed, meaning that we won't necessarily get bogus values in the process.
 Or it may be that sometimes last may have a refcount greater than 1, making it seem like the code is working and then randomly crash when this is not true anymore.
 
 Sometimes we may work with special values, like the integers from -5 to 255 which Python always keeps in memory, that makes the code work.
 
-For all this reasons, when using *borrowed references*, we should increment the refcount while in scope, and decrement it when we are done:
+For all these reasons, when using *borrowed references*, we should increment the refcount while in scope, and decrement it when we are done:
 
 ~~~c
 static void buggyTupleAccess(PyObject* o) {
-	if (PyTuple_Check(o)) {
-		PyObject* last = PyTuple_GetItem(o, PyTuple_Size(o)-1); 		
-		Py_INCREF(last); // increase when the scope we need it in starts
-		
-		PyTuple_SetItem(o, PyTuple_Size(o)-1, PyLong_FromLong(10000));
-		
-		// do something with last
-		
-		Py_DECREF(last) // Decrease the reference, potentially freeing it, as we have no need for it anymore
-	}
+    if (PyTuple_Check(o)) {
+        PyObject* last = PyTuple_GetItem(o, PyTuple_Size(o)-1);         
+        Py_INCREF(last); // increase when the scope we need it in starts
+        
+        PyTuple_SetItem(o, PyTuple_Size(o)-1, PyLong_FromLong(10000));
+        
+        // do something with last
+        
+        Py_DECREF(last) // Decrease the reference, potentially freeing it, as we have no need for it anymore
+    }
 }
 ~~~  
 
-{ By the way another thing we can do here is to get the item trough *PySequence_GetItem*, from the abstract sequence protocol, which already calls *Py_INCREF* giving us a new reference we only have to decref ).
+{ By the way, another thing we can do here is to get the item trough *PySequence_GetItem*, from the abstract sequence protocol, which already calls *Py_INCREF* giving us a new reference we only have to decref ).
 
 Simple enough but can get tricky at time. Furthermore, we have to make sure that the reference gets decreased in each code path.
 
@@ -231,25 +231,25 @@ Simple enough but can get tricky at time. Furthermore, we have to make sure that
 
 In the C API, exceptions are raised as a two-step process.
 
-First we have to actually set an exception. The current exception details are stored globally, per thread. You can see the members that store the exception in [cpython/pystate.h](https://github.com/python/cpython/blob/c11183cdcff6af13c4339fdcce84ab63f7930ddc/Include/cpython/pystate.h#L103) under the thread state structure.
+First, we have to actually set an exception. The current exception details are stored globally, per thread. You can see the members that store the exception in [cpython/pystate.h](https://github.com/python/cpython/blob/c11183cdcff6af13c4339fdcce84ab63f7930ddc/Include/cpython/pystate.h#L103) under the thread state structure.
 To do this we can use a [series of macros](https://docs.python.org/3/c-api/exceptions.html#raising-exceptions) defined in [cpython/error.c](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Python/errors.c#L844).
 
 The most important one is probably *PyObject\* PyErr_Format(PyObject\* exception, const char\* format, ...)*, which sets a given exception and a formatted message.
 The C API provides the same [standard exception objects](https://docs.python.org/3/c-api/exceptions.html#standard-exceptions) that [Pyhon does](https://docs.python.org/3/library/exceptions.html#built-in-exceptions) as [global PyObject*s](https://github.com/python/cpython/blob/8f59ee01be3d83d5513a9a3f654a237d77d80d9a/Include/pyerrors.h#L77).
 
 As a second step, we have to return an error indicator value from the current function.
-For a pointer-returning function, we should return *NULL*. For int-returning functions we should return -1 ( and 0 on success ) { An exception to this is the *PyArg_* family of functions which return 1 for success and 0 for failure }.
+For a pointer-returning function, we should return *NULL*. For int-returning functions, we should return -1 ( and 0 on success ) { An exception to this is the *PyArg_* family of functions which return 1 for success and 0 for failure }.
 
 For example:
 
 ~~~c
 static PyObject* tuple_get(PyObject* o, Py_ssize_t index) {
-	if (!PyTuple_CheckExact(o)) {
-	   PyErr_Format(PyExc_TypeError, "Unsupported operand type for %s: '%s'", __FUNCTION__, Py_TYPE(o)->tp_name);
-	   return NULL;
-	}
-	
-	.....
+    if (!PyTuple_CheckExact(o)) {
+       PyErr_Format(PyExc_TypeError, "Unsupported operand type for %s: '%s'", __FUNCTION__, Py_TYPE(o)->tp_name);
+       return NULL;
+    }
+    
+    .....
 } 
 ~~~
 
@@ -278,13 +278,13 @@ PyInit_custom()
 {
     PyObject* module; // This is our module object. We skip how to build it in this example
 
-	...
-	
+    ...
+    
     CustomException = PyErr_NewException("custom.CustomException", NULL, NULL); // We create the exception object and point to it
     Py_INCREF(CustomException);
     PyModule_AddObject(module, "CustomException", CustomException); // We need to add the exception to the module's objects
     
-	...
+    ...
 }
 ~~~
 
@@ -301,15 +301,15 @@ At the heart of all Python's object resides the [PyObject structure](https://git
  ~~~
  
 A PyObject, as you can see, simply contains the object reference count and a pointer to its type ( which we will look at in a moment ).
-There are a few interesting thing to know about Python's object ( and a few more interesting things you can read in CPython source that we normally should not need to know ).
+There are a few interesting things to know about Python's object ( and a few more interesting things you can read in CPython source that we normally should not need to know ).
  
-All object are allocated on the heap ( there are some exception regarding type objects ).
+All objects are allocated on the heap ( there are some exceptions regarding type objects ).
 We always work with PyObject* and each Python's object can be cast to a PyObject*.
 
 The most interesting part about the PyObject structure is the pointer to a [type](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/cpython/object.h#L177) object, this is where all the action actually resides.
-This structure contains all the [informations](https://docs.python.org/3/c-api/typeobj.html#type-objects) needed to know how the type actually operates.
+This structure contains all the [pieces of information](https://docs.python.org/3/c-api/typeobj.html#type-objects) needed to know how the type actually operates.
 
-We will look at some of the fields later while looking at the array implementation as it is easier to understand trough an example.
+We will look at some of the fields later while looking at the array implementation as it is easier to understand through an example.
 
 There are a few more things we could talk about but those were the most important concepts. Many things are just unclear without a more consistent example and as such we will explore them with the array example.
 
@@ -329,16 +329,16 @@ Furthermore, it gives me a lot of great chances to think and discuss how things 
 static PyTypeObject arrayType;
 
 typedef struct {
-	PyObject_HEAD
-	PyObject** data;
-	Py_ssize_t size;
-	PyTypeObject* storedType;
+    PyObject_HEAD
+    PyObject** data;
+    Py_ssize_t size;
+    PyTypeObject* storedType;
 } array;
 
 
 static PyMemberDef array_members[] = {
-	{"size", T_PYSSIZET, offsetof(array, size), READONLY, "Describe how many elements are stored in the array"},
-	{NULL}
+    {"size", T_PYSSIZET, offsetof(array, size), READONLY, "Describe how many elements are stored in the array"},
+    {NULL}
 };
 
 //-- Array Utilities --//
@@ -356,24 +356,24 @@ static PyMemberDef array_members[] = {
 #define ARR_ASSIGN(arr, i, obj) ((ARR_GET((arr), (i))) = (obj))
 
 static PyObject* newArray(PyTypeObject* type, PyTypeObject* storedType, Py_ssize_t size) {
-	array* self;
-	self = (array*)type->tp_alloc(type, 0);
-	if (self == NULL) {
-		return NULL;
-	}
+    array* self;
+    self = (array*)type->tp_alloc(type, 0);
+    if (self == NULL) {
+        return NULL;
+    }
 
-	self->data = (PyObject**)PyMem_Calloc(sizeof(PyObject*), size);
-	if (self->data == NULL) {
-		Py_DECREF(self);
-		return NULL;
-	}
+    self->data = (PyObject**)PyMem_Calloc(sizeof(PyObject*), size);
+    if (self->data == NULL) {
+        Py_DECREF(self);
+        return NULL;
+    }
 
-	self->size = size;
-	self->storedType = storedType;
+    self->size = size;
+    self->storedType = storedType;
 
-	Py_INCREF(self->storedType);
+    Py_INCREF(self->storedType);
 
-	return (PyObject*)self;
+    return (PyObject*)self;
 }
 
 // Array Utilities End //
@@ -381,87 +381,87 @@ static PyObject* newArray(PyTypeObject* type, PyTypeObject* storedType, Py_ssize
 //-- Array Type Methods --//
 
 static void array_dealloc(array* self) {
-	for (Py_ssize_t index = 0; index < self->size; ++index) {
-		Py_XDECREF(ARR_GET(self, index));
-	}
+    for (Py_ssize_t index = 0; index < self->size; ++index) {
+        Py_XDECREF(ARR_GET(self, index));
+    }
 
-	PyMem_Free((void*)self->data);
-	Py_DECREF(ARR_STORED_TYPE(self));
+    PyMem_Free((void*)self->data);
+    Py_DECREF(ARR_STORED_TYPE(self));
 }
 
 static PyObject* array_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
-	if (PyTuple_Size(args) < 2) {
-		PyErr_Format(PyExc_TypeError, "%s() takes at least 2 arguments (%i given)", __FUNCTION__, PyTuple_Size(args));
-		return NULL;
-	}
+    if (PyTuple_Size(args) < 2) {
+        PyErr_Format(PyExc_TypeError, "%s() takes at least 2 arguments (%i given)", __FUNCTION__, PyTuple_Size(args));
+        return NULL;
+    }
 
-	Py_ssize_t size = PyLong_AsSsize_t(PyTuple_GET_ITEM(args, 0));
-	PyObject* storedType = PyTuple_GET_ITEM(args, 1);
+    Py_ssize_t size = PyLong_AsSsize_t(PyTuple_GET_ITEM(args, 0));
+    PyObject* storedType = PyTuple_GET_ITEM(args, 1);
 
-	if (PyErr_Occurred() || !PyType_Check(storedType)) {
-		PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(PyTuple_GET_ITEM(args, 0))->tp_name, Py_TYPE(PyTuple_GET_ITEM(args, 1))->tp_name);
-		return NULL;
-	}
+    if (PyErr_Occurred() || !PyType_Check(storedType)) {
+        PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(PyTuple_GET_ITEM(args, 0))->tp_name, Py_TYPE(PyTuple_GET_ITEM(args, 1))->tp_name);
+        return NULL;
+    }
 
-	if (size <= 0) {
-		PyErr_Format(PyExc_ValueError, "The array size must be a positive integer greater than 0");
-		return NULL;
-	}
+    if (size <= 0) {
+        PyErr_Format(PyExc_ValueError, "The array size must be a positive integer greater than 0");
+        return NULL;
+    }
 
-	if (size > (PY_SSIZE_T_MAX / sizeof(PyObject*))) {
-		return PyErr_NoMemory();
-	}
+    if (size > (PY_SSIZE_T_MAX / sizeof(PyObject*))) {
+        return PyErr_NoMemory();
+    }
 
 
-	return newArray(type, (PyTypeObject*)storedType, size);
+    return newArray(type, (PyTypeObject*)storedType, size);
 }
 
 static int array_init(array* self, PyObject* args, PyObject* kwds) {
-	static const Py_ssize_t MIN_ARGUMENTS = 2;
-	
-	Py_ssize_t argsSize = PyTuple_Size(args);
+    static const Py_ssize_t MIN_ARGUMENTS = 2;
+    
+    Py_ssize_t argsSize = PyTuple_Size(args);
 
-	if (argsSize > (ARR_SIZE(self) + MIN_ARGUMENTS)) {
-		PyErr_Format(PyExc_TypeError, "%s() takes at most %i arguments for an array of size %i (%i given)", __FUNCTION__, ARR_SIZE(self) + MIN_ARGUMENTS, ARR_SIZE(self), argsSize);
-		return -1;
-	}
+    if (argsSize > (ARR_SIZE(self) + MIN_ARGUMENTS)) {
+        PyErr_Format(PyExc_TypeError, "%s() takes at most %i arguments for an array of size %i (%i given)", __FUNCTION__, ARR_SIZE(self) + MIN_ARGUMENTS, ARR_SIZE(self), argsSize);
+        return -1;
+    }
 
-	for (Py_ssize_t index = 2; index < argsSize; ++index) {
-		PyObject* tmp = PyTuple_GET_ITEM(args, index);
-		if (!ARR_CHECK_TYPE(self, tmp)) {
-			PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(self)->tp_name, Py_TYPE(tmp)->tp_name);
-			return -1;
-		}
+    for (Py_ssize_t index = 2; index < argsSize; ++index) {
+        PyObject* tmp = PyTuple_GET_ITEM(args, index);
+        if (!ARR_CHECK_TYPE(self, tmp)) {
+            PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(self)->tp_name, Py_TYPE(tmp)->tp_name);
+            return -1;
+        }
 
-		Py_INCREF(tmp);
-		ARR_ASSIGN(self, index-MIN_ARGUMENTS, tmp);
-	}
+        Py_INCREF(tmp);
+        ARR_ASSIGN(self, index-MIN_ARGUMENTS, tmp);
+    }
 
-	return 0;
+    return 0;
 }
 
 static PyObject* array_str(PyObject* o) {
-	PyObject* openingCharacter = PyUnicode_FromString("[");
-	PyObject* closeningCharacter = PyUnicode_FromString("]");
-	PyObject* separator = PyUnicode_FromString(", ");
+    PyObject* openingCharacter = PyUnicode_FromString("[");
+    PyObject* closeningCharacter = PyUnicode_FromString("]");
+    PyObject* separator = PyUnicode_FromString(", ");
 
-	PyObject* stringRepresentations = PyTuple_New(ARR_SIZE(o));
-	for (Py_ssize_t index = 0; index < ARR_SIZE(o); ++index) {
-		PyTuple_SET_ITEM(stringRepresentations, index, PyObject_Str(ARR_GET(o, index)));
-	}
+    PyObject* stringRepresentations = PyTuple_New(ARR_SIZE(o));
+    for (Py_ssize_t index = 0; index < ARR_SIZE(o); ++index) {
+        PyTuple_SET_ITEM(stringRepresentations, index, PyObject_Str(ARR_GET(o, index)));
+    }
 
-	PyObject* elementsString = PyUnicode_Join(separator, stringRepresentations);
-	PyObject* openedString = PyUnicode_Concat(openingCharacter, elementsString);
-	PyObject* completeString = PyUnicode_Concat(openedString, closeningCharacter);
+    PyObject* elementsString = PyUnicode_Join(separator, stringRepresentations);
+    PyObject* openedString = PyUnicode_Concat(openingCharacter, elementsString);
+    PyObject* completeString = PyUnicode_Concat(openedString, closeningCharacter);
 
-	Py_DECREF(openingCharacter);
-	Py_DECREF(closeningCharacter);
-	Py_DECREF(separator);
-	Py_DECREF(stringRepresentations);
-	Py_DECREF(elementsString);
-	Py_DECREF(openedString);
+    Py_DECREF(openingCharacter);
+    Py_DECREF(closeningCharacter);
+    Py_DECREF(separator);
+    Py_DECREF(stringRepresentations);
+    Py_DECREF(elementsString);
+    Py_DECREF(openedString);
 
-	return completeString;
+    return completeString;
 }
 
 // Array Type Methods End //
@@ -469,109 +469,109 @@ static PyObject* array_str(PyObject* o) {
 //-- Sequence Protocol --//
 
 static Py_ssize_t array_sq_length(PyObject* o) {
-	return ARR_SIZE(o);
+    return ARR_SIZE(o);
 }
 
 static PyObject* array_sq_item(PyObject* o, Py_ssize_t i) {
-	PyObject* item = NULL;
+    PyObject* item = NULL;
 
-	if (i < 0 || i >= ARR_SIZE(o)) {
-		PyErr_Format(PyExc_IndexError, "array index out of range");
-		return NULL;
-	}
+    if (i < 0 || i >= ARR_SIZE(o)) {
+        PyErr_Format(PyExc_IndexError, "array index out of range");
+        return NULL;
+    }
 
-	item = ARR_GET(o, i);
-	if (item == NULL) {
-		PyErr_Format(PyExc_IndexError, "Accessing uninitialized object at index %i", i);
-		return NULL;
-	}
+    item = ARR_GET(o, i);
+    if (item == NULL) {
+        PyErr_Format(PyExc_IndexError, "Accessing uninitialized object at index %i", i);
+        return NULL;
+    }
 
-	Py_INCREF(item);
-	return item;
+    Py_INCREF(item);
+    return item;
 }
 
 static int array_sq_ass_item(PyObject* o, Py_ssize_t i, PyObject* v) {
-	if (!ARR_CHECK_TYPE(o, v)) {
-		PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(o)->tp_name, Py_TYPE(v)->tp_name);
-		return -1;
-	}
+    if (!ARR_CHECK_TYPE(o, v)) {
+        PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(o)->tp_name, Py_TYPE(v)->tp_name);
+        return -1;
+    }
 
-	if (i < 0 || i >= ARR_SIZE(o)) {
-		PyErr_Format(PyExc_IndexError, "array index out of range");
-		return -1;
-	}
+    if (i < 0 || i >= ARR_SIZE(o)) {
+        PyErr_Format(PyExc_IndexError, "array index out of range");
+        return -1;
+    }
 
-	Py_XDECREF(ARR_GET(o, i));
-	ARR_ASSIGN(o, i, v);
-	Py_INCREF(v);
+    Py_XDECREF(ARR_GET(o, i));
+    ARR_ASSIGN(o, i, v);
+    Py_INCREF(v);
 
-	return 0;
+    return 0;
 }
 
 static PyObject* array_sq_concat(PyObject* o1, PyObject* o2) {
-	if (!ARR_EXACT_CHECK(o2)) {
-		PyErr_Format(PyExc_TypeError, "can only concatenate array ( not '%s' ) to array", Py_TYPE(o2)->tp_name);
-		return NULL;
-	}
+    if (!ARR_EXACT_CHECK(o2)) {
+        PyErr_Format(PyExc_TypeError, "can only concatenate array ( not '%s' ) to array", Py_TYPE(o2)->tp_name);
+        return NULL;
+    }
 
-	if (ARR_STORED_TYPE(o1) != ARR_STORED_TYPE(o2)) {
-		PyErr_Format(PyExc_TypeError, "can only concatenate array of type '%s' ( not '%s' ) to array of type '%s'", ARR_STORED_TYPE(o1)->tp_name, ARR_STORED_TYPE(o2)->tp_name, ARR_STORED_TYPE(o1)->tp_name);
-		return NULL;
-	}
+    if (ARR_STORED_TYPE(o1) != ARR_STORED_TYPE(o2)) {
+        PyErr_Format(PyExc_TypeError, "can only concatenate array of type '%s' ( not '%s' ) to array of type '%s'", ARR_STORED_TYPE(o1)->tp_name, ARR_STORED_TYPE(o2)->tp_name, ARR_STORED_TYPE(o1)->tp_name);
+        return NULL;
+    }
 
-	PyObject* arr = newArray(Py_TYPE(o1), ARR_STORED_TYPE(o1), ARR_SIZE(o1) + ARR_SIZE(o2));
-	if (arr == NULL) {
-		return NULL;
-	}
+    PyObject* arr = newArray(Py_TYPE(o1), ARR_STORED_TYPE(o1), ARR_SIZE(o1) + ARR_SIZE(o2));
+    if (arr == NULL) {
+        return NULL;
+    }
 
-	for (Py_ssize_t index = 0; index < ARR_SIZE(o1); ++index) {
-		array_sq_ass_item(arr, index, ARR_GET(o1, index));
-		if (PyErr_Occurred()) {
-			Py_DECREF(arr);
-			return NULL;
-		}
-	}
+    for (Py_ssize_t index = 0; index < ARR_SIZE(o1); ++index) {
+        array_sq_ass_item(arr, index, ARR_GET(o1, index));
+        if (PyErr_Occurred()) {
+            Py_DECREF(arr);
+            return NULL;
+        }
+    }
 
-	for (Py_ssize_t index = 0; index < ARR_SIZE(o2); ++index) {
-		array_sq_ass_item(arr, index + ARR_SIZE(o1), ARR_GET(o2, index));
-		if (PyErr_Occurred()) {
-			Py_DECREF(arr);
-			return NULL;
-		}
-	}
+    for (Py_ssize_t index = 0; index < ARR_SIZE(o2); ++index) {
+        array_sq_ass_item(arr, index + ARR_SIZE(o1), ARR_GET(o2, index));
+        if (PyErr_Occurred()) {
+            Py_DECREF(arr);
+            return NULL;
+        }
+    }
 
-	return arr;
+    return arr;
 }
 
 static PyObject* array_sq_repeat(PyObject* o, Py_ssize_t count) {
-	if (count <= 0) {
-		PyErr_Format(PyExc_ValueError, "Can't multiply array by non-positive non-greater than 0 int");
-	}
+    if (count <= 0) {
+        PyErr_Format(PyExc_ValueError, "Can't multiply array by non-positive non-greater than 0 int");
+    }
 
-	PyObject* arr = newArray(Py_TYPE(o), ARR_STORED_TYPE(o), ARR_SIZE(o) * count);
-	if (arr == NULL) {
-		return NULL;
-	}
+    PyObject* arr = newArray(Py_TYPE(o), ARR_STORED_TYPE(o), ARR_SIZE(o) * count);
+    if (arr == NULL) {
+        return NULL;
+    }
 
-	for (Py_ssize_t repetition = 0; repetition < count; ++repetition) {
-		for (Py_ssize_t index = 0; index < ARR_SIZE(o); ++index) {
-			array_sq_ass_item(arr, index + (ARR_SIZE(o) * repetition), ARR_GET(o, index));
-			if (PyErr_Occurred()) {
-				Py_DECREF(arr);
-				return NULL;
-			}
-		}
-	}
+    for (Py_ssize_t repetition = 0; repetition < count; ++repetition) {
+        for (Py_ssize_t index = 0; index < ARR_SIZE(o); ++index) {
+            array_sq_ass_item(arr, index + (ARR_SIZE(o) * repetition), ARR_GET(o, index));
+            if (PyErr_Occurred()) {
+                Py_DECREF(arr);
+                return NULL;
+            }
+        }
+    }
 
-	return arr;
+    return arr;
 }
 
 static PySequenceMethods array_sq_methods = {
-	.sq_length = array_sq_length,
-	.sq_item = array_sq_item,
-	.sq_ass_item = array_sq_ass_item,
-	.sq_concat = array_sq_concat,
-	.sq_repeat = array_sq_repeat
+    .sq_length = array_sq_length,
+    .sq_item = array_sq_item,
+    .sq_ass_item = array_sq_ass_item,
+    .sq_concat = array_sq_concat,
+    .sq_repeat = array_sq_repeat
 };
 
 // Sequence Protocol End //
@@ -579,18 +579,18 @@ static PySequenceMethods array_sq_methods = {
 //-- Array Structures and Type --//
 
 static PyTypeObject arrayType = {
-	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name = "lds_array.array",
-	.tp_doc = "A c-like array structure",
-	.tp_basicsize = sizeof(array),
-	.tp_itemsize = 0,
-	.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-	.tp_new = array_new,
-	.tp_init =  array_init,
-	.tp_dealloc = array_dealloc,
-	.tp_members = array_members,
-	.tp_as_sequence = &array_sq_methods,
-	.tp_str = array_str
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "lds_array.array",
+    .tp_doc = "A c-like array structure",
+    .tp_basicsize = sizeof(array),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_new = array_new,
+    .tp_init =  array_init,
+    .tp_dealloc = array_dealloc,
+    .tp_members = array_members,
+    .tp_as_sequence = &array_sq_methods,
+    .tp_str = array_str
 };
 
 // Array Structures and Type End //
@@ -598,27 +598,27 @@ static PyTypeObject arrayType = {
 //-- Module --//
 
 static PyModuleDef arraymodule = {
-	PyModuleDef_HEAD_INIT,
-	.m_name = "lds_array",
-	.m_doc = "C-like array module",
-	.m_size = -1
+    PyModuleDef_HEAD_INIT,
+    .m_name = "lds_array",
+    .m_doc = "C-like array module",
+    .m_size = -1
 };
 
 PyMODINIT_FUNC
 PyInit_lds_array() {
-	PyObject* m;
-	if (PyType_Ready(&arrayType) < 0) {
-		return NULL;
-	}
+    PyObject* m;
+    if (PyType_Ready(&arrayType) < 0) {
+        return NULL;
+    }
 
-	m = PyModule_Create(&arraymodule);
-	if (m == NULL) {
-		return NULL;
-	}
+    m = PyModule_Create(&arraymodule);
+    if (m == NULL) {
+        return NULL;
+    }
 
-	Py_INCREF(&arrayType);
-	PyModule_AddObject(m, "array", (PyObject*)&arrayType);
-	return m;
+    Py_INCREF(&arrayType);
+    PyModule_AddObject(m, "array", (PyObject*)&arrayType);
+    return m;
 }
 
 // Module End //
@@ -632,31 +632,31 @@ While it is the last thing in the array code, the simplest unit we can start fro
 
 ~~~c
 static PyModuleDef arraymodule = {
-	PyModuleDef_HEAD_INIT,
-	.m_name = "lds_array",
-	.m_doc = "C-like array module",
-	.m_size = -1
+    PyModuleDef_HEAD_INIT,
+    .m_name = "lds_array",
+    .m_doc = "C-like array module",
+    .m_size = -1
 };
 
 PyMODINIT_FUNC
 PyInit_lds_array() {
-	PyObject* m;
-	if (PyType_Ready(&arrayType) < 0) {
-		return NULL;
-	}
+    PyObject* m;
+    if (PyType_Ready(&arrayType) < 0) {
+        return NULL;
+    }
 
-	m = PyModule_Create(&arraymodule);
-	if (m == NULL) {
-		return NULL;
-	}
+    m = PyModule_Create(&arraymodule);
+    if (m == NULL) {
+        return NULL;
+    }
 
-	Py_INCREF(&arrayType);
-	PyModule_AddObject(m, "array", (PyObject*)&arrayType);
-	return m;
+    Py_INCREF(&arrayType);
+    PyModule_AddObject(m, "array", (PyObject*)&arrayType);
+    return m;
 }
 ~~~
 
-When we add an extension trough the C API we are adding a new module. To do this we have a two-stage process where we define the module and a function to initialize it.
+When we add an extension through the C API we are adding a new module. To do this we have a two-stage process where we define the module and a function to initialize it.
 [PyModuleDef](https://github.com/python/cpython/blob/aedc273fd90e31c7a20904568de3115f8957395b/Include/moduleobject.h#L75) is a structure that defines all the fields that a module object has.
 We will see that there is a similar structure for each type of entity we can add.
 
@@ -667,14 +667,14 @@ While the module array module we provide is really basic, PyModuleDef has a few 
 | PyModuleDef_Base  | m_base     | This is always initialized to [PyModuleDef_HEAD_INIT](https://github.com/python/cpython/blob/aedc273fd90e31c7a20904568de3115f8957395b/Include/moduleobject.h#L51) which adds some needed members                                                         |
 | const char*       | m_name     | The name for the module                                                                                                                                                                                                                                  |
 | const char*       | m_doc      | The docstring for the module. As for all docstrings members, we can use a PyDoc_STRVAR variable                                                                                                                                                          |
-| Py_ssize_t        | m_size     | A module state may be kept in a module specific memory. m_size defines the size of that memory. If set to -1 the module has, instead, global state and does not support sub-interpreters. A non negative size is required for multi-phase initialization |
+| Py_ssize_t        | m_size     | A module state may be kept in a module-specific memory. m_size defines the size of that memory. If set to -1 the module has, instead, global state and does not support sub-interpreters. A non-negative size is required for multi-phase initialization |
 | PyMethodDef*      | m_methods  | Points to a PyMethodDef structure that defines all the module-level functions                                                                                                                                                                            |
 | PyModuleDef_Slot* | m_slots    | Slot definitions for multi-phase initialization. Must be NULL when single-phase initialization is used                                                                                                                                                   |
 | traverseproc      | m_traverse | The traversal function neede for GC traversal. May be NULL in case the GC is not needed                                                                                                                                                                  |
 | inquiry           | m_clear    | The clear function for the GC. May be NULL in case the GC is not needed                                                                                                                                                                                  |
 | freefunc          | m_free     | A function called to deallocate the module. May be NULL if it isn't needed                                                                                                                                                                               |  
 
-While some members are pretty straighforward, like m_name and m_size, a few interesting things are introduced in this table.
+While some members are pretty straightforward, like m_name and m_size, a few interesting things are introduced in this table.
 The most important one for modules, as it is specific to them, is the difference between multi-phase and single-phase initialization, which we will look at in a bit.
 
 Going top to bottom,  we have three things to talk about before initialization:
@@ -713,17 +713,17 @@ It only has a few members:
 |:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:| 
 | const char*       | ml_name    | The name of the method |
 | PyCFunction       | ml_meth    | Pointer the function implementation |
-| int               | ml_flags   | Bits-flag indicating how Python should construct the call for this method. See below for more informations |
+| int               | ml_flags   | Bits-flag indicating how Python should construct the call for this method. See below for more pieces of information |
 | const char*       | ml_doc     | Docstring for the method |
 
 There are two interesting bits here, the PyCFunction type and ml_flags.
 [PyCFunction](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/methodobject.h#L18) is a typedefed function pointer to a function that returns a PyObject* and accepts two PyObject* as parameters.
-This is the basic signature for C Function that are callable by python.
+This is the basic signature for C Functions that are callable by python.
 
 The first PyObject*, usually called self, is actually the self object ( the same you would get in a Python instance method ). For a module-level function this is the module instance itself.
-The second parameter, ususally called args, is a PyTuple object that contains all the arguments of the function. Again, you can see the parallelism with Python.
+The second parameter, usually called args, is a PyTuple object that contains all the arguments of the function. Again, you can see the parallelism with Python.
 
-Extending on this is [PyCFunctionWithKeywords](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/methodobject.h#L20), which adds a third PyObject* paramater that, as you probably guessed, is a PyDictionary containing the named arguments passed to the function.
+Extending on this is [PyCFunctionWithKeywords](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/methodobject.h#L20), which adds a third PyObject* parameter that, as you probably guessed, is a PyDictionary containing the named arguments passed to the function.
 We will look at how to deal with both the args and kwargs arguments later.
 
 The ml_meth field has to be a PyCFunction pointer or a pointer to another function that is castable, and casted, to it.
@@ -732,13 +732,13 @@ There are a few flags we can use:
 
 | Flag              | Meaning                 |
 |:-------------------------------------------:| 
-| METH_VARARGS      | This is the standard calling convention. It passes a self and args argument and expect the method to be of the PyCFucntion type |
+| METH_VARARGS      | This is the standard calling convention. It passes a self and args argument and expects the method to be of the PyCFucntion type |
 | METH_KEYWORDS     | This is for PyCFunctionWithKeywords types. It passes self and args as METH_VARARGS but adds a third dictionary argument on top of them |
-| METH_NOARGS       | This is for function that expects no arguments. The ml_meth should still be of the PyCFunction type but the second parameter will always bbe passed aas NULL |
-| METH_O            | This is a commodity flags for PyCFunctions that expects a single PyObject as argument. Instead of passing a tuple the second argument is passed directly as the object that would be the sole element of the tuple. |
+| METH_NOARGS       | This is for a function that expects no arguments. The ml_meth should still be of the PyCFunction type but the second parameter will always be passed as NULL |
+| METH_O            | This is a commodity flag for PyCFunctions that expects a single PyObject as argument. Instead of passing a tuple the second argument is passed directly as the object that would be the sole element of the tuple. |
 
-Of all this flags only *METH_VARARGS* and *METH_KEYWORDS* can be combined togheter.
-There are two more flags,called binding flags, that can be combined with any of the previously described flags but are exclusive between themselves.
+Of all these flags only *METH_VARARGS* and *METH_KEYWORDS* can be combined together.
+There are two more flags, called binding flags, that can be combined with any of the previously described flags but are exclusive between themselves.
 
 | Flag              | Meaning                 |
 |:-------------------------------------------:| 
@@ -757,7 +757,7 @@ static PyObject* simplePow(PyObject* self, PyObject* args) { // PyCFunction
         return NULL;
     }
     
-    Py_INCREF(base); Py_INCREF(exponent); // We got borrowed references from the tuple. We increment the refcount for good meassure.
+    Py_INCREF(base); Py_INCREF(exponent); // We got borrowed references from the tuple. We increment the refcount for good measure.
     
     if (!PyNumber_CHECK(base) || !PyNumber_CHECK(exponent)) { // We check if the passed object implements the Number Protocol otherwise we raise an exception
        PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(base)->tp_name, Py_TYPE(exponent)->tp_name);
@@ -770,11 +770,11 @@ static PyObject* simplePow(PyObject* self, PyObject* args) { // PyCFunction
 
     Py_DECREF(base); Py_DECREF(exponent); // We have to decrement the refcount of the borrowed references
 
-    return result; // result is new reference that we are passing to the caller to handle
+    return result; // result is a new reference that we are passing to the caller to handle
 }
 
 // Check https://pythonextensionpatterns.readthedocs.io/en/latest/canonical_function.html for another way we could structure this ( and any other ) function.
-// Furthermore, you will see a good goto use in a C program ( This pattern is used troughout some of the CPython source code too )
+// Furthermore, you will see a good goto use in a C program ( This pattern is used throughout some of the CPython source code too )
 
 static PyMethodDef custom_methods[] = {
    { "simplePow", simplePow, METH_VARARGS, "" }, // Our method entry
@@ -798,16 +798,16 @@ PyInit_spam(void)
 
 ## m_traverse, m_clear and GC Support
 
-As said before, on top of the reference counting system Python ships with a an [optional-use garbage collector](https://rushter.com/blog/python-garbage-collector/) to deal, specifically, with cycles.
+As said before, on top of the reference counting system Python ships with a [optional-use garbage collector](https://rushter.com/blog/python-garbage-collector/) to deal, specifically, with cycles.
 To quote the API reference:
 
 > Python’s support for detecting and collecting garbage which involves circular references requires support from object types which are > “containers” for other objects which may also be containers. Types which do not store references to other objects, or which only store > references to atomic types (such as numbers or strings), do not need to provide any explicit support for garbage collection.
 
 The array structure we are building should actually implement GC support. I must say that in the few days I studied the API I never really implemented GC support nor looked into it much.
-While I can't give you any personal experience "insight", I can at least provide you with pointers to how such a support is added and where to look for informations on it.
+While I can't give you any personal experience "insight", I can at least provide you with pointers to how such support is added and where to look for informations on it.
 
 Implementing GC support doesn't seem to require too much.
-First we have to provide the traverse function, we will see later that the same GC support functions appear for object types too, which has a [traverseproc](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L158:15) signature.
+First, we have to provide the traverse function, we will see later that the same GC support functions appear for object types too, which has a [traverseproc](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L158:15) signature.
 
 If needed we have to provide a tp_clear function, which is of the [inquiry](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/object.h#L148) type.
 Going by the reference, the discriminator factor for needing a tp_clear function is the fact that the container we are garbage-collecting is mutable ( in which case we need one ) or not.
@@ -822,39 +822,39 @@ Furthermore, to actually enable the GC for the object, we need to add the [Py_TP
 
 To start working with the GC the best resource seems to be the [GC-support tutorial]()https://docs.python.org/3/extending/newtypes_tutorial.html#supporting-cyclic-garbage-collection in the [Extending and Embedding the Python Interpreter](https://docs.python.org/3/extending/index.html) guide.
 
-# Single-phase initialization and Multi-phase initiliazation
+# Single-phase initialization and Multi-phase initialization
 
 With those out of the way, the last thing we are interested in is the difference between the two types of module initialization.
-I've found the [PEP 489](https://www.python.org/dev/peps/pep-0489/) to be a really cool read on this argument. The reference advises to read [PEP 3121](https://www.python.org/dev/peps/pep-3121/) for more details on the sense of the m_size field.
+I've found the [PEP 489](https://www.python.org/dev/peps/pep-0489/) to be a really cool read on this argument. The reference advises reading [PEP 3121](https://www.python.org/dev/peps/pep-3121/) for more details on the sense of the m_size field.
 
 Like the names may imply, the two strategies differ in the number of steps taken to initialize a module and the way in which those steps are carried.  
-With single-phase initialization, the module is created, populated and returned directly by the initiliazation function, uniting the creation and initialization process and generating a singleton module.
+With single-phase initialization, the module is created, populated and returned directly by the initialization function, uniting the creation and initialization process and generating a singleton module.
 As we can read from [PEP 489](https://www.python.org/dev/peps/pep-0489/), this process is different from how Python Modules are built and is specific to C's extension modules.
 
-Furthermore, as the initialization function receives no context, the initialization process lacks access to some informations and brings along some difficult to resolve problems, like the support for sub-interpreters.
+Furthermore, as the initialization function receives no context, the initialization process lacks access to some pieces of information and brings along some difficult to resolve problems, like the support for sub-interpreters.
 
 On a practical note, this is what our array is doing and how single-phase initialization is supported in the C API:
 
 ~~~c
 PyMODINIT_FUNC
 PyInit_lds_array() {
-	PyObject* m;
-	if (PyType_Ready(&arrayType) < 0) {
-		return NULL;
-	}
+    PyObject* m;
+    if (PyType_Ready(&arrayType) < 0) {
+        return NULL;
+    }
 
-	m = PyModule_Create(&arraymodule);
-	if (m == NULL) {
-		return NULL;
-	}
+    m = PyModule_Create(&arraymodule);
+    if (m == NULL) {
+        return NULL;
+    }
 
-	Py_INCREF(&arrayType);
-	PyModule_AddObject(m, "array", (PyObject*)&arrayType);
-	return m;
+    Py_INCREF(&arrayType);
+    PyModule_AddObject(m, "array", (PyObject*)&arrayType);
+    return m;
 }
 ~~~
 
-This is a way of initiliazing the module, where we create a module instance from its definition and the populate it trough the use of [supporting functions](https://docs.python.org/3/c-api/module.html#support-functions) like [PyModule_AddObject](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/modsupport.c#L615:1), that uses single-phase initialization.
+This is a way of initializing the module, where we create a module instance from its definition and the populate it through the use of [supporting functions](https://docs.python.org/3/c-api/module.html#support-functions) like [PyModule_AddObject](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/modsupport.c#L615:1), that uses single-phase initialization.
 
 The code is pretty self-explicative so I won't explain it.
 
@@ -871,8 +871,8 @@ PyInit_lds_array(void)
 }
 ~~~
 
-This will give our module def to Python wich will call the constructing functions provided trough the m_slots field.
-The structure connect our m_slots field should be an array of [PyModuleDef_slots](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L61) which has two fields:
+This will give our module def to Python which will call the constructing functions provided through the m_slots field.
+The structure connects our m_slots field should be an array of [PyModuleDef_slots](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L61) which has two fields:
 
 | Type              | Member     | Use                                                                |
 |:---------------------------------------------------------------------------------------------------:| 
@@ -893,7 +893,7 @@ which should create the module object and return it or set an error if it is not
 The second parameter will receive the *PyModuleDef* we return from the init function.
 The spec parameter is a bit more interesting. There is a lot to understand about the ModuleSpec object and I will point you to [PEP 451](https://www.python.org/dev/peps/pep-0451/) for more informations on it.
 
-If a creation slot is not provided, Python will create the module trough the [PyModule_New function](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/moduleobject.c#L114).
+If a creation slot is not provided, Python will create the module through the [PyModule_New function](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/moduleobject.c#L114).
 I could not really find an example of a creation slot in the source code. It seems idiomatic to leave this part to Python.
 
 The second type points to a function with signature:
@@ -916,8 +916,8 @@ static int array_mod_exec(PyObject* module) {
 
     Py_INCREF(&arrayType);
     if (PyModule_AddObject(module, "array", (PyObject *) &arrayType) < 0) {
-        // While I tought that we would need to decref &arrayType, every snippet of this code that I found in the CPython source doesn't
-	// I'm still not sure why
+        // While I thought that we would need to decref &arrayType, every snippet of this code that I found in the CPython source doesn't
+    // I'm still not sure why
         return -1;
     }
     
@@ -930,11 +930,11 @@ static PyModuleDef_Slot[] arrayslots { // Our slots array
 }
 
 static PyModuleDef arraymodule = {
-	PyModuleDef_HEAD_INIT,
-	.m_name = "lds_array",
-	.m_doc = "C-like array module",
-	.m_size = -1,
-	.m_slots = arrayslots // We added our slots to the module def
+    PyModuleDef_HEAD_INIT,
+    .m_name = "lds_array",
+    .m_doc = "C-like array module",
+    .m_size = -1,
+    .m_slots = arrayslots // We added our slots to the module def
 };
 
 PyMODINIT_FUNC
@@ -943,9 +943,9 @@ PyInit_lds_array() {
 }
 ~~~
 
-This is acutally pretty similar to what we had before, we mostly moved some things around.
+This is actually pretty similar to what we had before, we mostly moved some things around.
 
-If you've read [PEP 489](https://www.python.org/dev/peps/pep-0489/), there seems to be quite a few advantage to it. I think this should be the preferred initialization for our extension modules.
+If you've read [PEP 489](https://www.python.org/dev/peps/pep-0489/), there seems to be quite a few advantages to it. I think this should be the preferred initialization for our extension modules.
 
 # The array object
 
@@ -954,10 +954,10 @@ First thing first, this is how we have defined the array:
 
 ~~~c
 typedef struct {
-	PyObject_HEAD
-	PyObject** data;
-	Py_ssize_t size;
-	PyTypeObject* storedType;
+    PyObject_HEAD
+    PyObject** data;
+    Py_ssize_t size;
+    PyTypeObject* storedType;
 } array;
 ~~~
 
@@ -977,12 +977,12 @@ I think we may have used it for the array object but I haven't tried it.
 
 To make an object a var object we have to use [PyObject_VAR_HEAD](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L101) instead of *PyObject_HEAD* and ensure that the last field of the struct is an array of length one where Python will malloc enough space for ob_size elements.
 Lastly, we have to make some changes to the type of the object that we will see soon enough.
-You can see an examle of this [here](https://github.com/python/cpython/blob/54ba556c6c7d8fd5504dc142c2e773890c55a774/Include/cpython/tupleobject.h#L9).
+You can see an example of this [here](https://github.com/python/cpython/blob/54ba556c6c7d8fd5504dc142c2e773890c55a774/Include/cpython/tupleobject.h#L9).
 
 ~~~c
 static PyMemberDef array_members[] = {
-	{"size", T_PYSSIZET, offsetof(array, size), READONLY, "Describe how many elements are stored in the array"},
-	{NULL}
+    {"size", T_PYSSIZET, offsetof(array, size), READONLY, "Describe how many elements are stored in the array"},
+    {NULL}
 };
 ~~~
 
@@ -1027,24 +1027,24 @@ The difference between T_OBJECT and T_OBJECT_EX is that the first returns None i
 The reference advises us to use the EX type because it handles the del statement more correctly.
 
 This NULL-terminated array of PyMemberDef structures is plugged into the array type to define the object attributes.
-There is no real reason to give read access to the size attribute as we support the Python's len trough the sequence protocol. Nonetheless, I was trying out attributes.
+There is no real reason to give read access to the size attribute as we support Python's len trough the sequence protocol. Nonetheless, I was trying out attributes.
 
 Going forward we finally get to the core of the action of a PyObject: its [type](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Include/object.h#L346).
 
 ~~~c
 static PyTypeObject arrayType = {
-	PyVarObject_HEAD_INIT(NULL, 0)
-	.tp_name = "lds_array.array",
-	.tp_doc = "A c-like array structure",
-	.tp_basicsize = sizeof(array),
-	.tp_itemsize = 0,
-	.tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
-	.tp_new = array_new,
-	.tp_init =  array_init,
-	.tp_dealloc = array_dealloc,
-	.tp_members = array_members,
-	.tp_as_sequence = &array_sq_methods,
-	.tp_str = array_str
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "lds_array.array",
+    .tp_doc = "A c-like array structure",
+    .tp_basicsize = sizeof(array),
+    .tp_itemsize = 0,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_new = array_new,
+    .tp_init =  array_init,
+    .tp_dealloc = array_dealloc,
+    .tp_members = array_members,
+    .tp_as_sequence = &array_sq_methods,
+    .tp_str = array_str
 };
 ~~~
 
@@ -1057,9 +1057,9 @@ Some of those are already familiar like (tp_)name and (tp_)doc.
 
 tp_basicsize and tp_itemsize work in tandem to define how much space the object will need.
 tp_basicsize is the size of the actual structure.
-tp_itemsize should be 0 for all objects that aren't variable in size. For varObjects it represents the size of a single stored item. Togheter with the ob_size field it defines how much memory the stored elements occupy.
+tp_itemsize should be 0 for all objects that aren't variable in size. For varObjects it represents the size of a single stored item. Together with the ob_size field it defines how much memory the stored elements occupy.
 
-tp_flags is used for various reasons. Usually it should have at least Py_TPFLAGS_DEFAULT set.
+tp_flags is used for various reasons. Usually, it should have at least Py_TPFLAGS_DEFAULT set.
 We have a few [choices](https://github.com/python/cpython/blob/364f0b0f19cc3f0d5e63f571ec9163cf41c62958/Include/object.h#L294) here:
 
 | Flag | Use |
@@ -1089,8 +1089,8 @@ tp_str is, again, familiar as it is exposed \_\_str\_\_ and is used to support s
 tp_as_sequence is an interesting field. It is used to support the [sequence abstract protocol](https://docs.python.org/3/c-api/sequence.html).
 There are quite a few [protocols](https://docs.python.org/3/c-api/abstract.html). They are not that much different from a Java-like interface in concept.
 
-With the sequence protocol we can support indexing operations and the expressions like len.
-As with many, but not all, other protocols, we simply have to plug in the type a reference to a specific structure that points to the requested implementations.
+With the sequence protocol, we can support indexing operations and expressions like len.
+As with many, but not all, other protocols, we simply have to put in the type a reference to a specific structure that points to the requested implementations.
 For the sequence protocol this structure is [PySequenceMethods](https://github.com/python/cpython/blob/bb86bf4c4eaa30b1f5192dab9f389ce0bb61114d/Include/cpython/object.h#L139).
 
 Again, there are a [few things](https://docs.python.org/3/c-api/typeobj.html#sequence-object-structures) we can implement for this structure:
@@ -1101,11 +1101,11 @@ sq_length is used to handle negative indexes in sq_item and sq_ass_item. If a ne
 
 sq_concat is a [binaryfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L146) that is called by [PySequence_Concat](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1551) and by the + operator if the nb_slot ( \_\_add\_\_ ) is missing.
 It should return a new sequence containing all elements from the left argument followed by all elements of the right argument.
-There is an inplace version of concat in sq_inplace_concat that modifies the first argument instead of creating a new sequence.
+There is an in-place version of concat in sq_inplace_concat that modifies the first argument instead of creating a new sequence.
 
 sq_repeat is an [ssizeargfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L150) that is called by [PySequence_Repeat](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1576) and by the * operator if the nb_multiply (\_\_mul\_\_ ) slot is missing. 
 It should return a new sequence with the elements of the original sequence repeated n times.
-There is an inplace version of repeat in sq_inplace_repeat that modifies the sequence instead of creating a new one.
+There is an in-place version of repeat in sq_inplace_repeat that modifies the sequence instead of creating a new one.
 
 sq_item is an ssizeargfunc that is called by [PySequence_GetItem](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1661) and [PyObject_GetItem](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L143) which are equivalent to Python's index operator. 
 It should return a new reference to the item at the requested index.
@@ -1129,55 +1129,55 @@ Starting from new:
 
 ~~~c
 static PyObject* newArray(PyTypeObject* type, PyTypeObject* storedType, Py_ssize_t size) {
-	array* self;
-	self = (array*)type->tp_alloc(type, 0);
-	if (self == NULL) {
-		return NULL;
-	}
+    array* self;
+    self = (array*)type->tp_alloc(type, 0);
+    if (self == NULL) {
+        return NULL;
+    }
 
-	self->data = (PyObject**)PyMem_Calloc(sizeof(PyObject*), size);
-	if (self->data == NULL) {
-		Py_DECREF(self);
-		return NULL;
-	}
+    self->data = (PyObject**)PyMem_Calloc(sizeof(PyObject*), size);
+    if (self->data == NULL) {
+        Py_DECREF(self);
+        return NULL;
+    }
 
-	self->size = size;
-	self->storedType = storedType;
+    self->size = size;
+    self->storedType = storedType;
 
-	Py_INCREF(self->storedType);
+    Py_INCREF(self->storedType);
 
-	return (PyObject*)self;
+    return (PyObject*)self;
 }
 
 static PyObject* array_new(PyTypeObject* type, PyObject* args, PyObject* kwds) {
-	if (PyTuple_Size(args) < 2) {
-		PyErr_Format(PyExc_TypeError, "%s() takes at least 2 arguments (%i given)", __FUNCTION__, PyTuple_Size(args));
-		return NULL;
-	}
+    if (PyTuple_Size(args) < 2) {
+        PyErr_Format(PyExc_TypeError, "%s() takes at least 2 arguments (%i given)", __FUNCTION__, PyTuple_Size(args));
+        return NULL;
+    }
 
-	Py_ssize_t size = PyLong_AsSsize_t(PyTuple_GET_ITEM(args, 0));
-	PyObject* storedType = PyTuple_GET_ITEM(args, 1);
+    Py_ssize_t size = PyLong_AsSsize_t(PyTuple_GET_ITEM(args, 0));
+    PyObject* storedType = PyTuple_GET_ITEM(args, 1);
 
-	if (PyErr_Occurred() || !PyType_Check(storedType)) {
-		PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(PyTuple_GET_ITEM(args, 0))->tp_name, Py_TYPE(PyTuple_GET_ITEM(args, 1))->tp_name);
-		return NULL;
-	}
+    if (PyErr_Occurred() || !PyType_Check(storedType)) {
+        PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s: '%s' and '%s'", __FUNCTION__, Py_TYPE(PyTuple_GET_ITEM(args, 0))->tp_name, Py_TYPE(PyTuple_GET_ITEM(args, 1))->tp_name);
+        return NULL;
+    }
 
-	if (size <= 0) {
-		PyErr_Format(PyExc_ValueError, "The array size must be a positive integer greater than 0");
-		return NULL;
-	}
+    if (size <= 0) {
+        PyErr_Format(PyExc_ValueError, "The array size must be a positive integer greater than 0");
+        return NULL;
+    }
 
-	if (size > (PY_SSIZE_T_MAX / sizeof(PyObject*))) {
-		return PyErr_NoMemory();
-	}
+    if (size > (PY_SSIZE_T_MAX / sizeof(PyObject*))) {
+        return PyErr_NoMemory();
+    }
 
 
-	return newArray(type, (PyTypeObject*)storedType, size);
+    return newArray(type, (PyTypeObject*)storedType, size);
 }
 ~~~
 
-A new function has type [newfunc](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L175) and is expected to allocate a new instance and do the bare minumum initialization of its members.
+A new function has type [newfunc](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L175) and is expected to allocate a new instance and do the bare minimum initialization of its members.
 In the case of array, we allocate as much space for n pointers and set them to zero.
 
 To construct an array, I decided to require at least two arguments, a size and a type, and at most 2 + size arguments. The optional arguments are used to initialize the array values.
@@ -1193,7 +1193,7 @@ While we don't use them here, for reasons I will explain in a moment, we have a 
 [PyArg_ParseTuple](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L123) and [PyArg_ParseTupleAndKeywords](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L1428) are the bread and butter of argument parsing.
 
 The former takes the args tuple, a format string and a variable number of arguments that are used to store the parsed arguments, similar to printf.
-The latter takes, additionally, the kwds object and a kewyword list as its second and fourth argument, after the args tuple and then after the format string.
+The latter takes, additionally, the kwds object and a keyword list as its second and fourth argument, after the args tuple and then after the format string.
 A keyword list is a NULL-terminated array of char* that represents the named arguments' names.
 
 The format string for those functions has [quite a few options](https://docs.python.org/3/c-api/arg.html#strings-and-buffers).
@@ -1201,10 +1201,10 @@ The format string for those functions has [quite a few options](https://docs.pyt
 Both of those functions have a correspandant function that accepts a va_list instead of a variable number of arguments, [PyArg_VaParse](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L173) and [PyArg_VaParseTupleAndKeywords](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L1478).
 
 We then have [PyArg_UnpackTuple](https://github.com/python/cpython/blob/62be33870e2f8517314bf9c7275548e799296f7e/Python/getargs.c#L2738) which doesn't take a format string.
-It takes, instead, a tuple object, again it will useally be our args parameter, a const char* used as the name for error reporting, two Py_ssize_t min and max, and a variable number of arguments to store the values in.
-The tuple size should be at leat min and no more than max. All parsed arguments have to be stored in PyObject*s.
+It takes, instead, a tuple object, again it will usually be our args parameter, a const char* used as the name for error reporting, two Py_ssize_t min and max, and a variable number of arguments to store the values in.
+The tuple size should be at least min and no more than max. All parsed arguments have to be stored in PyObject*s.
 
-All of these function return an int value that is true if it succeds and false if there was any error.
+All of these functions return an int value that is true if it succeeds and false if there was an error.
 
 Here are some examples:
 
@@ -1237,16 +1237,16 @@ PyArg_UnpackTuple(args, "test", 1, 2, &first, &second);
 ~~~
 
 For array_new I've not used them as it was a little difficult working with a variable number of argument.
-For format string parser we should've had to build the string dinamycally as an error is returned if the args tuple length does not match the format we are giving or the input is not exausted.
+For format string parser we should've had to build the string dynamically as an error is returned if the args tuple length does not match the format we are giving or the input is not exhausted.
 
 We can't use PyArg_UnpackTuple with a min of 2 and a max of 2 as it returns an error when the size of the tuple is smaller than the min or bigger than the max.
-We could do something like using a max that is the theoritical limit that an array can hold based on the size of a PyObject*, but we would need to provide as many PyObject* to store the arguments as there are arguments in the tuple, which isn't particularly feasible since we don't even know how many there are yet.
+We could do something like using a max that is the theoretical limit that an array can hold based on the size of a PyObject*, but we would need to provide as many PyObject* to store the arguments as there are arguments in the tuple, which isn't particularly feasible since we don't even know how many there are yet.
 
 If we really wanted to use them we could probably do something like [slicing the tuple](https://docs.python.org/3/c-api/tuple.html#c.PyTuple_GetSlice) but we would have to deal with a new reference. Furthermore, I think doing this by hand is clearer.
 
 In the end, while those helper functions are really really handy ( and they provide some form of error checking that we may otherwise do by hand ), args and kwds are still PyObjects that we can handle manually.
 
-While [PyTuple_GET_ITEM](https://github.com/python/cpython/blob/3191391515824fa7f3c573d807f1034c6a28fab3/Include/cpython/tupleobject.h#L27:9) returns a borrowed reference, and we don't have to manage it, we should probably expand the function to increase the borrowed refernces and decrease them again before exiting.
+While [PyTuple_GET_ITEM](https://github.com/python/cpython/blob/3191391515824fa7f3c573d807f1034c6a28fab3/Include/cpython/tupleobject.h#L27:9) returns a borrowed reference, and we don't have to manage it, we should probably expand the function to increase the borrowed references and decrease them again before exiting.
 
 [PyErr_Occurred](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/errors.c#L175) checks if an exception is currently set. We are using it to check if anything happened in [PyLong_AsSsize_t](https://github.com/python/cpython/blob/364f0b0f19cc3f0d5e63f571ec9163cf41c62958/Objects/longobject.c#L683).
 Beware that the PyTuple_GET_ITEM macro does no error or range checking contrary to its sister function [PyTuple_GetItem](https://github.com/python/cpython/blob/234531b4462b20d668762bd78406fd2ebab129c9/Objects/tupleobject.c#L150).
@@ -1264,7 +1264,7 @@ After some more error checking we pass the ball to new_array.
 array* self;
 self = (array*)type->tp_alloc(type, 0);
 if (self == NULL) {
-	return NULL;
+    return NULL;
 }
 ~~~
 
@@ -1272,7 +1272,7 @@ This is something that you will see in most \_\_new\_\_ functions. We use the ty
 
 An alloc function [initializes the memory for the instance itself](https://docs.python.org/3/c-api/typeobj.html#c.PyTypeObject.tp_alloc).  We can provide a custom one, but we will usually fall on the standard Python's allocation strategy.
 
-With our instance in hand we simply have to initialize the needed memory for our array. We do this trough Python's [memory interface functions](https://docs.python.org/3/c-api/memory.html#memory-interface).
+With our instance in hand, we simply have to initialize the needed memory for our array. We do this through Python's [memory interface functions](https://docs.python.org/3/c-api/memory.html#memory-interface).
 The API provides our known malloc, free, etc...
 It does even provide a new for object allocation.
 
@@ -1282,44 +1282,44 @@ Moving on, we have to complete the instance initialization with our \_\_init\_\_
 
 ~~~c
 static int array_init(array* self, PyObject* args, PyObject* kwds) {
-	static const Py_ssize_t MIN_ARGUMENTS = 2;
-	
-	Py_ssize_t argsSize = PyTuple_Size(args);
+    static const Py_ssize_t MIN_ARGUMENTS = 2;
+    
+    Py_ssize_t argsSize = PyTuple_Size(args);
 
-	if (argsSize > (ARR_SIZE(self) + MIN_ARGUMENTS)) {
-		PyErr_Format(PyExc_TypeError, "%s() takes at most %i arguments for an array of size %i (%i given)", __FUNCTION__, ARR_SIZE(self) + MIN_ARGUMENTS, ARR_SIZE(self), argsSize);
-		return -1;
-	}
+    if (argsSize > (ARR_SIZE(self) + MIN_ARGUMENTS)) {
+        PyErr_Format(PyExc_TypeError, "%s() takes at most %i arguments for an array of size %i (%i given)", __FUNCTION__, ARR_SIZE(self) + MIN_ARGUMENTS, ARR_SIZE(self), argsSize);
+        return -1;
+    }
 
-	for (Py_ssize_t index = 2; index < argsSize; ++index) {
-		PyObject* tmp = PyTuple_GET_ITEM(args, index);
-		if (!ARR_CHECK_TYPE(self, tmp)) {
-			PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(self)->tp_name, Py_TYPE(tmp)->tp_name);
-			return -1;
-		}
+    for (Py_ssize_t index = 2; index < argsSize; ++index) {
+        PyObject* tmp = PyTuple_GET_ITEM(args, index);
+        if (!ARR_CHECK_TYPE(self, tmp)) {
+            PyErr_Format(PyExc_TypeError, "Unsupported operand type(s) for %s for array of type '%s': '%s'", __FUNCTION__, ARR_STORED_TYPE(self)->tp_name, Py_TYPE(tmp)->tp_name);
+            return -1;
+        }
 
-		Py_INCREF(tmp);
-		ARR_ASSIGN(self, index-MIN_ARGUMENTS, tmp);
-	}
+        Py_INCREF(tmp);
+        ARR_ASSIGN(self, index-MIN_ARGUMENTS, tmp);
+    }
 
-	return 0;
+    return 0;
 }
 
 ~~~
 
 You should probably know what is going on by now as we are using things we have already seen.
-As you can see, this time we return a negative number to signify errrors as expected from int-returning functions.
+As you can see, this time we return a negative number to signify errors as expected from int-returning functions.
 
 The deallocator is pretty simple too:
 
 ~~~c
 static void array_dealloc(array* self) {
-	for (Py_ssize_t index = 0; index < self->size; ++index) {
-		Py_XDECREF(ARR_GET(self, index));
-	}
+    for (Py_ssize_t index = 0; index < self->size; ++index) {
+        Py_XDECREF(ARR_GET(self, index));
+    }
 
-	PyMem_Free((void*)self->data);
-	Py_DECREF(ARR_STORED_TYPE(self));
+    PyMem_Free((void*)self->data);
+    Py_DECREF(ARR_STORED_TYPE(self));
 }
 ~~~
 
@@ -1329,9 +1329,9 @@ There are surely things that can be done in different ways, and maybe should. I 
 # Some afterwords
 
 Unfortunately, I used all the allotted time for this post and could not cover some interesting things that I learnt.
-Initially I wanted to produce a more tutorial-like post but I completely got lost in my ramblings and wrote more than I could handle on the time I had.
+Initially, I wanted to produce a more tutorial-like post but I completely got lost in my ramblings and wrote more than I could handle on the time I had.
 I still hope this can be used as a beginner resource for starting out with the C API.
 
-I don't particularly like working with Python as a language. Nonetheless, working the C API was a really enjoyable experience that shed some lights on how some things works internally in Python and gave me some better tools to appreciate it and its usage.
+I don't particularly like working with Python as a language. Nonetheless, working the C API was a really enjoyable experience that shed some lights on how some things work internally in Python and gave me some better tools to appreciate it and its usage.
 
 I'd really like to have the chance, later on, to write some interesting extension modules and to find a use-case for the C API.
