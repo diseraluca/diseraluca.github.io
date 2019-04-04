@@ -4,7 +4,6 @@ title: Getting our feet wet with Python's C API
 date: 2019-03-21
 categories: introduction
 tags: python C introduction tutorial
-draft: true
 ---
 
 #Approaching the shore
