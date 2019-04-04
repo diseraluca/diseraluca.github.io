@@ -75,6 +75,7 @@ There are a few "catches" with this header file that are of note.
     * string.h
     * errno.h 
     * stdlib.h
+    
   if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
 2. This header file can define some pre-processor definitions that change the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
 
