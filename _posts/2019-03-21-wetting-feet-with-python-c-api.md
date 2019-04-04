@@ -74,8 +74,7 @@ There are a few "catches" with this header file that are of note.
     * stdio.h 
     * string.h
     * errno.h 
-    * stdlib.h
-   if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
+    * stdlib.h, if this is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
   
 2. This header file can define some pre-processor definitions that change the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
 
@@ -99,6 +98,8 @@ As you may imagine, *Py_INCREF* increments the count by one while *Py_DECREF* de
 Furthermore, if *Py_DECREF* decrements a refcount to 0, it frees the object memory, not directly but by calling the object destructor trough a function pointer which is stored in the *tp_deallocator* member of its *PyTypeObject*.
 *Py_XDECREF* works exactly like *Py_DECREF* but, while the latter requires its argument to be non-NULL, correctly handles a NULL-argument.
 
+There exists an x macro for increasing too, *Py_XINCREF*
+
 We have yet another ( and last ) macro at our disposal in *Py_CLEAR*, which decrements a refcount to 0, frees the object and sets its argument to *NULL* ( while the other decrement macros don't ).
 *Py_CLEAR* like *Py_XDECREF* handles *NULL* arguments ( by doing nothing ).
 
@@ -110,7 +111,7 @@ In Python's ownership model, we can identify three types of references, each one
 
 Firstly, we have **new references**, for example, the one returned by a PyObject-building function; e.g *Py_BuildValue* or *PyTuple_New*.
 When we get hold of a *new reference*, as already said this usually happens when we construct a new object, we become its owner.
-As the owner of a *new reference* it is our job to dispose of it, by *Py_DECREF*ing it to 0 or to, otherwise, pass it to someone who will do it for, essentially giving up our ownership in the process.
+As the owner of a *new reference* it is our job to dispose of it, by *Py_DECREF*ing it to 0 or to, otherwise, pass it to someone who will do it for us, essentially giving up our ownership in the process.
 
 If we won't take care of our *new reference* this way, we will end with a memory leak.
 
@@ -126,7 +127,7 @@ static PyObject* square(long n) {
     
     Py_DECREF(num); // As we don't need it anymore we do our job and decrease the reference, deleting it
     
-    return res; // Instead of res ourselves, we pass the ownership to the caller, which will need to eventually dispose of it or pass it along, as a new reference
+    return res; // Instead of managing res ourselves, we pass the ownership to the caller, which will need to eventually dispose of it or pass it along, as a new reference
 }
 ~~~ 
 
@@ -222,7 +223,7 @@ static void buggyTupleAccess(PyObject* o) {
 }
 ~~~  
 
-{ By the way, another thing we can do here is to get the item trough *PySequence_GetItem*, from the abstract sequence protocol, which already calls *Py_INCREF* giving us a new reference we only have to decref ).
+{ By the way, another thing we can do here is to get the item trough *PySequence_GetItem*, from the abstract sequence protocol, which will give us a new reference we only have to decref ).
 
 Simple enough but can get tricky at time. Furthermore, we have to make sure that the reference gets decreased in each code path.
 
@@ -261,7 +262,7 @@ Traceback (most recent call last):
 SystemError: error return without exception set
 ~~~
 
-Setting an exception but fail to return a value that signals it, will give us an error at runtime.
+Setting an exception but failing to return a value that signals it, will give us an error at runtime.
 Usually, we should check for most return values and propagate an exception when set ( Without overwriting it so that we know where and what initially occurred ).
 
 Other than using the built-in exception, we can build custom module-level exceptions trough *PyErr_NewException* and *PyErr_NewExceptionWithDoc*.
@@ -623,7 +624,7 @@ PyInit_lds_array() {
 // Module End //
 ~~~
 
-It has a few things going on. Some things are may be a bit difficult to untangle at first glance if you've never used the C API but the example should be simple enough to be used as a kick-start.
+It has a few things going on. Some things may be a bit difficult to untangle at first glance if you've never used the C API but the example should be simple enough to be used as a kick-start.
 
 # The module object and initialization
 
@@ -772,8 +773,7 @@ static PyObject* simplePow(PyObject* self, PyObject* args) { // PyCFunction
     return result; // result is a new reference that we are passing to the caller to handle
 }
 
-// Check https://pythonextensionpatterns.readthedocs.io/en/latest/canonical_function.html for another way we could structure this ( and any other ) function.
-// Furthermore, you will see a good goto use in a C program ( This pattern is used throughout some of the CPython source code too )
+// Check https://pythonextensionpatterns.readthedocs.io/en/latest/canonical_function.html for another way we could structure this ( and many other ) function ( This pattern is used throughout some of the CPython source code too ).
 
 static PyMethodDef custom_methods[] = {
    { "simplePow", simplePow, METH_VARARGS, "" }, // Our method entry
@@ -800,7 +800,7 @@ PyInit_spam(void)
 As said before, on top of the reference counting system Python ships with a [optional-use garbage collector](https://rushter.com/blog/python-garbage-collector/) to deal, specifically, with cycles.
 To quote the API reference:
 
-> Python’s support for detecting and collecting garbage which involves circular references requires support from object types which are > “containers” for other objects which may also be containers. Types which do not store references to other objects, or which only store > references to atomic types (such as numbers or strings), do not need to provide any explicit support for garbage collection.
+> Python’s support for detecting and collecting garbage which involves circular references requires support from object types which are “containers” for other objects which may also be containers. Types which do not store references to other objects, or which only store references to atomic types (such as numbers or strings), do not need to provide any explicit support for garbage collection.
 
 The array structure we are building should actually implement GC support. I must say that in the few days I studied the API I never really implemented GC support nor looked into it much.
 While I can't give you any personal experience "insight", I can at least provide you with pointers to how such support is added and where to look for informations on it.
@@ -819,7 +819,7 @@ The other [things](https://docs.python.org/3/c-api/gcsupport.html#supporting-cyc
 
 Furthermore, to actually enable the GC for the object, we need to add the [Py_TPFLAGS_HAVE_GC](https://docs.python.org/3/c-api/typeobj.html#Py_TPFLAGS_HAVE_GC) flag to its type.
 
-To start working with the GC the best resource seems to be the [GC-support tutorial]()https://docs.python.org/3/extending/newtypes_tutorial.html#supporting-cyclic-garbage-collection in the [Extending and Embedding the Python Interpreter](https://docs.python.org/3/extending/index.html) guide.
+To start working with the GC the best resource seems to be the [GC-support tutorial](https://docs.python.org/3/extending/newtypes_tutorial.html#supporting-cyclic-garbage-collection) in the [Extending and Embedding the Python Interpreter](https://docs.python.org/3/extending/index.html) guide.
 
 # Single-phase initialization and Multi-phase initialization
 
@@ -853,7 +853,7 @@ PyInit_lds_array() {
 }
 ~~~
 
-This is a way of initializing the module, where we create a module instance from its definition and the populate it through the use of [supporting functions](https://docs.python.org/3/c-api/module.html#support-functions) like [PyModule_AddObject](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/modsupport.c#L615:1), that uses single-phase initialization.
+This is a way of initializing the module, where we create a module instance from its definition and then populate it through the use of [supporting functions](https://docs.python.org/3/c-api/module.html#support-functions) like [PyModule_AddObject](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Python/modsupport.c#L615:1), that uses single-phase initialization.
 
 The code is pretty self-explicative so I won't explain it.
 
@@ -882,7 +882,7 @@ The slot field has two possible types.
 
 [Py_mod_create](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L66) and [Py_mod_exec](https://github.com/python/cpython/blob/b232df9197a19e78d0e2a751e56e0e62547354ec/Include/moduleobject.h#L67).
 
-The first points to function of signature:
+The first points to a function of signature:
 
 ~~~c
 PyObject* f(PyObject *spec, PyModuleDef *def)
@@ -966,11 +966,17 @@ It doesn't have many fields.
 *data* Is where our references will be stored. We will allocate this memory in the __new__ method of our array.
 
 *size* tells us how big the array is. This is non-changing value that is decided on construction.
-[Py_ssize_t](https://github.com/python/cpython/blob/7a2368063f25746d4008a74aca0dc0b82f86ff7b/Include/pyport.h#L84) is a signed number type for which sizeof(size_t) == sizeof(Py_ssize_t) holds.
+[Py_ssize_t](https://github.com/python/cpython/blob/7a2368063f25746d4008a74aca0dc0b82f86ff7b/Include/pyport.h#L84) is a signed number type for which 
+
+~~~c
+sizeof(size_t) == sizeof(Py_ssize_t) 
+~~~
+
+holds.
 
 *storedType* is a pointer to a Python Type ( which is a PyObject too ) we will use to provide some type-checks of inserted elements.
 
-One interesting thing is that, later, I've found out that Python provides a second type of PyObject specifically for objects that have a notion of length ( like containers ): the [PyVarObject](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L118) that adds a field to store the number of items in the object, *ob_size*.
+One interesting thing is that, later, I've found out that Python provides a second type of PyObject specifically for objects that have a notion of length ( like containers ): the [PyVarObject](https://github.com/python/cpython/blob/9bdd2de84c1af55fbc006d3f892313623bd0195c/Include/object.h#L118); that adds a field to store the number of items in the object, *ob_size*.
 
 I think we may have used it for the array object but I haven't tried it. 
 
@@ -1019,7 +1025,7 @@ We have a few possible [types](https://github.com/python/cpython/blob/e42b705188
 | T_ULONG     | unsigned long      |
 | T_BOOL      | char               |
 | T_LONGLONG  | long long          |
-| T_ULONGLOGN | unsigned long long |
+| T_ULONGLONG | unsigned long long |
 | T_PYSSIZET  | Py_ssize_t         |
 
 The difference between T_OBJECT and T_OBJECT_EX is that the first returns None if the member is NULL while the latter raises an AttributeError.
@@ -1094,7 +1100,7 @@ For the sequence protocol this structure is [PySequenceMethods](https://github.c
 
 Again, there are a [few things](https://docs.python.org/3/c-api/typeobj.html#sequence-object-structures) we can implement for this structure:
 
-sq_lenqth has signature [lenfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L149:22) and is used by [PySequence_size](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1518:1) and [PyObject_Size](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L46) which are both equivalent to Python's len. It should return the sequence length.
+sq_length has signature [lenfunc](https://github.com/python/cpython/blob/e9a1dcb4237cb2be71ab05883d472038ea9caf62/Include/object.h#L149:22) and is used by [PySequence_size](https://github.com/python/cpython/blob/e42b705188271da108de42b55d9344642170aa2b/Objects/abstract.c#L1518:1) and [PyObject_Size](https://github.com/python/cpython/blob/a24107b04c1277e3c1105f98aff5bfa3a98b33a0/Objects/abstract.c#L46) which are both equivalent to Python's len. It should return the sequence length.
 
 sq_length is used to handle negative indexes in sq_item and sq_ass_item. If a negative index is passed sq_length is called and its result is added to the negative index. If sq_length is missing the index is passed as is.
 
