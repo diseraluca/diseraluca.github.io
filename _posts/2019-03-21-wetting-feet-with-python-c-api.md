@@ -6,7 +6,7 @@ categories: introduction
 tags: python C introduction tutorial
 ---
 
-#Approaching the shore
+# Approaching the shore
 
 The Pythons'C API is something that I was always interested in.
 Nonetheless, I never found an exercise for which it would have made sense to try my hand at it.
@@ -15,10 +15,10 @@ the [From Nand To Tetris Course](https://www.coursera.org/learn/build-a-computer
 
 I will write about that exercise in a future post. For this one, instead, I'd like to provide a resource for some of the basics related to writing Python's extension modules.
 
-I must say, to my disdain, that to actually start and write something with the C API was a little bit more difficult than I initially thought.
+I must say, to my disdain, that to actually start and write something with the C API was a little bit more difficult than I initially thought. The first impression leaves you with some question as there is a lot to learn.
 I could not find that many good resources on it and the best resource there is, the [Python/C API Reference Manual](https://docs.python.org/3/c-api/index.html) and the [Extending and Embedding the Python Interpreter Tutorial](https://docs.python.org/3/extending/index.html),
 while good, are not QT level good regarding documentation.
-Nonetheless, with a bit of effort, combined with the [CPython source code](https://github.com/python/cpython), it is more than enough to start writing something.
+Nonetheless, with a bit of effort, combined with the [CPython source code](https://github.com/python/cpython), it is more than enough to start writing something. In the end, it isn't as complicated as it may seem.
 
 To have some code reference, I will use the first thing I build in this last few days, a static size array of references that is type-checked at runtime ( similar to a C array of pointers in some way but with some notable differences ).
 
@@ -56,7 +56,7 @@ So please take everything with a grain of salt.
 
 Furthermore, we will only look at using C code in Python and not at calling Python from C.
 
-The goal of this post is to try and streamline the very first step of approaching the C API, the step I did this last few days, in the hope of helping someone that is beginning this journey that has a few hurdles at the start.
+The goal of this post is to try and streamline the very first step of approaching the C API, the step I did this last few days, in the hope of helping someone that is beginning this journey that may have a few hurdles at the start.
 
 With this behind us, let's go on.
 
@@ -75,8 +75,7 @@ There are a few "catches" with this header file that are of note.
     * string.h
     * errno.h 
     * stdlib.h
-    
-  if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
+    if the latter is not present *malloc*, *realloc* and *free* are defined by the *Python.h* header file.
 2. This header file can define some pre-processor definitions that change the way in which standard header files behave. As such, **it is important to** *#include* **it before any standard header**.
 
 All *Python.h* user-visible names, be it of function, macros or structure, have the prefix *Py* or *PY* and it is strongly advised to never use this prefixes in our code to avoid any kind of confusion.
