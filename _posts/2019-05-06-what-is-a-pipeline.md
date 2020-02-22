@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: What is a pipeline
 date: 2019-05-06
 categories: learning
@@ -46,14 +48,14 @@ While this definition shares some of the things that I currently consider part o
 The first time I encountered the concept of a pipeline in the CG industry was at the start of my journey at Rainbow Academy's [3Ddp course](https://www.rainbowacademy.it/corsi/master-animazione-3d-visual-effects-videogames/) back in 2017.
 To build an intuition of what are the different phases and pieces, usually, required to deliver a digital product, I was faced with a picture that looked something like the following:
 
-![production pipeline]({{ "/assets/PIPELINE_ANDY_PRODUCTION_PIPELINE.jpg" | absolute_url }})
+![production pipeline]({{ "/images/assets/PIPELINE_ANDY_PRODUCTION_PIPELINE.jpg" | absolute_url }})
 
 > The picture should be by [Andy Bean](https://www.lynda.com/Andy-Beane/356907-1.html)
 
 It may be the case that many artists were introduced to the pipeline this way.
 Now, the pipeline we are talking about here is obviously not this one, but, nonetheless, they are deeply connected.
 
-![pipeline data storage]({{ "/assets/PIPELINE_PRODUCTION_PIPELINE.png" | absolute_url }})
+![pipeline data storage]({{ "/images/assets/PIPELINE_PRODUCTION_PIPELINE.png" | absolute_url }})
 
 In the model I'm using a similar concept to the one in the image that is referred to as a ***Production Pipeline***.
 For simplicity's sakes, I'm treating it as a black box that takes as input a series of concrete assets { the budget, the actual artists and their contract, the workstations, the idea and so on } and produces an output, which we will later recognize as a completed project.
@@ -61,7 +63,7 @@ For the Microline project I've actually added some more specifics to the Product
 
 In the model, I assign a few property to a production pipeline that we are interested in: The workers and a ***concrete pipeline***.
 
-![pipeline data storage]({{ "/assets/PIPELINE_PRODUCTION_PIPELINE_PROPERTIES.png" | absolute_url }})
+![pipeline data storage]({{ "/images/assets/PIPELINE_PRODUCTION_PIPELINE_PROPERTIES.png" | absolute_url }})
 
 The workers are an abstraction over the user of a pipeline.
 The concrete pipeline is a generator of pipeline instances { for reasons that I hope will be clear later }, which are the actual pipelines the users will interface with.
@@ -104,7 +106,7 @@ And so on and so on. I'm not that good with writing down these types of requirem
 
 Leaving that aside, to tackle this requirement, the pipeline has to be able to store data somewhere and retrieve it back.
 
-![pipeline data storage]({{ "/assets/PIPELINE_PRODUCTION_PIPELINE_STORAGE.png" | absolute_url }})
+![pipeline data storage]({{ "/images/assets/PIPELINE_PRODUCTION_PIPELINE_STORAGE.png" | absolute_url }})
 
 The data storage is an abstract place where data from the Production Pipeline can be stored. Usually, it may be a server in the production.
 In this model, the data storage lives outside the pipeline, into the production pipeline, and communicates with it trough a Connector.

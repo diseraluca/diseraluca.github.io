@@ -1,0 +1,22 @@
+a {
+  text-decoration: none;
+}
+.page_header {
+  height: 350px;
+  background-image: url('/assets/images/bg.webp');
+  background-repeat: no-repeat;
+  background-size: 100%;
+  font-size: 20px;
+  a {
+    padding: 5px 20px;
+    color: yellow;
+  }
+}
+.post_card {
+  padding: 20px 0 30px;
+  .author {
+    margin: 0 0 5px;
+    font-size: 0.9em;
+    font-weight: 300;
+  }
+}

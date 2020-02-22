@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: Case Study 1 Delta Mush - Introduction
 date: 2018-07-22
 categories: case-study
@@ -43,7 +45,7 @@ Where $$ N $$ is number of connected vertices to vertex $$i$$, $$ p_j $$ are the
 $$w_j$$ is a weight factor that is applied to the transformation. It can be constant or it can be calculated from a series of factors. One techniques is to use the lenght of the edge between vertex $$i$$ and vertex $$j$$ to find an inversely proportional weight.
 In this Case Study we'll keep it simple(r) and use a basic smoothing where we find the average position of the connected vertexes and displace the vertex to it.
 
-![An example of a smoothing algorithm. Left - Non Smoothed Mesh \ Right - Smoothed Mesh]({{ "/assets/DeltaMushIntroduction_CaseStudy_smoothExample.png" | absolute_url }})
+![An example of a smoothing algorithm. Left - Non Smoothed Mesh \ Right - Smoothed Mesh]({{ "/images/assets/DeltaMushIntroduction_CaseStudy_smoothExample.png" | absolute_url }})
 
 Those smoothing algorithms usually lets the user decide a number of iterations to perform. Let $$N$$ be the number of iterations to perform, the 0 < $$n$$ < $$N$$ iteration is performed on the corresponding mesh that is smoothed $$n-1$$ times.
 In simpler terms, the smoothing is additive with subsequent iterations performed on the already smoothed mesh and not on the original mesh.
@@ -67,7 +69,7 @@ So, tangent space is a somewhat complex concept. But for our purposes we can try
 In essence Tangent Space is a coordinate system relative to a certain surface where up is directly away from the surface ( how a normal would be for example ).
 In our case, we have to build this space relative to every vertex so that we can store and reapply the deltas correctly independant of how the vertices are transformed.
 
-![Tangent Space]({{ "/assets/DeltaMushIntroduction_CaseStudy_tangentSpaceExample.png" | absolute_url }})
+![Tangent Space]({{ "/images/assets/DeltaMushIntroduction_CaseStudy_tangentSpaceExample.png" | absolute_url }})
 
 As you can see from the image we can build it using the normal, the tangent and the binormal ( Maya API provides them for us trough MFnMesh using the UV of the mesh. I know of another method to build tangent space that doesn't need UVs but we are probably gonna use Maya API directly in the code. We could end up trying to do it manually in the future if the API method ends up being a source of slowness ).
 

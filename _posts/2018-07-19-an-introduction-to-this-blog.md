@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: An introduction to this blog
 date: 2018-07-19 
 ---

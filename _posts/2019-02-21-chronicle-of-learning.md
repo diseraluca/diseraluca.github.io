@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: The chronicle of self-learning - mov, Turing Machines and Compilers
 date: 2019-02-21
 categories: abstract
@@ -244,7 +246,7 @@ state alphabet -> expression -> transition
 Where "state", "alphabet" and "transition" are defined as above. "expression" is a valid Tummy expression ( e.g a sequence of TMs $$M1, M2, ... MN$$ ).
 An image can help us understand this concept.
 
-![delegating transiction]({{ "/assets/TUMMY_delegating_transiction.png" | absolute_url }})
+![delegating transiction]({{ "/images/assets/TUMMY_delegating_transiction.png" | absolute_url }})
 
 Basically, we have this TM $$M$$ that is executing on the tape $$T$$. $$M$$ is currently at state $$n$$ when it encounters a delegating transition. The transition is delegated to $$M'$$, which is a TM
 that writes two 5s to the tape and then halts. $$M'$$ is executed on the original tape $$T$$ with its head starting at the position where the head of $$M$$ was when it encountered the delegating transition.
@@ -749,7 +751,7 @@ To shift right on a Turing machine, we move to the end of the input, move left t
 
 But how do we know which character we blanked? Turing Machines don't have any memory of this kind of things.
 
-![hold pattern]({{ "/assets/TUMMY_hold.png" | absolute_url }})
+![hold pattern]({{ "/images/assets/TUMMY_hold.png" | absolute_url }})
 
 This is done like in the image. We create a path, doing the same thing, for each character but moving to different states so that we can write, in the end, the character which started the path by specifying it directly. 
 

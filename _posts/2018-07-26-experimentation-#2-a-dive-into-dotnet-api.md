@@ -40,7 +40,7 @@ It isn't too difficult to setup VS for the API. I'm using Visual Studio 2017 Com
 
 * Create a new *C#* project ( File->New->Project ) by choosing the **Class Library (.Net Framework)** Template. Here it is a good idea to set the target framework
    to the one used by the API code examples. I'm on *Maya 2017 update 4* and the *.net framework* is **4.5.1**.
-   ![VS1]({{ "/assets/DOTNET_Experimentation_visualStudio_1.png" | absolute_url }})
+   ![VS1]({{ "/images/assets/DOTNET_Experimentation_visualStudio_1.png" | absolute_url }})
    
 * Add a reference ( In the solution explorer right-click references -> add reference ) to the openmayacs.dll that comes with your installation of maya.
    You can find it in %MAYA_LOCATION%/bin/. Coming with it you should find openmayacs.xml, the code documentation that will enable Intellisense etc.
@@ -48,7 +48,7 @@ It isn't too difficult to setup VS for the API. I'm using Visual Studio 2017 Com
    
 * After loading the reference we should set ( click on the reference and you can see its properties ) *Copy Local* property of the openmayacs reference to False.
    This means that the openmayacs.dll reference won't be copied to the assembly directory. Failure to do so may create problems when the plugin will be used by maya.
-   ![VS2]({{ "/assets/DOTNET_Experimentation_visualStudio_2.png" | absolute_url }})
+   ![VS2]({{ "/images/assets/DOTNET_Experimentation_visualStudio_2.png" | absolute_url }})
    
 * In the project property, under build events -> post-build event command line, add:
 
@@ -59,7 +59,7 @@ copy "$(TargetPath)" "$(SolutionDir)assemblies\$(TargetName).nll.dll"
 
 > This, after a build is complete, will create a directory called *Assemblies*, copy the builded assembly into it and change its extension to **.nll.dll** ( the extension needed by *C#* maya plugin ).
 
-![VS3]({{ "/assets/DOTNET_Experimentation_visualStudio_3.png" | absolute_url }})
+![VS3]({{ "/images/assets/DOTNET_Experimentation_visualStudio_3.png" | absolute_url }})
 * That's all! We're ready to develop some plugins!
 
 ## The SingleMeshBlend_cs deformer

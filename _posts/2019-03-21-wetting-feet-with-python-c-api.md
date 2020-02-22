@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: Getting our feet wet with Python's C API
 date: 2019-03-21
 categories: introduction

@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: An exercise in Futility - cometRename
 date: 2019-01-14
 categories: ramblings
@@ -62,7 +64,7 @@ There aren't many requirements that we need to satisfy. The 5 hours left are mor
 
 As a preview, this is the architecture that came out of this exercise:
 
-![project structure]({{ "/assets/FUTILITY_Structure.jpg" | absolute_url }})
+![project structure]({{ "/images/assets/FUTILITY_Structure.jpg" | absolute_url }})
 
 For how I tried to complicate things, this came out pretty simple in the end.
 
@@ -70,7 +72,7 @@ For how I tried to complicate things, this came out pretty simple in the end.
 
 For those who don't know it, this is the original interface of the *cometRename* tool.
 
-![cometRename]({{ "/assets/FUTILITY_cometRename_interface.PNG" | absolute_url }})
+![cometRename]({{ "/images/assets/FUTILITY_cometRename_interface.PNG" | absolute_url }})
 
 I've seen many tools that provide a similar inelegant, but easy-and-fast to use, interface.
 Unfortunately, I've never been a fan of this. For my taste ( I'm ***horrible*** at any kind of art design so I'm not the one who should talk ), such an interface provides far too much unused informations.
@@ -79,7 +81,7 @@ one mode at the same time.
 
 For my version of the tool I've decided to go for a different kind of interface, that came out as follows :
 
-![ldsRename]({{ "/assets/FUTILITY_ldsRename_interface.PNG" | absolute_url }})
+![ldsRename]({{ "/images/assets/FUTILITY_ldsRename_interface.PNG" | absolute_url }})
 
 Again, this choice had some ulterior motives behind it. For example, I really wanted to try to do a tool with dynamic loading and unloading of widgets, but I never found the correct occasion for it in my previous tools.
 In this instance, the additional informations for the rename mode, like the prefix, is actually a dynamically loaded widget from which informations are taken.

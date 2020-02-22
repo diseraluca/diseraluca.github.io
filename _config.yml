@@ -1,17 +1,10 @@
+title: Luca Di Sera
 name: Luca Di Sera
-# Conversion
-markdown:    kramdown
-highlighter: rouge
-
-# Markdown Processors
-kramdown:
-  input: GFM
-  auto_ids: true
-  syntax_highlighter: rouge
-  syntax_highlighter_opts:
-        # Use existing pygments syntax highlighting css
-        css_class: 'highlight'
-  
+description: "I was always a geek-head. As such I self-formed myself, since I was little, in everything that could get my interest was it a humanistic discipline or a scientific one. I was especially passionate about programming and computer sciences and I self-studied those discipline for some years."
+show_downloads: false
+google_analytics:
+#theme: jekyll-theme-hacker
+# gems: [jekyll-paginate-м2]
 permalink: /blog/:year/:month/:day/:title
 
 paginate: 5
@@ -21,5 +14,4 @@ excerpt_separator: <!--godomalissimo-->
 
 plugins:
   - jekyll-sitemap
-
-theme: jekyll-theme-hacker
+  - jekyll-paginate
