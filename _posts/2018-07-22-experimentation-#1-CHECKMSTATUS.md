@@ -128,8 +128,8 @@ On a Windows 7 home premium 64 bit OS
 
 ## Some result to crunch
 
-![Deformer Sample Chart]({{ "/images/assets/CHECK_MSTATUS_Experimentation_DeformerSamples_Chart.png" | absolute_url }})
-![Deformer Sample Average Chart]({{ "/images/assets/CHECK_MSTATUS_Experimentation_DeformerAverage_Chart.png" | absolute_url }})
+![Deformer Sample Chart]({{ "/assets/images/CHECK_MSTATUS_Experimentation_DeformerSamples_Chart.png" | absolute_url }})
+![Deformer Sample Average Chart]({{ "/assets/images/CHECK_MSTATUS_Experimentation_DeformerAverage_Chart.png" | absolute_url }})
 
 As we can see here there is a (depending on context) slight change in performance.
 An interesting thing to note, that appeared in all the tests, is that the deformer which uses *CHECK_MSTATUS_AND_RETURN* actually seems to perform a bit better than the version which uses* CHECK_MSTATUS*. I didn't expect it.

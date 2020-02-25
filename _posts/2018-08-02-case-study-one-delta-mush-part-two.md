@@ -342,7 +342,7 @@ On a Windows 7 home premium 64 bit OS
 
 #### The results
 
-![timings]({{ "/images/assets/DeltaMushPart2_CaseStudy_timingCharts.png" | absolute_url }})
+![timings]({{ "/assets/images/DeltaMushPart2_CaseStudy_timingCharts.png" | absolute_url }})
 
 As you can see we had a HUGE improvement in timings. The new version run almost ***300-400%*** faster with just these small changes.
 There really isn't much to say here. All of those things should have been done on the first draft of the deformer.

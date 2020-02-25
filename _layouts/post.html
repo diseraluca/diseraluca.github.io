@@ -1,14 +1,29 @@
 ---
 layout: default
 ---
+<div class="post_subtitle">
+<div>  
+  <small>{{ page.date | date: "%-d %B %Y" }}</small>
+  <p class="view">by {{ page.author | default: site.author }}</p>
+</div>
 
-<small>{{ page.date | date: "%-d %B %Y" }}</small>
-<h1>{{ page.title }}</h1>
-
-<p class="view">by {{ page.author | default: site.author }}</p>
+  {% if page.quote.text %}
+  <blockquote {% if page.quote.link %}
+  cite="{{page.quote.link}}" {% endif %} >
+    <p>{{page.quote.text}}</p>
+    {% if page.quote.author %}
+        <footer>—{{page.quote.author}},
+      {% endif %} 
+      {% if page.quote.source %}
+      <cite>{{page.quote.source}}</cite>
+      {% endif %}
+    </footer>
+  </blockquote>
+  {% endif %}
+</div>
 
 {{content}}
 
 {% if page.tags %}
-  <small>tags: <em>{{ page.tags | join: "</em> - <em>" }}</em></small>
+<small class="tags">tags: <em>{{ page.tags | join: "</em> - <em>" }}</em></small>
 {% endif %}

@@ -1,5 +1,8 @@
-<footer class="container">
-  <a href="#">Email</a>
-  <a href="#">GitHub</a>
-
+<footer>
+  <div class="container" id="contacts">
+    <h2>{{site.data.contacts.title}}</h2>
+    {% for contact in site.data.contacts.items %}
+    <a href="{{contact.link}}"><i class="{{contact.icon}}"></i> {{contact.title}}</a>
+    {% endfor %}
+  </div>
 </footer>

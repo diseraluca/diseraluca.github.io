@@ -1,0 +1,14 @@
+title: "Contact me:"
+items: 
+- link: "mailto:disera.luca@gmail.com"
+  title: Email
+  icon: "fa fa-envelope"
+- link: "https://github.com/diseraluca"
+  title: GitHub
+  icon: "fa fa-github-square"
+- link: "https://www.linkedin.com/in/luca-di-sera-200023167/"
+  title: Linkedin
+  icon: "fa fa-linkedin-square"
+- link: "https://www.facebook.com/luca.disera.1"
+  title: Facebook
+  icon: "fa fa-facebook-official"

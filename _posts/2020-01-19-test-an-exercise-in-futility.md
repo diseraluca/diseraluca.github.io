@@ -2,10 +2,15 @@
 layout: post
 pagination: 
   enabled: true
-title: An exercise in Futility - cometRename
-date: 2019-01-14
+title: TEST QUOTE -An exercise in Futility - cometRename
+date: 2020-01-14
 categories: ramblings
 tags: python maya script qt ramblings
+quote:
+  text: "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe."
+  author: Albert Einstein
+  source: Brave New World
+  link: "#"
 ---
 
 ## An exercise in futility

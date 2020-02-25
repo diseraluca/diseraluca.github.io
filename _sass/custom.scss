@@ -2,21 +2,83 @@ a {
   text-decoration: none;
 }
 .page_header {
+  display: flex;
+  flex-direction: row;
   height: 350px;
-  background-image: url('/assets/images/bg.webp');
+  background-image: url("/assets/images/bg.webp");
   background-repeat: no-repeat;
-  background-size: 100%;
+  background-size: 100% 100%;
   font-size: 20px;
   a {
     padding: 5px 20px;
     color: yellow;
   }
 }
+.post_subtitle {
+  border: none;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  blockquote {
+    * {
+      border: none;
+    }
+  }
+}
 .post_card {
   padding: 20px 0 30px;
-  .author {
-    margin: 0 0 5px;
-    font-size: 0.9em;
-    font-weight: 300;
+  border-bottom: 1px solid #777;
+}
+.author {
+  margin: 0 0 5px;
+  font-size: 0.9em;
+  font-weight: 300;
+}
+.pagination {
+  margin-top: 30px;
+  text-align: center;
+}
+footer {
+  border-top: 1px dashed $conifer;
+  padding: 40px 0;
+  a {
+    text-decoration: none;
+    margin-right: 25px;
+    padding: 5px 10px;
+    border: 1px transparent;
+    &:hover {
+      border: 1px solid $conifer;
+    }
+  }
+  .fa {
+    color: $conifer;
+  }
+}
+.tags {
+  color: $conifer;
+  padding: 10px 0;
+  margin: 20px 0;
+  border-top: 1px solid #777;
+}
+@media (max-width: 1024px) {
+  .page_header {
+    height: 240px;
+  }
+}
+@media (max-width: 900px) {
+  .page_header {
+    height: 200px;
+  }
+}
+@media (max-width: 768px) {
+  .page_header {
+    height: 150px;
+  }
+}
+@media (max-width: 425px) {
+  .page_header {
+    height: 70px;
+  }
+  .page_header a {
+    padding: 5px 10px;
   }
 }
