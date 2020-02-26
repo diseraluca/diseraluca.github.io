@@ -1,22 +1,30 @@
 <!DOCTYPE html>
-	<html>
-		<head>
-			<title>{{ page.title }}</title>
-			<!-- link to main stylesheet -->
-			<link rel="stylesheet" type="text/css" href="/css/main.css">
-			<link rel=”stylesheet” type="text/css" href="{{ site.baseurl }}/css/monokai.css">
-			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-			<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-MML-AM_CHTML' async></script>
-		</head>
-		<body>
-			{% include header.html %}
-			<div class="container">
-			
-			{{ content }}
-			
-			</div><!-- /.container -->
-			<footer>
-	    		{% include footer.html %}
-			</footer>
-		</body>
-	</html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
+
+<!-- % seo %} -->
+{% include head.html %}
+  </head>
+
+  <body>
+
+    <header class="page_header">
+      <a href="{{'/' | relative_url}}" class="logo container">
+        {{site.logo}}
+      </a>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>{{page.title}}</h1>
+        {{ content }}
+      </section>
+    </div>
+
+    {% include footer.html %}
+  </body>
+</html>

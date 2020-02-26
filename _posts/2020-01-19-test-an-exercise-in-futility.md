@@ -2,10 +2,15 @@
 layout: post
 pagination: 
   enabled: true
-title: An exercise in Futility - cometRename
-date: 2019-01-14
+title: TEST QUOTE -An exercise in Futility - cometRename
+date: 2020-01-14
 categories: ramblings
 tags: python maya script qt ramblings
+quote:
+  text: "Two things are infinite: the universe and human stupidity; and I'm not sure about the universe."
+  author: Albert Einstein
+  source: Brave New World
+  link: "#"
 ---
 
 ## An exercise in futility
@@ -18,6 +23,7 @@ For this exercise, I wanted something more interesting, an excuse to try some ne
 
 As a disclaimer, there won't be much code in this post. I usually do not disclose any code that is voluntarily contrived and meaningless. 
 Furthermore, the post itself is nothing more than some informal ramblings on my part.
+
 
 ## An imaginary email
 

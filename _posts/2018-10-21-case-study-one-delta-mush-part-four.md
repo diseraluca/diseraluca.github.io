@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: Case Study 1 Delta Mush - Part 4
 date: 2018-10-21
 categories: case-study
@@ -25,7 +27,7 @@ As the main interest of this post is SIMD instructions we will have a small intr
 
 #### Some Numbers, Again
 There isn't too much to say. As you can see from the graph
-![final]({{ "/assets/DeltaMushPart4_CaseStudy_results.png" | absolute_url }})
+![final]({{ "/assets/images/DeltaMushPart4_CaseStudy_results.png" | absolute_url }})
 We are talking of about a 190% increase in performance. The ideal speedup would have been 4x but we haven't shot too far from the target ( and considering that not all code was vectorizable we may have shoot more precisily than we think ).
 The main reason are AVX instructions but limiting the number of neighbours ( more on this later ) had a noticeable effect too.
 So much talk of SIMD, AVX, SOA and so on...
@@ -244,12 +246,12 @@ But what would our data layout look like to maximize our parallel capabilities ?
 Now, I've used this acronym a few times already and you're probably scrathcing your head thinking about what its meaning could be.
 The way our data is usually layed out is called AOS ( Array Of Structure ). We are all familiar with this type of layout that may look something like this:
 
-![aos]({{ "/assets/DeltaMushPart4_CaseStudy_aos.png" | absolute_url }})
+![aos]({{ "/assets/images/DeltaMushPart4_CaseStudy_aos.png" | absolute_url }})
 
 As we've seen, this isn't ideal if we want to parallelize our vector operations.
 A better way to organize our data is called SOA ( Structure of Array ).
 
-![soa]({{ "/assets/DeltaMushPart4_CaseStudy_soa.png" | absolute_url }})
+![soa]({{ "/assets/images/DeltaMushPart4_CaseStudy_soa.png" | absolute_url }})
 
 With a SOA layout we  organize our data by components so that they are in a contiguos memory space. Our vectors are now indicized on multiple arrays that compose our structure.
 As you can easily guess this means we can load and compute more than one at a time directly.
@@ -732,7 +734,7 @@ MMatrix tangentSpaceMatrix{};
 Before we modify the code, we should look at how our data is layed out currently. In the new version the data that comes to us is in SOA form.
 We have a few arrays that contains what we need. I layed it out visually in the next image :
 
-![incomingData]({{ "/assets/DeltaMushPart4_CaseStudy_incomingData.png" | absolute_url }})
+![incomingData]({{ "/assets/images/DeltaMushPart4_CaseStudy_incomingData.png" | absolute_url }})
 
 
 
@@ -773,7 +775,7 @@ for (unsigned int neighbourIndex{ 0 }; neighbourIndex < DELTA_COUNT; ++neighbour
 Now, the way the variables state flows requires some explanation.
 Let’s start with how the neighbor works.
 
-![neighboursFlow]({{ "/assets/DeltaMushPart4_CaseStudy_neighboursFlow.png" | absolute_url }})
+![neighboursFlow]({{ "/assets/images/DeltaMushPart4_CaseStudy_neighboursFlow.png" | absolute_url }})
 
 
 Well, my artistic skills are as bad as always but the point of the image is to show how the pointer changes during the iterations.

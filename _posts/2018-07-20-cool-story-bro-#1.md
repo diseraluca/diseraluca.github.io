@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: Cool Story Bro - SingleBlendMesh and my interest for code optimization
 date: 2018-07-20
 categories:: cool-story-bro
@@ -74,7 +76,7 @@ I got the opportunity as soon as possible.
 It was incredible. He could teach me so much in so little. He showed me some detail that I could never see before and my curiosity was out of this world.
 It was a friendly hand indeed, but one that brought me to the pit of obsession.
 
-![SingleBlendMeshDeformer]({{ "/assets/SingleBlendMesh.PNG" | absolute_url }})
+![SingleBlendMeshDeformer]({{ "/assets/images/SingleBlendMesh.PNG" | absolute_url }})
 
 Everything I was learning filled me with joy. Every millisecond I could tear down furthered my sense of pride.
 When I dipped into AVX I was completely captured.

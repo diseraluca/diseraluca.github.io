@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: Case Study 1 Delta Mush - Part 1
 date: 2018-07-29
 categories: case-study
@@ -28,7 +30,7 @@ So this code uses this new method.
 So, how does this method work?
 It has similarities with the method I explained last time. The difference is in how we build the tangent space representation mostly.
 
-![deltas]({{ "/assets/DeltaMushPart1_CaseStudy_deltas.png" | absolute_url }})
+![deltas]({{ "/assets/images/DeltaMushPart1_CaseStudy_deltas.png" | absolute_url }})
 
 So, as you can see from the image **(1)**, we will use the neighbour vertexes pairs to build two vectors that are relative to the vertex we are calculating for.
 Those will be the base of our tanget space. We will do a cross product to find an orthogonal axis.
@@ -559,7 +561,7 @@ unsigned int neighbourIterations{ neighbours[vertexIndex].length() - 1 };
 We then start to iterate over the vertex pairs. Now, since we are iterating over pairs and not single elements, the number of iterations we have to do is reduced by one. This is because we are going to eat the last element with the penultimate element and by iterating on all the elements we would go out of the array bounds.
 This is easily seen in the image:
 
-![Array pairs]({{ "/assets/DeltaMushPart1_CaseStudy_array.png" | absolute_url }})
+![Array pairs]({{ "/assets/images/DeltaMushPart1_CaseStudy_array.png" | absolute_url }})
 
 ~~~cpp
 unsigned int neighbourIterations{ neighbours[vertexIndex].length() - 1 };

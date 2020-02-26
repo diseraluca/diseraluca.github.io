@@ -1,5 +1,7 @@
 ---
 layout: post
+pagination: 
+  enabled: true
 title: Case Study 1 Delta Mush - Part 3
 date: 2018-08-05
 categories: case-study
@@ -19,7 +21,7 @@ For reference, and please read it if you find something interesting in this post
 So, the first interesting bits: The code is about **43%** faster on the one cylinder scene and **33%** faster on the multiple cylinder scene.
 Here are some graphs:
 
-![final]({{ "/assets/DeltaMushPar3_CaseStudy_finalComparison.png" | absolute_url }})
+![final]({{ "/assets/images/DeltaMushPar3_CaseStudy_finalComparison.png" | absolute_url }})
 
 As you can see the performance improved a lot.
 Let's see how this was done.
@@ -45,11 +47,11 @@ Now we can jump to the code.
 **Maya containers are oh so slow**. This was something that was told to me. I must say that, for how much I accepted it as truth, I could not really understand how much slow they are until I had seen it with my eyes.
 For this reason I will start this part by showing you two examples of the result of removing some of maya containers usage in this deformer.
 
-![final]({{ "/assets/DeltaMushPar3_CaseStudy_ANPpointers.png" | absolute_url }})
+![final]({{ "/assets/images/DeltaMushPar3_CaseStudy_ANPpointers.png" | absolute_url }})
 
 ---
 
-![final]({{ "/assets/DeltaMushPar3_CaseStudy_ANPpointers2.png" | absolute_url }})
+![final]({{ "/assets/images/DeltaMushPar3_CaseStudy_ANPpointers2.png" | absolute_url }})
 
 
 If this is not convincing you, or even if it is actually, you should try it yourself. But how do we bypass them you may ask?
@@ -247,7 +249,7 @@ This has multiple advantages, like removing the function call overhead and makin
 
 This has led to interesting results which you can see in the graph:
 
-![final]({{ "/assets/DeltaMushPar3_CaseStudy_ANPinlining.png" | absolute_url }})
+![final]({{ "/assets/images/DeltaMushPar3_CaseStudy_ANPinlining.png" | absolute_url }})
 
 This was mostly what I did.
 Let's move on.
@@ -272,7 +274,7 @@ This let's us have work with the correct data while having a memory space to wri
 
 I drew an image that should help visualize what we are doing here:
 
-![buffer]({{ "/assets/DeltaMushPar3_CaseStudy_buffers.png" | absolute_url }})
+![buffer]({{ "/assets/images/DeltaMushPar3_CaseStudy_buffers.png" | absolute_url }})
 
 Now when we have our pointer in place:
 
@@ -344,7 +346,7 @@ Now I don't like this. I'd like to find a way to avoid this code if possible but
 
 For how simple it was this gave us the possibility of removing a really expensive operation. You don't have to trust me, just look at the following results and try it yourself:
 
-![ASbuffer]({{ "/assets/DeltaMushPar3_CaseStudy_ASbuffers.png" | absolute_url }})
+![ASbuffer]({{ "/assets/images/DeltaMushPar3_CaseStudy_ASbuffers.png" | absolute_url }})
 
 ## Aligning our vector directly on a matrix
 

@@ -1,0 +1,48 @@
+---
+layout: default
+---
+<div class="post_subtitle">
+<div>  
+  <small>{{ page.date | date: "%-d %B %Y" }}</small>
+  <p class="view">by {{ page.author | default: site.author }}</p>
+</div>
+
+  {% if page.quote.text %}
+  <blockquote {% if page.quote.link %}
+  cite="{{page.quote.link}}" {% endif %} >
+    <p>{{page.quote.text}}</p>
+    {% if page.quote.author %}
+        <footer>—{{page.quote.author}},
+      {% endif %} 
+      {% if page.quote.source %}
+      <cite>{{page.quote.source}}</cite>
+      {% endif %}
+    </footer>
+  </blockquote>
+  {% endif %}
+</div>
+
+{{content}}
+<button onclick="topFunction()" id="GoTop" title="Go to top">&#24;</button>
+
+<script>
+//Get the button:
+mybutton = document.getElementById("GoTop");
+
+// When the user scrolls down 20px from the top of the document, show the button
+window.onscroll = function() {scrollFunction()};
+
+function scrollFunction() {
+if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+mybutton.style.display = "block";
+} else {
+mybutton.style.display = "none";
+}
+}
+
+// When the user clicks on the button, scroll to the top of the document
+function topFunction() {
+document.body.scrollTop = 0; // For Safari
+document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+}
+</script>
