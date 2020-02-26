@@ -11,17 +11,16 @@ quote:
 
 # Things changing again
 
-It's been almost a year since I've written anything on this blog, there are a few reasons for why I have not written anything which may
-become more apparent later in the post.
+It's been almost a year since I've written anything on this blog.
 
-Right now I have feel the need to write some times again and, as such, decided to resking the blog a bit.
+Right now I feel the need to write again and, as such, decided to resking the blog a bit.
 The aestetichs of this new iteration of the blog more closely resembles how I aestetichally feel about my abstract self as of now.
 
 As there are changes to this blog, there were many changes to my life this last year.
 
 Deciding how I would reskin the blog enabled me to think about myself and my objective a lot, and helped me recap on where I am and where I am going.
 
-There are many things I could say about how things changed and how those changes are reflected in this new blog skin but it too personal to actually write about them.
+There are many things I could say about how things changed and how those changes are reflected in this new blog skin but it is too personal to actually write about them.
 
 This blog exists to aid me in my learning. I learned many things this past year but not many things I wanted to write about.
 I'm currently working on things that I feel are interesting for a blog post and hope I will be able to use this new skin in the coming months.
