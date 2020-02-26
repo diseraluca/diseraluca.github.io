@@ -1,3 +1,19 @@
+# Simple blog based on Hacher theme
+
+## Folders structure
+
++ ``_data``  - folder for data files in yaml format
++ ``_draft`` - for posts drafts
++ ``_includes`` - reusable common parts of pages
++ ``_layouts`` - pages and posts layouts
++ ``_posts`` - posts folder
++ ``_sass`` - stylesheets folder. 
+To customise your pages appearance edit ``custom.scss``
+
+## Warning
+
+Since the filtering of the html code is canceled in excerpts posts, be careful not to cut off half the tag.
+
 # The Hacker theme
 
 [![Build Status](https://travis-ci.org/pages-themes/hacker.svg?branch=master)](https://travis-ci.org/pages-themes/hacker) [![Gem Version](https://badge.fury.io/rb/jekyll-theme-hacker.svg)](https://badge.fury.io/rb/jekyll-theme-hacker)
