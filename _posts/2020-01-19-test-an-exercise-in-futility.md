@@ -24,6 +24,7 @@ For this exercise, I wanted something more interesting, an excuse to try some ne
 As a disclaimer, there won't be much code in this post. I usually do not disclose any code that is voluntarily contrived and meaningless. 
 Furthermore, the post itself is nothing more than some informal ramblings on my part.
 
+
 ## An imaginary email
 
 > Dear Mr. Di Sera,

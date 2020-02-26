@@ -10,7 +10,7 @@ title: Luca Di Sera
     <span class="date">{{ post.date | date: "%B %m %Y" }}</span>
   </p>
   <div class="content">
-  {{ post.excerpt | truncatewords: 60 | strip_html }}
+  {{ post.excerpt | truncatewords: 40 }}
   </div>
   </div>
 {% endfor %}
