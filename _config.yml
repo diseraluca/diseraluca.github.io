@@ -1,6 +1,8 @@
 title: Luca Di Sera
 author: Luca Di Sera
 description: "I was always a geek-head. As such I self-formed myself, since I was little, in everything that could get my interest was it a humanistic discipline or a scientific one. I was especially passionate about programming and computer sciences and I self-studied those discipline for some years."
+baseurl: "" # the subpath of your site, e.g. /blog
+#environment: production
 show_downloads: false
 google_analytics:
 #theme: jekyll-theme-hacker
