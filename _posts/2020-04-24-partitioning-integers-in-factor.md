@@ -25,7 +25,7 @@ Thus, I decided to look a bit into the topic, which is mostly new to me ( I have
 # What does it mean to partition an integer?
 
 A partition of a positive integer $$ n $$ is a multiset of positive integers which sum is $$ n $$.
-For example, $$ { 6 1 1 } $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$.
+For example, $$ \{\, 6\, 1\, 1\, \} $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$.
 
 <table>
   <caption>Partitions for the positive integer 8</caption>
