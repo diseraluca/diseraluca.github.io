@@ -11,7 +11,7 @@ The last few months have been pretty stressfull between university, searching fo
 I thus was looking for a breather, something that would distract myself but that I would be able to take less seriously than a personal project ( which, in the end, will stress me as I fight my unreachable perfection problem ).
 
 I've decided to read [Grune/Jacob's Parsing Techniques](https://dickgrune.com/Books/PTAPG_2nd_Edition/).
-Now, in the book, the first parsing method that is encountered is that of [Unger's Parsers](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/unger.pdf) which requires all the k-partitions of the input string to execute.
+Now, in the book, the first parsing method that is encountered is that of [Unger's Parsers](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/unger.pdf) which requires all the k-partitions of the input string to execute ( which is actually the partitioning of a set, but we can build that from integer partitions ).
 
 > From what I could gather it seems that, in regards to Unger's Parsers, we are actually interested in Integer Compositions rather than partitions. 
 > The difference seems to be that order does not matter in partitions, such that $$ 2 + 1 $$ and $$ 1 + 2 $$ represent the same partition, while it matters in compositions.
