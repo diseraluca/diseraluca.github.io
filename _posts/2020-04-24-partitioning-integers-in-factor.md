@@ -13,8 +13,8 @@ I thus was looking for a breather, something that would distract myself but that
 I've decided to read [Grune/Jacob's Parsing Techniques](https://dickgrune.com/Books/PTAPG_2nd_Edition/).
 Now, in the book, the first parsing method that is encountered is that of [Unger's Parsers](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/unger.pdf) which requires all the k-partitions of the input string to execute.
 
-> I'm not completely sure on this as I found divergent convetions, but we are probably looking for the union of all the premutations of each k-partition for an Unger Parser, since the term Integer Partitions implies unordered entities such that $$ 3 + 1 $$ is the same partition as $$ 1 + 3 $$.
-I've seen this type called Integer Combinations but I cannot find any definitive proof on the correct terminology.
+> From what I could gather it seems that, in regards to Unger's Parsers, we are actually interested in Integer Compositions rather than partitions. 
+> The difference seems to be that order does not matter in partitions, such that $$ 2 + 1 $$ and $$ 1 + 2 $$ represent the same partition, while it matters in compositions.
 
 To my surprise, it seems that there is no default way in factor to partition a sequence in k-partitions; or, at least, I was unable to find it neither by searching where I toughth it would be, namely, [math.combinatorics](https://docs.factorcode.org/content/vocab-math.combinatorics.html), [grouping](https://docs.factorcode.org/content/vocab-grouping.html) or [splitting](https://docs.factorcode.org/content/vocab-splitting.html); neither by a general search.
 
@@ -90,3 +90,9 @@ For example, $$ { 6 1 1 } $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$
     <td></td>
   </tr>
 </table>
+
+We call an element of a partition a part. Thus, by $$ k-partition $$ of $$ n $$ we will mean a partition of $$ n $$ that has $$ k $$ parts.
+
+On a really basic level, this seems to be all there is to the definition of Integer Partitions.
+> On a more involved level, there seems to be a lot of cool knowledge related to Integer Partitions.
+> One such bit that I encountered is the [work](https://www.wikiwand.com/en/Ramanujan%27s_congruences) done by mathematician [Srinivasa Ramanujan](https://en.wikipedia.org/wiki/Srinivasa_Ramanujan)( On which, by the way, there is a somewhat engaging [movie](https://en.wikipedia.org/wiki/The_Man_Who_Knew_Infinity_(film)) ) on the partition function.
