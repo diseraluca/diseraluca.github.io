@@ -13,8 +13,39 @@ I thus was looking for a breather, something that would distract myself but that
 I've decided to read [Grune/Jacob's Parsing Techniques](https://dickgrune.com/Books/PTAPG_2nd_Edition/).
 Now, in the book, the first parsing method that is encountered is that of [Unger's Parsers](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/unger.pdf) which requires all the k-partitions of the input string to execute.
 
-To my surprise, it seems that there is no default way in factor to partition a sequence in k-partitions; or, at least, I was unable to find it neither by searching where I toughth it would be, namely, [math.combinatorics](https://docs.factorcode.org/content/vocab-math.combinatorics.html), [grouping](https://docs.factorcode.org/content/vocab-grouping.html) or [splitting](https://docs.factorcode.org/content/vocab-splitting.html) neither by a general search.
+> I'm not completely sure on this as I found divergent convetions, but we are probably looking for the union of all the premutations of each k-partition for an Unger Parser, since the term Integer Partitions implies unordered entities such that $$ 3 + 1 $$ is the same partition as $$ 1 + 3 $$.
+I've seen this type called Integer Combinations but I cannot find any definitive proof on the correct terminology.
+
+To my surprise, it seems that there is no default way in factor to partition a sequence in k-partitions; or, at least, I was unable to find it neither by searching where I toughth it would be, namely, [math.combinatorics](https://docs.factorcode.org/content/vocab-math.combinatorics.html), [grouping](https://docs.factorcode.org/content/vocab-grouping.html) or [splitting](https://docs.factorcode.org/content/vocab-splitting.html); neither by a general search.
 
 Thus, I decided to look a bit into the topic, which is mostly new to me ( I haven't really done much combinatorics and I just know some small bits here and there that I learned when needed ).
 
 <!--godomalissimo-->
+
+# What does it mean to partition an integer?
+
+A partition of a positive integer $$ n $$ is a multiset of positive integers which sum is $$ n $$.
+For example, $$ { 6 1 1 } $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$.
+
+{% raw %}
+
+$$
+
+\begin{tabular}{|c|}
+\hline
+\textbf{1-partitions} \\
+\hline
+8 \\
+\hline
+\textbf{2-partition} \\
+\hline
+71 \\
+62 \\
+53 \\
+44 \\
+\hline
+\end{tabular}
+
+$$
+
+{% raw %}
