@@ -30,7 +30,6 @@ For example, $$ { 6 1 1 } $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$
 {% raw %}
 
 $$
-
 \begin{tabular}{|c|}
 \hline
 \textbf{1-partitions} \\
@@ -44,8 +43,7 @@ $$
 53 \\
 44 \\
 \hline
-\end{tabular}
-
+\end{tabular}V
 $$
 
 {% endraw %}
