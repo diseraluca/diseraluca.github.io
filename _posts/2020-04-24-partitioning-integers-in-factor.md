@@ -43,7 +43,7 @@ $$
 53 \\
 44 \\
 \hline
-\end{tabular}V
+\end{tabular}
 $$
 
 {% endraw %}
