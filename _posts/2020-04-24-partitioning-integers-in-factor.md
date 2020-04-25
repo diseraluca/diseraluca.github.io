@@ -107,6 +107,8 @@ Of the methods I've found, I've decided to follow [this paper](http://www.nakano
 
 ## Partitions as a binary tree
 
+> This section is a summary of Section 2 of the aforementioned paper. Much of the terminology and structure of the text > comes from the paper and isn't an original creation of mine.
+
 | ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
 |:--:| 
 | *Family tree for the positive number 8* |
@@ -129,3 +131,13 @@ $$ P(A) $$, the *parent partition* of $$ A $$, is defined over two cases:
    > {% raw %} $$ P(A) = (a_1+1)a_2 \ldots (a_m-1) $$ {% endraw %}
    > That is, $$ P(A) $$ is defined as incrementing the first and decrementing the last part of $$ A $$.
    > In this case, the parts of $$ P(A) $$ are equal to the parts of $$ A $$.
+
+We call $$ A $$ the *child partition* of $$ P(A) $$.
+
+$$ A $$ has a single *parent partition* and $$ P(A) $$ has at most two *child partition*.
+If $$ A \in S(n) $$ then $$ P(A) \in S(n) $$.
+
+Thus, if $$ A \in S(n) $$, and $$ A $$ is not the root partition, repeatedly applying $ P $ builds a sequence $$ A,P(A),P(P(A)) \ldots $$ of partitions $$ \in S(n) $$ that will, in the end, reach the *root partition*.
+
+The intersection of all such sequences is the *family tree* of $$ S(n) $$, $$ T_n $$, where a vertex represents a partition $$ \in S(n) $$ and an edge is formed by a pair $$ A $$ and $$ P(A) $$.
+$$ T_n $$, thus, contains all partitions of $$ n $$.
