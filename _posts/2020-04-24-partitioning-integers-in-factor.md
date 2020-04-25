@@ -116,7 +116,14 @@ Let $$ S(n) $$ be the set of all partitions of the positive integer $$ n $$.
 A partition $$ A \in S(n) $$ is a monotonically decreasing sequence of positive integers {% raw %} $$ A = a_1a_2 \ldots a_m $$ {% endraw %}, where $$ m \ge 1 $$ holds, such that $$ n = \sum_{i=1}^{m} a_i $$.
 
 When $$ m = 1 $$ then $$ A = n $$ holds.
+This partition is called the root partition.
 
-#### Intermezzo: Showing that the sum of a one-sequence of the positive natural n is n
+Let $$ A $$ be a partition in $$ S(n) $$ that is not the root partition.
+$$ P(A) $$, the *parent partition* of $$ A $$, is defined over two cases:
 
-TEMP
+1. The last element of $$ A $$ is $$ 1 $$, i.e $$ a_m = 1 $$
+   > {% raw %} $$ P(A) = (a_1+1)a_2\ldotsa_{m-1} $$ {% endraw %}
+   > That is, $$ P(A) $$ is defined as incrementing the first and removing the last part of $$ A $$.
+2. The last element of $$ A $$ is greater than $$ 1 $$, i.e $$ a_m > 1 $$
+   > {% raw %} $$ P(A) = (a_1+1)a_2\ldots(a_m-1) $$ {% endraw %}
+   > That is, $$ P(A) $$ is defined as incrementing the first and decrementing the last part of $$ A $$.
