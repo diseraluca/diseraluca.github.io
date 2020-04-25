@@ -142,3 +142,23 @@ $$ T_n $$, thus, contains all partitions of $$ n $$.
 | ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
 |:--:| 
 | *Family tree for the positive number 8* |
+
+#### Intermezzo: Proving that $$ A $$ has a single parent partition
+
+Let $$ A = a_1a_2 \ldots a_m $$ be a be a partition $$ \in S(n) $$ that is not the root partition.
+If $$ A $$ has a *parent partition*, either $$ a_m = 1 $$ or $$ a_m > 1 $$.
+
+If $$ A $$ had no *parent partition*, then both $$ a_m \neq 1 $$ and $$ a_m \le 1 $$ must hold.
+Since $$ a_m $$ cannot be equal to $$ 1 $$, for the two conditions to hold $$ a_m $$ must be less than $$ 1 $$ but since $$ 1 $$ is the least-element of the positive naturals, it is not possible that $$ A $$ has no *root partition* and either **Case 1** or **Case 2** must hold.
+
+Now, assume that both **Case 1** and **Case 2** hold at the same time. It follows that, for this to be true, $$ a_m = 1 $$ and $$ a_m > 1 $$ must hold.
+SHOW that this cannot be by the definition of >
+
+###### If $$ A \in S(n) $$ and A is not the root partition, $$ P(A) \in S(n) $$
+
+Lemma: c + n - c = n
+{% raw %}
+
+If $$ A \in S(n) $$ and $$ A $$ is not the root partition it must have the form $$ a_1 \ldots  a_m $$ where $$ m > 1 $$ and its sum must be $$ n $$.
+
+Suppose that $$ a_m = 1 $$, then the *parent partition* of $$ A $$ must be of the first case and thus have the form $$ (a_1+1) \ldots a_{m-1} $$.
