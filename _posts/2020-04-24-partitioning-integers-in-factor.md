@@ -107,3 +107,6 @@ Of the methods I've found, I've decided to follow [this paper](http://www.nakano
 
 ## Partitions as a binary tree
 
+| ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
+|:--:| 
+| *Family tree for the positive number 8* |
