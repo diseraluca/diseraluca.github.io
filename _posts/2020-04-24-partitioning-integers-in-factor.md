@@ -110,3 +110,7 @@ Of the methods I've found, I've decided to follow [this paper](http://www.nakano
 | ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
 |:--:| 
 | *Family tree for the positive number 8* |
+
+Let $$ S(n) $$ be the set of all partitions of the positive integer $$ n $$.
+
+A partition $$ A \in S(n) $$ is a monotonically decreasing sequence of positive integers $$ A = a_1a_2\ldotsa_m $$, where $$ m \ge 1 $$ holds, such that $$ n = \sum_{i=1}^{m} a_i $$.
