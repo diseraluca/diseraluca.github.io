@@ -145,6 +145,18 @@ $$ T_n $$, thus, contains all partitions of $$ n $$.
 
 #### Intermezzo: Proving that $$ A $$ has a single parent partition
 
+
+
+##### Theorem: $$ m = 1 \rightarrow A = n $$
+
+If $$ A $$ is a partition in $$ S(n) $$, then it must be of the form $$ a_1a_2 \ldots a_m $$ for some $$ m \ge 1 $$ and
+both $$ a_1 \ge a_2 \ge \ldots \ge a_m > 0 $$ and $$ n = a_1 + a_2 + \ldots + a_m $$ must hold.
+
+If $$ m = 1 $$, it means that $$ A $$ is of the form $$ a_1 $$ and, thus, $$ n = a_1 $$ holds.
+
+
+##### Lemma: If $$ A $$ is a partition in $$ S(n) $$ and is not the root partition
+
 Let $$ A = a_1a_2 \ldots a_m $$ be a be a partition $$ \in S(n) $$ that is not the root partition.
 If $$ A $$ has a *parent partition*, either $$ a_m = 1 $$ or $$ a_m > 1 $$.
 
@@ -157,8 +169,10 @@ SHOW that this cannot be by the definition of >
 ###### If $$ A \in S(n) $$ and A is not the root partition, $$ P(A) \in S(n) $$
 
 Lemma: c + n - c = n
-{% raw %}
 
 If $$ A \in S(n) $$ and $$ A $$ is not the root partition it must have the form $$ a_1 \ldots  a_m $$ where $$ m > 1 $$ and its sum must be $$ n $$.
 
 Suppose that $$ a_m = 1 $$, then the *parent partition* of $$ A $$ must be of the first case and thus have the form $$ (a_1+1) \ldots a_{m-1} $$.
+
+## Generating the tree
+
