@@ -146,15 +146,15 @@ $$ T_n $$, thus, contains all partitions of $$ n $$.
 #### Intermezzo: Proving that $$ A $$ has a single parent partition
 
 <div class="definition">
-  $S(n)$ is the set of all partitions of $$ n $$.
+  $$ S(n) $$ is the set of all partitions of $$ n $$.
 </div>
 
 <div class="definition">
-  If $$ A $$ is a partition of $ n $ then
+  If $$ A $$ is a partition of $$ n $$ then
   <ul>
-    <li>$A = a_1a_2 \ldots a_m$ for some $ m \ge 1 $</li>
-    <li>$a_1 \ge a_2 \ge \ldots \ge a_m > 0$</li>
-    <li>$n = a_1 + a_2 + \ldots + a_m$</li>
+    <li> $$ A = a_1a_2 \ldots a_m $$ for some $$ m \ge 1 $$ </li>
+    <li> $$ a_1 \ge a_2 \ge \ldots \ge a_m > 0 $$ </li>
+    <li> $$ n = a_1 + a_2 + \ldots + a_m $$ </li>
   </ul>
 </div>
 
