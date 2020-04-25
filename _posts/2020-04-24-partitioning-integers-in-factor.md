@@ -109,10 +109,6 @@ Of the methods I've found, I've decided to follow [this paper](http://www.nakano
 
 > This section is a summary of Section 2 of the aforementioned paper. Much of the terminology and structure of the text > comes from the paper and isn't an original creation of mine.
 
-| ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
-|:--:| 
-| *Family tree for the positive number 8* |
-
 Let $$ S(n) $$ be the set of all partitions of the positive integer $$ n $$.
 
 A partition $$ A \in S(n) $$ is a monotonically decreasing sequence of positive integers {% raw %} $$ A = a_1a_2 \ldots a_m $$ {% endraw %}, where $$ m \ge 1 $$ holds, such that $$ n = \sum_{i=1}^{m} a_i $$.
@@ -141,3 +137,8 @@ Thus, if $$ A \in S(n) $$, and $$ A $$ is not the root partition, repeatedly app
 
 The intersection of all such sequences is the *family tree* of $$ S(n) $$, $$ T_n $$, where a vertex represents a partition $$ \in S(n) $$ and an edge is formed by a pair $$ A $$ and $$ P(A) $$.
 $$ T_n $$, thus, contains all partitions of $$ n $$.
+
+
+| ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
+|:--:| 
+| *Family tree for the positive number 8* |
