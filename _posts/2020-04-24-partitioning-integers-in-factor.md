@@ -145,11 +145,22 @@ $$ T_n $$, thus, contains all partitions of $$ n $$.
 
 #### Intermezzo: Proving that $$ A $$ has a single parent partition
 
+<div class="definition">
+  $S(n)$ is the set of all partitions of $$ n $$.
+</div>
 
+<div class="definition">
+  If $$ A $$ is a partition of $ n $ then
+  <ul>
+    <li>$A = a_1a_2 \ldots a_m$ for some $ m \ge 1 $</li>
+    <li>$a_1 \ge a_2 \ge \ldots \ge a_m > 0$</li>
+    <li>$n = a_1 + a_2 + \ldots + a_m$</li>
+  </ul>
+</div>
 
 <div class="theorem">
   $$ m = 1 \rightarrow A = n $$
-<\div>
+</div>
 
 > If $$ A $$ is a partition in $$ S(n) $$, then it must be of the form $$ a_1a_2 \ldots a_m $$ for some $$ m \ge 1 $$>>
 > and both $$ a_1 \ge a_2 \ge \ldots \ge a_m > 0 $$ and $$ n = a_1 + a_2 + \ldots + a_m $$ must hold.
@@ -159,18 +170,6 @@ $$ T_n $$, thus, contains all partitions of $$ n $$.
 
 ##### Lemma: If $$ A $$ is a partition in $$ S(n) $$ and is not the root partition
 
-<div class="definition">
-  $S(n)$ is the set of all partitions of $$ n $$.
-</div>
-
-<div class="definition">
-  If $$ A $$ is a partion of $ n $ then
-  <ul>
-    <li>$A = a_1a_2 \ldots a_m$ for some $ m \ge 1 $</li>
-    <li>$a_1 \ge a_2 \ge \ldots \ge a_m > 0$</li>
-    <li>$n = a_1 + a_2 + \ldots + a_m$</li>
-  </ul>
-</div>
 
 Let $$ A = a_1a_2 \ldots a_m $$ be a be a partition $$ \in S(n) $$ that is not the root partition.
 If $$ A $$ has a *parent partition*, either $$ a_m = 1 $$ or $$ a_m > 1 $$.
