@@ -122,8 +122,10 @@ Let $$ A $$ be a partition in $$ S(n) $$ that is not the root partition.
 $$ P(A) $$, the *parent partition* of $$ A $$, is defined over two cases:
 
 1. The last element of $$ A $$ is $$ 1 $$, i.e $$ a_m = 1 $$
-   > {% raw %} $$ P(A) = (a_1+1)a_2\ldotsa_{m-1} $$ {% endraw %}
+   > {% raw %} $$ P(A) = (a_1+1)a_2 \ldots a_{m-1} $$ {% endraw %}
    > That is, $$ P(A) $$ is defined as incrementing the first and removing the last part of $$ A $$.
+   > In this case, the parts of $$ P(A) $$ are one less than the parts of $$ A $$.
 2. The last element of $$ A $$ is greater than $$ 1 $$, i.e $$ a_m > 1 $$
-   > {% raw %} $$ P(A) = (a_1+1)a_2\ldots(a_m-1) $$ {% endraw %}
+   > {% raw %} $$ P(A) = (a_1+1)a_2 \ldots (a_m-1) $$ {% endraw %}
    > That is, $$ P(A) $$ is defined as incrementing the first and decrementing the last part of $$ A $$.
+   > In this case, the parts of $$ P(A) $$ are equal to the parts of $$ A $$.
