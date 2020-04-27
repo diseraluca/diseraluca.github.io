@@ -152,7 +152,7 @@ For example, $$ \{\!\{ \,8  \,1 \,1\, \}\!\} $$ produces a preserving child $$ \
 Each partition has either zero, one or two child. The paper identifies three cases:
 
 1. $$ a_1 = a_2 $$
-   * We have no child partition $$ a_1 < a_2 $$ holds in both $$ A[m] $$ and $$ A[m+1] $$.
+   * We have no child partition as $$ a_1 < a_2 $$ holds in both $$ A[m] $$ and $$ A[m+1] $$.
 2. $$ a_1 > a_2 $$ and $$ a_{m-1} = a_m $$
    * $$ A[m] $$ is not a partitition as $$ a_{m-1} < a_m $$ holds in it.
    * $$ A[m+1] $$ is a partition an thus we have one child.
@@ -161,9 +161,9 @@ Each partition has either zero, one or two child. The paper identifies three cas
       * $$ A[m] $$ is not a partition as $$ a_{m-1} < a_m $$ holds in it.
       * $$ A[m+1] $$ is a partition and thus we have one child.
    2. Otherwise
-      * Both $$ A[m] $$ and $$ A[m+1] $$ are partitions and those we have two children.
+      * Both $$ A[m] $$ and $$ A[m+1] $$ are partitions and thus we have two children.
       
-Thus, the $$ S(n) $$ can be built by starting from the *root partition*, finding its direct child and then recursively generating the tree from here.
+Thus, $$ S(n) $$ can be built by starting from the *root partition*, finding its direct child and then recursively generating the tree from there.
 
 Let's compute an example, we will find the partitions of $$ 4 $$.
 
