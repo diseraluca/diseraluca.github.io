@@ -7,18 +7,19 @@ hidden: true
 
 # Why Integer Partitioning?
 
-The last few months have been pretty stressfull between university, searching for a challenging job ( which is absolutely the most stressfull one ), personal projects and, obviously, the whole COVID-19 situtation.
-I thus was looking for a breather, something that would distract myself but that I would be able to take less seriously than a personal project ( which, in the end, will stress me as I fight my unreachable perfection problem ).
+The last few months have been pretty stressful between university, searching for an interesting job ( which is absolutely the most stressful thing ), personal projects and, obviously, the whole COVID-19 situtation.
+I thus was looking for a breather, something that would distract myself and that I would be able to take less seriously than a personal project ( which, in the end, will stress me as I fight my unreachable perfection problem ).
 
 I've decided to read [Grune/Jacob's Parsing Techniques](https://dickgrune.com/Books/PTAPG_2nd_Edition/).
-Now, in the book, the first parsing method that is encountered is that of [Unger's Parsers](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/unger.pdf) which requires all the k-partitions of the input string to execute ( which is actually the partitioning of a set, but we can build that from integer partitions ).
-
-> From what I could gather it seems that, in regards to Unger's Parsers, we are actually interested in Integer Compositions rather than partitions. 
-> The difference seems to be that order does not matter in partitions, such that $$ 2 + 1 $$ and $$ 1 + 2 $$ represent the same partition, while it matters in compositions.
+Now, in the book, the first parsing method that is encountered is that of [Unger's Parsers](https://user.phil-fak.uni-duesseldorf.de/~kallmeyer/Parsing/unger.pdf) which requires all the k-compositions of the input string to execute.
 
 To my surprise, it seems that there is no default way in factor to partition a sequence in k-partitions; or, at least, I was unable to find it neither by searching where I toughth it would be, namely, [math.combinatorics](https://docs.factorcode.org/content/vocab-math.combinatorics.html), [grouping](https://docs.factorcode.org/content/vocab-grouping.html) or [splitting](https://docs.factorcode.org/content/vocab-splitting.html); neither by a general search.
 
+EDIT: I've asked on the factor's mailng list and indeed there is no default way. It seems that will now be added tough.
+
 Thus, I decided to look a bit into the topic, which is mostly new to me ( I haven't really done much combinatorics and I just know some small bits here and there that I learned when needed ).
+
+Since we can build set-partitions/compositions from integer-partitions/compositions, I've decided to look into, specifically, integer-patitioning ( compositions can then be built from the partitions of the same number ). 
 
 <!--godomalissimo-->
 
@@ -107,86 +108,81 @@ Of the methods I've found, I've decided to follow [this paper](http://www.nakano
 
 ## Partitions as a binary tree
 
-> This section is a summary of Section 2 of the aforementioned paper. Much of the terminology and structure of the text > comes from the paper and isn't an original creation of mine.
+> This section is a summary of Sections [2,6] of the aforementioned paper. Much of the terminology and structure of the text > comes from the paper and isn't an original creation of mine.
 
-Let $$ S(n) $$ be the set of all partitions of the positive integer $$ n $$.
-
-A partition $$ A \in S(n) $$ is a monotonically decreasing sequence of positive integers {% raw %} $$ A = a_1a_2 \ldots a_m $$ {% endraw %}, where $$ m \ge 1 $$ holds, such that $$ n = \sum_{i=1}^{m} a_i $$.
-
-When $$ m = 1 $$ then $$ A = n $$ holds.
-This partition is called the root partition.
-
-Let $$ A $$ be a partition in $$ S(n) $$ that is not the root partition.
-$$ P(A) $$, the *parent partition* of $$ A $$, is defined over two cases:
-
-1. The last element of $$ A $$ is $$ 1 $$, i.e $$ a_m = 1 $$
-   > {% raw %} $$ P(A) = (a_1+1)a_2 \ldots a_{m-1} $$ {% endraw %}
-   > That is, $$ P(A) $$ is defined as incrementing the first and removing the last part of $$ A $$.
-   > In this case, the parts of $$ P(A) $$ are one less than the parts of $$ A $$.
-2. The last element of $$ A $$ is greater than $$ 1 $$, i.e $$ a_m > 1 $$
-   > {% raw %} $$ P(A) = (a_1+1)a_2 \ldots (a_m-1) $$ {% endraw %}
-   > That is, $$ P(A) $$ is defined as incrementing the first and decrementing the last part of $$ A $$.
-   > In this case, the parts of $$ P(A) $$ are equal to the parts of $$ A $$.
-
-We call $$ A $$ the *child partition* of $$ P(A) $$.
-
-$$ A $$ has a single *parent partition* and $$ P(A) $$ has at most two *child partition*.
-If $$ A \in S(n) $$ then $$ P(A) \in S(n) $$.
-
-Thus, if $$ A \in S(n) $$, and $$ A $$ is not the root partition, repeatedly applying $ P $ builds a sequence $$ A,P(A),P(P(A)) \ldots $$ of partitions $$ \in S(n) $$ that will, in the end, reach the *root partition*.
-
-The intersection of all such sequences is the *family tree* of $$ S(n) $$, $$ T_n $$, where a vertex represents a partition $$ \in S(n) $$ and an edge is formed by a pair $$ A $$ and $$ P(A) $$.
-$$ T_n $$, thus, contains all partitions of $$ n $$.
-
+The paper models the partitions of a positive integer $$ n $$ as a binary tree ( called its *family tree* ).
 
 | ![Family tree for the positive number 8]({{ "/assets/images/familytreefornumbereight.png" | absolute_url }}) | 
 |:--:| 
 | *Family tree for the positive number 8* |
 
-#### Intermezzo: Proving that $$ A $$ has a single parent partition
+Let $$ S(n) $$ be the set of all partitions of the positive integer $$ n $$.
 
-<div class="definition">
-  $$ S(n) $$ is the set of all partitions of $$ n $$.
-</div>
+From the paper, we define a partition as follows:
 
-<div class="definition">
-  If $$ A $$ is a partition of $$ n $$ then
-  <ul>
-    <li> $$ A = a_1a_2 \ldots a_m $$ for some $$ m \ge 1 $$ </li>
-    <li> $$ a_1 \ge a_2 \ge \ldots \ge a_m > 0 $$ </li>
-    <li> $$ n = a_1 + a_2 + \ldots + a_m $$ </li>
-  </ul>
-</div>
+A partition $$ A \in S(n) $$ is a monotonically decreasing sequence of positive integers {% raw %} $$ A = a_1a_2 \ldots a_m $$ {% endraw %}, where $$ m \ge 1 $$ holds, such that $$ n = \sum_{i=1}^{m} a_i $$.
 
-<div class="theorem">
-  $$ m = 1 \rightarrow A = n $$
-</div>
+Each $$ a_i $$ is called a part of $$ A $$.
 
-> If $$ A $$ is a partition in $$ S(n) $$, then it must be of the form $$ a_1a_2 \ldots a_m $$ for some $$ m \ge 1 $$>>
-> and both $$ a_1 \ge a_2 \ge \ldots \ge a_m > 0 $$ and $$ n = a_1 + a_2 + \ldots + a_m $$ must hold.
->
-> If $$ m = 1 $$, it means that $$ A $$ is of the form $$ a_1 $$ and, thus, $$ n = a_1 $$ holds.
+Thus, for example:
 
+* $$ \{\!\{ 1 1 1 1 \}\!\} $$ is a partition of four with four parts.
+* $$ \{\!\{ 2 2 1 \}\!\} $$ is a partition of five with three parts.
+* $$ \{\!\{ 3 2 1 \}\!\} $$ is a partition of six with three parts.
+* $$ \{\!\{ 4 5 2 1 \}\!\} $$ cannot be a partition since $$ a_1 < a_2 $$.
 
-##### Lemma: If $$ A $$ is a partition in $$ S(n) $$ and is not the root partition
+The root of the binary tree is identified into the *root partition*, which is the partition $$ A \in S(n) $$ that has a single part.
+The *root partition* is always a multiset with $$ n $$ as its sole element.
 
+There is then a single direct child to the root partition that has the form $$ (n-1)1 $$.
 
-Let $$ A = a_1a_2 \ldots a_m $$ be a be a partition $$ \in S(n) $$ that is not the root partition.
-If $$ A $$ has a *parent partition*, either $$ a_m = 1 $$ or $$ a_m > 1 $$.
+Given a partition $$ A \in S(n) $$ that has at least two parts, there are two ways in which we can generate a new partition that is still $$ \in S(n) $$ ( thus each partition has at most two child and we can envision the partitions as a binary tree ).
+We call them $$ A[m] $$ and $$ A[m+1] $$.
 
-If $$ A $$ had no *parent partition*, then both $$ a_m \neq 1 $$ and $$ a_m \le 1 $$ must hold.
-Since $$ a_m $$ cannot be equal to $$ 1 $$, for the two conditions to hold $$ a_m $$ must be less than $$ 1 $$ but since $$ 1 $$ is the least-element of the positive naturals, it is not possible that $$ A $$ has no *root partition* and either **Case 1** or **Case 2** must hold.
+1. $$ A[m]$$ ( In code, I call this a preserving child )[This terminology is not present in the paper]
+   > We can generate $$ A[m] $$ from a partition $$ A = a_1a_2 \ldots a_m $$ by subtracting one from $$ a_1 $$ and adding one to $$ a_m $$.
+   > Thus, $$ A[m] $$ has the form $$ (a_1 - 1)a_2 \ldots (a_m + 1) $$.
+2. $$ A[m+1] $$ ( In code, I call this an expanding child )[This terminology is not present in the paper]
+   > We can generate $$ A[m+1] $$ from a partition $$ A = a_1a_2 \ldots a_m $$ by subtracting one from $$ a_1 $$ and adding a one at the end.
+   > Thus, $$ A[m+1] $$ has form $$ (a_1 - 1)a_2 \ldots a_ma_{m+1} $$ where $$ a_{m+1} = 1 $$.
 
-Now, assume that both **Case 1** and **Case 2** hold at the same time. It follows that, for this to be true, $$ a_m = 1 $$ and $$ a_m > 1 $$ must hold.
-SHOW that this cannot be by the definition of >
+Now, we can see that not every partition generates both or any valid partition $$ A[m] $$ or $$ A[m+1] $$.
+For example, $$ \{\!\{8 1 1 \}\!\} $$ produces a preserving child $$ \{\!\{7 1 2 \}\!\} $$ which is not a partition as $$ a_2 < a_3 $$.
 
-###### If $$ A \in S(n) $$ and A is not the root partition, $$ P(A) \in S(n) $$
+Each partition has either zero, one or two child. The paper identifies three cases:
 
-Lemma: c + n - c = n
+1. $$ a_1 = a_2 $$
+   * We have no child partition $$ a_1 < a_2 $$ holds in both $$ A[m] $$ and $$ A[m+1] $$.
+2. $$ a_1 > a_2 $$ and $$ a_{m-1} = a_m $$
+   * $$ A[m] $$ is not a partitition as $$ a_{m-1} < a_m $$ holds in it.
+   * $$ A[m+1] $$ is a partition an thus we have one child.
+3. $$ a_1 > a_2 $$ and $$ a_{m-1} > a_m $$. We consider two subcases:
+   1. $$ m = 2 $$ and $$ a_{m-1} - {a_m} = 1 $$
+      * $$ A[m] $$ is not a partition as $$ a_{m-1} < a_m $$ holds in it.
+      * $$ A[m+1] $$ is a partition and thus we have one child.
+   2. Otherwise
+      * Both $$ A[m] $$ and $$ A[m+1] $$ are partitions and those we have two children.
+      
+Thus, the $$ S(n) $$ can be built by starting from the *root partition*, finding its direct child and then recursively generating the tree from here.
 
-If $$ A \in S(n) $$ and $$ A $$ is not the root partition it must have the form $$ a_1 \ldots  a_m $$ where $$ m > 1 $$ and its sum must be $$ n $$.
+Let's compute an example, we will find the partitions of $$ 4 $$.
 
-Suppose that $$ a_m = 1 $$, then the *parent partition* of $$ A $$ must be of the first case and thus have the form $$ (a_1+1) \ldots a_{m-1} $$.
+1. The *root partition* of $$ 4 $$ is $$ \{\!\{ 4 \}\!\} $$.
+2. The child of the root partition is $$ \{\!\{ 3 1 \}\!\} $$.
+3. $$ \{\!\{ 3 1 \}\!\} $$ is of case 3.2, thus we have two children.
+   1. $$ \{\!\{ 2 2 \}\!\} $$ is the $$ A[m] $$ child. It is a case 1 partition and thus has no child, making it a leaf of the tree.
+   2. $$ \{\!\{ 2 1 1 \}\!\} $$ is the $$ A[m+1] $$ child. It is a case 2 partition and thus has an $$ A[m+1] $$ child.
+      1. $$ \{\!\{ 1 1 1 1 \}\!\} $$ is the $$ A[m+1] $$ chld. It is a case 1 partition and thus has no child, making it a leaf of the tree.
 
-## Generating the tree
+| ![Family tree for the positive number 4]({{ "/assets/images/familytreefornumberfour.png" | absolute_url }}) | 
+|:--:| 
+| *Family tree for the positive number 4* |
+
+Thus, the partitions of $$ 4 $$ are $$ \{\!\{ 4 \}\!\} $$, $$ \{\!\{ 3 1 \}\!\} $$, $$ \{\!\{ 2 2 \}\!\} $$, $$ \{\!\{ 2 1 1 \}\!\} $$, $$ \{\!\{ 1 1 1 1 \}\!\} $$.
+
+      
+#### Intermezzo:
+
+TODO: Complete and add the experiments done in idris.
+TODO: Complete and add a personal latex interpretation of the paper where some proof are tried.
 
