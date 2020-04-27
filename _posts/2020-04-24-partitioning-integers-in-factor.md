@@ -108,7 +108,7 @@ Of the methods I've found, I've decided to follow [this paper](http://www.nakano
 
 ## Partitions as a binary tree
 
-> This section is a summary of Sections [2,6] of the aforementioned paper. Much of the terminology and structure of the text > comes from the paper and isn't an original creation of mine.
+> This section is a summary of Sections [2,6] of the aforementioned paper. Much of the terminology and structure of the text comes from the paper and isn't an original creation of mine.
 
 The paper models the partitions of a positive integer $$ n $$ as a binary tree ( called its *family tree* ).
 
