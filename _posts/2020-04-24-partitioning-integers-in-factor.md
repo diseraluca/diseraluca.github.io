@@ -26,7 +26,7 @@ Since we can build set-partitions/compositions from integer-partitions/compositi
 # What does it mean to partition an integer?
 
 A partition of a positive integer $$ n $$ is a multiset of positive integers which sum is $$ n $$.
-For example, $$ \{\, 6\, 1\, 1\, \} $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$.
+For example, $$ \{\!\{\, 6\, 1\, 1\, \}\!\} $$ is a partition of $$ 8 $$ since $$ 6 + 1 + 1 = 8 $$.
 
 <table>
   <caption>Partitions for the positive integer 8</caption>
@@ -126,10 +126,10 @@ Each $$ a_i $$ is called a part of $$ A $$.
 
 Thus, for example:
 
-* $$ \{\!\{ 1 1 1 1 \}\!\} $$ is a partition of four with four parts.
-* $$ \{\!\{ 2 2 1 \}\!\} $$ is a partition of five with three parts.
-* $$ \{\!\{ 3 2 1 \}\!\} $$ is a partition of six with three parts.
-* $$ \{\!\{ 4 5 2 1 \}\!\} $$ cannot be a partition since $$ a_1 < a_2 $$.
+* $$ \{\!\{\, 1 \, 1 \, 1 \, 1 \, \}\!\} $$ is a partition of four with four parts.
+* $$ \{\!\{\, 2 \, 2 \, 1 \, \}\!\} $$ is a partition of five with three parts.
+* $$ \{\!\{ \, 3 \, 2 \, 1 \}\!\} $$ is a partition of six with three parts.
+* $$ \{\!\{ \, 4 \, 5 \, 2 \, 1 \}\!\} $$ cannot be a partition since $$ a_1 < a_2 $$.
 
 The root of the binary tree is identified into the *root partition*, which is the partition $$ A \in S(n) $$ that has a single part.
 The *root partition* is always a multiset with $$ n $$ as its sole element.
@@ -147,7 +147,7 @@ We call them $$ A[m] $$ and $$ A[m+1] $$.
    > Thus, $$ A[m+1] $$ has form $$ (a_1 - 1)a_2 \ldots a_ma_{m+1} $$ where $$ a_{m+1} = 1 $$.
 
 Now, we can see that not every partition generates both or any valid partition $$ A[m] $$ or $$ A[m+1] $$.
-For example, $$ \{\!\{8 1 1 \}\!\} $$ produces a preserving child $$ \{\!\{7 1 2 \}\!\} $$ which is not a partition as $$ a_2 < a_3 $$.
+For example, $$ \{\!\{ \,8  \,1 \,1\, \}\!\} $$ produces a preserving child $$ \{\!\{\,7\, 1\, 2\, \}\!\} $$ which is not a partition as $$ a_2 < a_3 $$.
 
 Each partition has either zero, one or two child. The paper identifies three cases:
 
@@ -167,18 +167,18 @@ Thus, the $$ S(n) $$ can be built by starting from the *root partition*, finding
 
 Let's compute an example, we will find the partitions of $$ 4 $$.
 
-1. The *root partition* of $$ 4 $$ is $$ \{\!\{ 4 \}\!\} $$.
-2. The child of the root partition is $$ \{\!\{ 3 1 \}\!\} $$.
-3. $$ \{\!\{ 3 1 \}\!\} $$ is of case 3.2, thus we have two children.
-   1. $$ \{\!\{ 2 2 \}\!\} $$ is the $$ A[m] $$ child. It is a case 1 partition and thus has no child, making it a leaf of the tree.
-   2. $$ \{\!\{ 2 1 1 \}\!\} $$ is the $$ A[m+1] $$ child. It is a case 2 partition and thus has an $$ A[m+1] $$ child.
-      1. $$ \{\!\{ 1 1 1 1 \}\!\} $$ is the $$ A[m+1] $$ chld. It is a case 1 partition and thus has no child, making it a leaf of the tree.
+1. The *root partition* of $$ 4 $$ is $$ \{\!\{ \,4\, \}\!\} $$.
+2. The child of the root partition is $$ \{\!\{ \,3\, 1\, \}\!\} $$.
+3. $$ \{\!\{ \,3\, 1\, \}\!\} $$ is of case 3.2, thus we have two children.
+   1. $$ \{\!\{ \,2\, 2\, \}\!\} $$ is the $$ A[m] $$ child. It is a case 1 partition and thus has no child, making it a leaf of the tree.
+   2. $$ \{\!\{ \,2\, 1\, 1\, \}\!\} $$ is the $$ A[m+1] $$ child. It is a case 2 partition and thus has an $$ A[m+1] $$ child.
+      1. $$ \{\!\{\, 1\, 1\, 1\, 1\, \}\!\} $$ is the $$ A[m+1] $$ chld. It is a case 1 partition and thus has no child, making it a leaf of the tree.
 
 | ![Family tree for the positive number 4]({{ "/assets/images/familytreefornumberfour.png" | absolute_url }}) | 
 |:--:| 
 | *Family tree for the positive number 4* |
 
-Thus, the partitions of $$ 4 $$ are $$ \{\!\{ 4 \}\!\} $$, $$ \{\!\{ 3 1 \}\!\} $$, $$ \{\!\{ 2 2 \}\!\} $$, $$ \{\!\{ 2 1 1 \}\!\} $$, $$ \{\!\{ 1 1 1 1 \}\!\} $$.
+Thus, the partitions of $$ 4 $$ are $$ \{\!\{ \,4\, \}\!\} $$, $$ \{\!\{ \,3\, 1\, \}\!\} $$, $$ \{\!\{ \,2\, 2\, \}\!\} $$, $$ \{\!\{ \,2 \,1 \,1\, \}\!\} $$, $$ \{\!\{ \,1 \,1 \,1 \,1\, \}\!\} $$.
 
       
 #### Intermezzo:
