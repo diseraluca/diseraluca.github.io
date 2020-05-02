@@ -197,7 +197,7 @@ We will call the set of partitions of $$ n $$ with exactly $$ k $$ parts, where 
 
 If $$ k = n $$ there is a single, trivial partition of $$ k $$ parts, i.e a multiset of $$ n $$ ones.
 
-In the case where $$ n > k $$, the paper shows that there is bijection between $$ S{\le k}(n - k) $$ and $$ S_{=k}(n) $$.
+In the case where $$ n > k $$, the paper shows that there is bijection between $$ S_{\le k}(n - k) $$ and $$ S_{=k}(n) $$.
 
 We can go from a partition $$ A \in S_{=k}(n) $$ to a partition $$ B \in S_{\le k}(n - k) $$, by subtracting one from each part of $$ A $$.
 
@@ -222,7 +222,7 @@ Let's look at an example, $$ S_{\le 4}(8 - 4) $$ has the following elements, i.e
 We can thus find the partitions of $$ S_{=4}(8) $$ as follows:
 
 1. $$ \{\!\{ \,4\, \}\!\} $$ has $$ 1 $$ part.
-   1. $$ \{\!\{ \,5\, \}\!\} is the result of adding one to each of its parts.
+   1. $$ \{\!\{ \,5\, \}\!\} $$ is the result of adding one to each of its parts.
    2. $$ \{\!\{ \,5\, 1\,1\,1\, \}\!\} is the result of appending $$ 4 - 1 = 3 $$ ones to the new partition.
 2. $$ \{\!\{ \,3\, 1\, \}\!\} $$ has $$ 2 $$ parts.
    1. $$ \{\!\{ \,4\, 2\, \}\!\} $$ is the result of adding one to each of its parts.
