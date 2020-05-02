@@ -15,8 +15,6 @@ Now, in the book, the first parsing method that is encountered is that of [Unger
 
 To my surprise, it seems that there is no default way in factor to partition a sequence in k-partitions; or, at least, I was unable to find it neither by searching where I toughth it would be, namely, [math.combinatorics](https://docs.factorcode.org/content/vocab-math.combinatorics.html), [grouping](https://docs.factorcode.org/content/vocab-grouping.html) or [splitting](https://docs.factorcode.org/content/vocab-splitting.html); neither by a general search.
 
-EDIT: I've asked on the factor's mailng list and indeed there is no default way. It seems that will now be added tough.
-
 Thus, I decided to look a bit into the topic, which is mostly new to me ( I haven't really done much combinatorics and I just know some small bits here and there that I learned when needed ).
 
 Since we can build set-partitions/compositions from integer-partitions/compositions, I've decided to look into, specifically, integer-patitioning ( compositions can then be built from the partitions of the same number ). 
@@ -180,7 +178,21 @@ Let's compute an example, we will find the partitions of $$ 4 $$.
 
 Thus, the partitions of $$ 4 $$ are $$ \{\!\{ \,4\, \}\!\} $$, $$ \{\!\{ \,3\, 1\, \}\!\} $$, $$ \{\!\{ \,2\, 2\, \}\!\} $$, $$ \{\!\{ \,2 \,1 \,1\, \}\!\} $$, $$ \{\!\{ \,1 \,1 \,1 \,1\, \}\!\} $$.
 
+###### Partitions with at most $$ k $$ parts
+
+If we want to only build the partitions of $$ n $$ that have at most $$ k $$ parts, we will call this set $$ S_{\le k}(n) $$, we are able to do so by adding a restriction to the generation algorithm:
+
+* If the currently inspected partition has an $$ A[m+1] $$ child and $$ m = k $$, we do not search the $$ A[m+1] $$ branch.
       
+For example, the partitions of $$ 4 $$ with at most $$ 2 $$ parts can be generated as folllows:
+
+1. The *root partition* of $$ 4 $$ is $$ \{\!\{ \,4\, \}\!\} $$.
+2. The child of the root partition is $$ \{\!\{ \,3\, 1\, \}\!\} $$.
+3. $$ \{\!\{ \,3\, 1\, \}\!\} $$ is of case 3.2, thus we have two children, but since $$ m = k $$ we will not search the $$ A[m+1] branch $$
+   1. $$ \{\!\{ \,2\, 2\, \}\!\} $$ is the $$ A[m] $$ child. It is a case 1 partition and thus has no child, making it a leaf of the tree.
+
+###### Partitions with exactly $$ k $$ parts
+
 #### Intermezzo:
 
 TODO: Complete and add the experiments done in idris.
