@@ -199,9 +199,65 @@ If $$ k = n $$ there is a single, trivial partition of $$ k $$ parts, i.e a mult
 
 In the case where $$ n > k $$, the paper shows that there is bijection between $$ S{\le k}(n - k) $$ and $$ S_{=k}(n) $$.
 
+We can go from a partition $$ A \in S_{=k}(n) $$ to a partition $$ B \in S_{\le k}(n - k) $$, by subtracting one from each part of $$ A $$.
 
-#### Intermezzo:
+$$ A $$ has exactly $$ k $$ parts thus $$ B $$ will have at most $$ k $$ parts.
+Since we are removing one from each part, we will subtract $$ k $$ from the sum of the partition, which is $$ n $$, and thus the new partition will have a sum of $$ n - k $$.
+
+To go from a partition $$ B \in S_{\le k}(n - k) $$, with $$ b \le k $$ parts, to a partition $$ A \in S_{=k}(n), we will add one to each part of $$ B $$ and then append $$ k - b $$ ones to the resulting partition.
+
+Since we are adding one to each part of $$ B $$, the new partition has a sum of $$ n - k + b $$.
+We then add $$ k - b $$ ones and thus have a sum of $$ n - k + b + k - b = n $$.
+
+Furthermore, we will have exactly $$ b + k - b = k $$ parts.
+
+Let's look at an example, $$ S_{\le 4}(8 - 4) $$ has the following elements, i.e all partitions of $$ 4 $$:
+
+* $$ \{\!\{ \,4\, \}\!\} $$ 
+* $$ \{\!\{ \,3\, 1\, \}\!\} $$ 
+* $$ \{\!\{ \,2\, 2\, \}\!\} $$ 
+* $$ \{\!\{ \,2 \,1 \,1\, \}\!\} $$ 
+* $$ \{\!\{ \,1 \,1 \,1 \,1\, \}\!\} $$
+
+We can thus find the partitions of $$ S_{=4}(8) $$ as follows:
+
+1. $$ \{\!\{ \,4\, \}\!\} $$ has $$ 1 $$ part.
+   1. $$ \{\!\{ \,5\, \}\!\} is the result of adding one to each of its parts.
+   2. $$ \{\!\{ \,5\, 1\,1\,1\, \}\!\} is the result of appending $$ 4 - 1 = 3 $$ ones to the new partition.
+2. $$ \{\!\{ \,3\, 1\, \}\!\} $$ has $$ 2 $$ parts.
+   1. $$ \{\!\{ \,4\, 2\, \}\!\} $$ is the result of adding one to each of its parts.
+   2. $$ \{\!\{ \,4\, 2\,1\,1\, \}\!\} $$ is the result of appending $$ 4 - 2 = 2 $$ ones to the new partition.
+3. $$ \{\!\{ \,2\, 2\, \}\!\} $$ has $$ 2 $$ parts.
+   1. $$ \{\!\{ \,3\, 3\, \}\!\} $$ is the result of adding one to each of its parts.
+   2. $$ \{\!\{ \,3\, 3\,1\,1\, \}\!\} $$ is the result of appending $$ 4 - 2 = 2 $$ ones to the new partition.
+4. $$ \{\!\{ \,2 \,1 \,1\, \}\!\} $$ has $$ 3 $$ parts.
+   1. $$ \{\!\{ \,3 \,2 \,2\, \}\!\} $$ is the result of adding one to each of its parts.
+   2. $$ \{\!\{ \,3 \,2 \,2\,1\, \}\!\} $$ is the result of appending $$ 4 - 3 = 1 $$ ones to the new partition.
+5. $$ \{\!\{ \,1 \,1 \,1 \,1\, \}\!\} $$ has $$ 4 $$ parts.
+   1. $$ \{\!\{ \,2 \,2 \,2 \,2\, \}\!\} $$ is the result of adding one to each of its parts.
+   2. $$ \{\!\{ \,2 \,2 \,2 \,2\, \}\!\} $$ is the result of appending $$ 4 - 4 = 0 $$ ones to the new partition.
+
+Thus the $$ 4 $$-partitions of $$ 8 $$ are:
+
+* $$ \{\!\{ \,5\, 1\,1\,1\, \}\!\} $$
+* $$ \{\!\{ \,4\, 2\,1\,1\, \}\!\} $$
+* $$ \{\!\{ \,3\, 3\,1\,1\, \}\!\} $$
+* $$ \{\!\{ \,3 \,2 \,2\,1\, \}\!\} $$
+* $$ \{\!\{ \,2 \,2 \,2 \,2\, \}\!\} $$
+
+The paper has some more interesting sections about generating restricted partitions but I won't cover them as they are not needed for the task at hand. 
+
+## Intermezzo:
 
 TODO: Complete and add the experiments done in idris.
 TODO: Complete and add a personal latex interpretation of the paper where some proof are tried.
 
+# Implementing it in Factor
+
+## $$ S_{\le k}(n) $$ generation as the atomic procedure
+
+### Edge cases to consider and some testing of the code
+
+## But didn't we need compositions?
+
+## Uhm...okay that was easy. But didn't we need to partition a sequence?
