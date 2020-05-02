@@ -188,10 +188,17 @@ For example, the partitions of $$ 4 $$ with at most $$ 2 $$ parts can be generat
 
 1. The *root partition* of $$ 4 $$ is $$ \{\!\{ \,4\, \}\!\} $$.
 2. The child of the root partition is $$ \{\!\{ \,3\, 1\, \}\!\} $$.
-3. $$ \{\!\{ \,3\, 1\, \}\!\} $$ is of case 3.2, thus we have two children, but since $$ m = k $$ we will not search the $$ A[m+1] branch $$
+3. $$ \{\!\{ \,3\, 1\, \}\!\} $$ is of case 3.2, thus we have two children, but since $$ m = k $$ we will not search the $$ A[m+1] $$ branch
    1. $$ \{\!\{ \,2\, 2\, \}\!\} $$ is the $$ A[m] $$ child. It is a case 1 partition and thus has no child, making it a leaf of the tree.
 
 ###### Partitions with exactly $$ k $$ parts
+
+We will call the set of partitions of $$ n $$ with exactly $$ k $$ parts, where $$ n \ge k $$ holds, $$ S_{=k}(n) $$.
+
+If $$ k = n $$ there is a single, trivial partition of $$ k $$ parts, i.e a multiset of $$ n $$ ones.
+
+In the case where $$ n > k $$, the paper shows that there is bijection between $$ S{\le k}(n - k) $$ and $$ S_{=k}(n) $$.
+
 
 #### Intermezzo:
 
