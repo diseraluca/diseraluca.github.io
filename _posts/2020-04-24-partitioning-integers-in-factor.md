@@ -255,7 +255,7 @@ TODO: Complete and add the experiments done in idris.
 
 ## $$ S_{\le k}(n) $$ generation as the atomic procedure
 
-Generating $$ S(n) $$ from a procedure that generates $$ S_{\le k}(n) $$ is as easy as generating $$ S_{\le n}(n) $$.
+Generating $$ S(n) $$ from a procedure that generates $$ S_{\le k}(n) $$ is as easy as asking for $$ S_{\le n}(n) $$.
 Further, from the paper we know that we can generate $$ S_{=k}(n) $$ from $$ S_{\le k}(n - k) $$.
 
 If we consider the case where we have a procedure that generates $$ S(n) $$, we could easily generate $$ S_{\le k}(n) $$ and $$ S_{=k}(n) $$ by filtering the set.
