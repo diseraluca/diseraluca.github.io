@@ -721,4 +721,148 @@ I think that trying to tackle such a library might be an interesting project and
 
 ## But didn't we need compositions?
 
+As we said in the beginnig, we actually need to compute the composition of an integer rather than its partitions.
+
+The difference between the two is that partitions are unordered ( In the case of the paper we have an order constraint on them but that is not necessary ), such that $$ \{\!\{\,4\,1\,1\,\}\!\} $$ is the same partition as $$ \{\!\{\,1\,4\,1\,\}\!\} $$, while compositions are ordered, thus $$ \{\!\{\,4\,1\,1\,\}\!\} $$ and $$ \{\!\{\,1\,4\,1\,\}\!\} $$ are different compositions.
+
+It is trivial to see that compositions are simply the unique permutations of a partition.
+Thus, given $$ S(n) $$, $$ S_{<=k}(n) $$ or $$ S_{=k}(n) $$ we can find the corresponding set of compositions by mapping each element to its unique partitions.
+
+Factor already provide the necessary code to so:
+
+~~~factor
+: compositions ( partitions -- compositions )
+    [ all-permutations members ] [ append ] map-reduce ;
+~~~
+
+~~~factor
+IN: scratchpad 4 partitions compositions .
+{
+    { 4 }
+    { 3 1 }
+    { 1 3 }
+    { 2 1 1 }
+    { 1 2 1 }
+    { 1 1 2 }
+    { 1 1 1 1 }
+    { 2 2 }
+}
+IN: scratchpad 8 4 <=k-partitions compositions .
+{
+    { 8 }
+    { 7 1 }
+    { 1 7 }
+    { 6 1 1 }
+    { 1 6 1 }
+    { 1 1 6 }
+    { 5 1 1 1 }
+    { 1 5 1 1 }
+    { 1 1 5 1 }
+    { 1 1 1 5 }
+    { 6 2 }
+    { 2 6 }
+    { 5 2 1 }
+    { 5 1 2 }
+    { 2 5 1 }
+    { 2 1 5 }
+    { 1 5 2 }
+    { 1 2 5 }
+    { 4 2 1 1 }
+    { 4 1 2 1 }
+    { 4 1 1 2 }
+    { 2 4 1 1 }
+    { 2 1 4 1 }
+    { 2 1 1 4 }
+    { 1 4 2 1 }
+    { 1 4 1 2 }
+    { 1 2 4 1 }
+    { 1 2 1 4 }
+    { 1 1 4 2 }
+    { 1 1 2 4 }
+    { 4 2 2 }
+    { 2 4 2 }
+    { 2 2 4 }
+    { 3 2 2 1 }
+    { 3 2 1 2 }
+    { 3 1 2 2 }
+    { 2 3 2 1 }
+    { 2 3 1 2 }
+    { 2 2 3 1 }
+    { 2 2 1 3 }
+    { 2 1 3 2 }
+    { 2 1 2 3 }
+    { 1 3 2 2 }
+    { 1 2 3 2 }
+    { 1 2 2 3 }
+    { 2 2 2 2 }
+    { 5 3 }
+    { 3 5 }
+    { 4 3 1 }
+    { 4 1 3 }
+    { 3 4 1 }
+    { 3 1 4 }
+    { 1 4 3 }
+    { 1 3 4 }
+    { 3 3 1 1 }
+    { 3 1 3 1 }
+    { 3 1 1 3 }
+    { 1 3 3 1 }
+    { 1 3 1 3 }
+    { 1 1 3 3 }
+    { 3 3 2 }
+    { 3 2 3 }
+    { 2 3 3 }
+    { 4 4 }
+}
+~~~
+
 ## Uhm...okay that was easy. But didn't we need to partition a sequence?
+
+Why, yes that was our ultimate goal.
+
+Again, we already have everything that we need at our disposal.
+
+~~~factor
+: split-compositions ( seq compositions -- seq )
+    [ cum-sum split-indices but-last ] with map ;
+~~~
+
+Given a partition or a composition of $$ n $$ of the form $$ a_1a_2 \ldots a_m $$ we can divide a sequence of length $$ n $$ into $$ m $$ parts by splitting the sequence at the cumulative sums, $$ a_1, a_1 + a_2, \ldots, a_1 + a_2 + \ldots + a_m $$.
+
+For example:
+
+~~~factor
+IN: scratchpad "pqrs" dup length partitions compositions split-compositions .
+{
+    { "pqrs" }
+    { "pqr" "s" }
+    { "p" "qrs" }
+    { "pq" "r" "s" }
+    { "p" "qr" "s" }
+    { "p" "q" "rs" }
+    { "p" "q" "r" "s" }
+    { "pq" "rs" }
+}
+IN: scratchpad "pqrs" dup length 2 <=k-partitions split-compositions .
+{ { "pqrs" } { "pqr" "s" } { "pq" "rs" } }
+IN: scratchpad "(i+i)xi" dup length 3 =k-partitions compositions split-compositions .
+{
+    { "(i+i)" "x" "i" }
+    { "(" "i+i)x" "i" }
+    { "(" "i" "+i)xi" }
+    { "(i+i" ")x" "i" }
+    { "(i+i" ")" "xi" }
+    { "(i" "+i)x" "i" }
+    { "(i" "+" "i)xi" }
+    { "(" "i+i)" "xi" }
+    { "(" "i+" "i)xi" }
+    { "(i+" "i)" "xi" }
+    { "(i" "+i)" "xi" }
+    { "(i" "+i" ")xi" }
+    { "(i+" "i)x" "i" }
+    { "(i+" "i" ")xi" }
+    { "(" "i+i" ")xi" }
+}
+~~~
+
+And that is exactly what we needed!
