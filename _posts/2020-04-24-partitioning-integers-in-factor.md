@@ -250,13 +250,42 @@ The paper has some more interesting sections about generating restricted partiti
 ## Intermezzo:
 
 TODO: Complete and add the experiments done in idris.
-TODO: Complete and add a personal latex interpretation of the paper where some proof are tried.
 
 # Implementing it in Factor
 
 ## $$ S_{\le k}(n) $$ generation as the atomic procedure
 
-### Edge cases to consider and some testing of the code
+Generating $$ S(n) $$ from a procedure that generates $$ S_{\le k}(n) $$ is as easy as generating $$ S_{\le n}(n) $$.
+Further, from the paper we know that we can generate $$ S_{=k}(n) $$ from $$ S_{\le k}(n - k) $$.
+
+If we consider the case where we have a procedure that generates $$ S(n) $$, we could easily generate $$ S_{\le k}(n) $$ and $$ S_{=k}(n) $$ by filtering the set.
+This case would be far from ideal, tough, as we would need to do a lot of unneded work ( and $$ S(n) $$ becomes big fast enough ).
+
+If we, instead, are able to generate $$ S_{=k}(n) $$ we could generate all partitions by $$ n $$ applications and
+the same is true for generating $$ S_{\le k}(n) $$.
+Again, this would require quite a bit of repeated or unneded work.
+
+As such, I've started from a word that generates $$ S_{\le k}(n) $$ and built the other words from there.
+
+I feel that this is a good middle ground. While we still incur in some overhead in not generating $$ S_{=k}(n) $$ directly, it is negligible for our use case and simplifies the implementation.
+
+Now, you will actually see that I completely disregarded performance here, as it was not the point of the exercise.
+The same is true for correctness and elegance.
+> You may wonder, then, what did I not disregard. Uhm... probably nothing. The time I allotted for this exercise was small and thus I simply produced an "it works!" solution to better understand the domain.
+
+Now, the core of the generating procedure is the following, based on the code from the paper:
+
+~~~factor
+:: <=k-children ( partition k -- )
+    partition ,
+    partition has-an-expanding-child? [
+        partition length k < [ partition expanding-child k <=k-children ] when
+        partition has-a-preserving-child? [ partition preserving-child k <=k-children ] when
+    ] when ;
+~~~
+
+
+### Intermezzo: A small test suite
 
 ## But didn't we need compositions?
 
