@@ -270,10 +270,12 @@ As such, I've started from a word that generates $$ S_{\le k}(n) $$ and built th
 I feel that this is a good middle ground. While we still incur in some overhead in not generating $$ S_{=k}(n) $$ directly, it is negligible for our use case and simplifies the implementation.
 
 Now, you will actually see that I completely disregarded performance here, as it was not the point of the exercise.
-The same is true for correctness and elegance.
+The same is true for correctness and elegance. So talking about finding a good middle ground may feel a bit contradictory.
 > You may wonder, then, what did I not disregard. Uhm... probably nothing. The time I allotted for this exercise was small and thus I simply produced an "it works!" solution to better understand the domain.
 
-Now, the core of the generating procedure is the following, based on the code from the paper:
+### Generating $$ S{\le k}(n) $$
+
+The core of the generating procedure is the following, based on the code from the paper:
 
 ~~~factor
 :: <=k-children ( partition k -- )
@@ -284,6 +286,208 @@ Now, the core of the generating procedure is the following, based on the code fr
     ] when ;
 ~~~
 
+This part is simple enough; if we consider the left child to be $$ A[m+1] $$ this basically describe a pre-order depth-first-search of our family tree.
+
+we first collect the current partition. From *,* you can infer that the word is actually called trough [make](https://docs.factorcode.org/content/word-make%2Cmake.html).
+
+This wasn't necessary and is a refuse from an initial implementation that was more contrived. Nonetheless, I think it might streamline the code a bit.
+
+*has-an-expanding-child* is defined as follows:
+
+~~~factor
+: has-an-expanding-child? ( partition -- ? )
+    first2 > ;
+~~~
+
+This check basically ensures that we are either in case 2 or 3 from the paper.
+
+If you remember ( or check the first part of this article again ), if $$ a_1 = a_2 $$ we have no child.
+In all other cases, we have an $$ A[m+1] $$ child.
+
+Since we are generating $$ S_{\le k}(n) $$, instead of directly recurring we have one more check to ensure that we actually want to generate that $$ A[m+1] $$ child that we know to be existing.
+If we do, i.e we are not working on a partition that has $$ k $$-parts, we recur and start descending the child-branch.
+
+When we start to get back again, we check if we have an $$ A[m] $$ and descend that branch.
+
+*has-a-preserving-child* is defined as follows:
+
+~~~factor
+: has-a-preserving-child? ( partition -- ? )
+    [ last2 [ > ] [ - 1 > ] 2bi ]
+    [ length 2 > ]
+    bi or and ;
+~~~
+
+We check if $$ a_{m-1} > a_m $$, thus putting us in the third case.
+Then we check that we are not in the first subcase such that we are in the general second subcase, which is the only case with an $$ A[m] $$ child.
+
+The utility words *expanding-child* and *preserving-child* are defined as follows and are basically a one-to-one implementation of the generating procedure defined in the paper:
+
+~~~factor
+: expanding-child ( partition -- seq )
+    unclip 1 - prefix 1 suffix ;
+
+: preserving-child ( partition -- seq )
+    unclip 1 - prefix unclip-last 1 + suffix ;
+~~~
+
+*<=k-children* is called from another word that provides the starting partition, i.e the child of the root partition, and calls *make*:
+
+~~~factor
+: root-child ( n -- partition )
+    1 - 1 2array ;
+
+: (<=k-partitions) ( n k -- partitions )
+    [ root-child ] dip [ <=k-children ] { } make ;
+~~~
+
+As a last indirection, the actual public entry point, from which everything starts, is the following word:
+
+~~~factor
+: <=k-partitions ( n k -- partitions )
+    [ [ [ 0 > ] both? ] [ drop 1array 1array ] [ { } ] smart-if* ]
+    [
+        [ [ 1 > ] bi@ and ]
+        [ (<=k-partitions) append ]
+        smart-when*
+    ] 2bi ;
+~~~
+
+> This is one of the ugliest parts of the code in my opinion and one of the first parts I would surely refactor.
+
+Basically, we generate a empty-sequence in the case where the request is malformed, i.e $$ n $$ or $$ k $$ are not positive naturals.
+Otherwise, we generate a sequence containing the root partition and then dispatch to *(<=k-partitions)* and adding its result to our sequence.
+
+This is all for generating $$ S{\le k}(n) $$.
+
+A small example of it in action:
+
+~~~factor
+IN: scratchpad 8 4 <=k-partitions .
+{
+    { 8 }
+    { 7 1 }
+    { 6 1 1 }
+    { 5 1 1 1 }
+    { 6 2 }
+    { 5 2 1 }
+    { 4 2 1 1 }
+    { 4 2 2 }
+    { 3 2 2 1 }
+    { 2 2 2 2 }
+    { 5 3 }
+    { 4 3 1 }
+    { 3 3 1 1 }
+    { 3 3 2 }
+    { 4 4 }
+}
+IN: scratchpad 4 2 <=k-partitions .
+{ { 4 } { 3 1 } { 2 2 } }
+~~~
+
+### Generating $$ S(n) $$
+
+The word we implemented is already able to generate $$ S(n) $$ efficiently and providing a word for it is as trivial as follows:
+
+~~~factor
+: partitions ( n -- partitions )
+    dup <=k-partitions ;
+~~~
+
+~~~factor
+IN: scratchpad 12 partitions .
+{
+    { 12 }
+    { 11 1 }
+    { 10 1 1 }
+    { 9 1 1 1 }
+    { 8 1 1 1 1 }
+    { 7 1 1 1 1 1 }
+    { 6 1 1 1 1 1 1 }
+    { 5 1 1 1 1 1 1 1 }
+    { 4 1 1 1 1 1 1 1 1 }
+    { 3 1 1 1 1 1 1 1 1 1 }
+    { 2 1 1 1 1 1 1 1 1 1 1 }
+    { 1 1 1 1 1 1 1 1 1 1 1 1 }
+    { 10 2 }
+    { 9 2 1 }
+    { 8 2 1 1 }
+    { 7 2 1 1 1 }
+    { 6 2 1 1 1 1 }
+    { 5 2 1 1 1 1 1 }
+    { 4 2 1 1 1 1 1 1 }
+    { 3 2 1 1 1 1 1 1 1 }
+    { 2 2 1 1 1 1 1 1 1 1 }
+    { 8 2 2 }
+    { 7 2 2 1 }
+    { 6 2 2 1 1 }
+    { 5 2 2 1 1 1 }
+    { 4 2 2 1 1 1 1 }
+    { 3 2 2 1 1 1 1 1 }
+    { 2 2 2 1 1 1 1 1 1 }
+    { 6 2 2 2 }
+    { 5 2 2 2 1 }
+    { 4 2 2 2 1 1 }
+    { 3 2 2 2 1 1 1 }
+    { 2 2 2 2 1 1 1 1 }
+    { 4 2 2 2 2 }
+    { 3 2 2 2 2 1 }
+    { 2 2 2 2 2 1 1 }
+    { 2 2 2 2 2 2 }
+    { 9 3 }
+    { 8 3 1 }
+    { 7 3 1 1 }
+    { 6 3 1 1 1 }
+    { 5 3 1 1 1 1 }
+    { 4 3 1 1 1 1 1 }
+    { 3 3 1 1 1 1 1 1 }
+    { 7 3 2 }
+    { 6 3 2 1 }
+    { 5 3 2 1 1 }
+    { 4 3 2 1 1 1 }
+    { 3 3 2 1 1 1 1 }
+    { 5 3 2 2 }
+    { 4 3 2 2 1 }
+    { 3 3 2 2 1 1 }
+    { 3 3 2 2 2 }
+    { 6 3 3 }
+    { 5 3 3 1 }
+    { 4 3 3 1 1 }
+    { 3 3 3 1 1 1 }
+    { 4 3 3 2 }
+    { 3 3 3 2 1 }
+    { 3 3 3 3 }
+    { 8 4 }
+    { 7 4 1 }
+    { 6 4 1 1 }
+    { 5 4 1 1 1 }
+    { 4 4 1 1 1 1 }
+    { 6 4 2 }
+    { 5 4 2 1 }
+    { 4 4 2 1 1 }
+    { 4 4 2 2 }
+    { 5 4 3 }
+    { 4 4 3 1 }
+    { 4 4 4 }
+    { 7 5 }
+    { 6 5 1 }
+    { 5 5 1 1 }
+    { 5 5 2 }
+    { 6 6 }
+}
+IN: scratchpad 5 partitions .
+{
+    { 5 }
+    { 4 1 }
+    { 3 1 1 }
+    { 2 1 1 1 }
+    { 1 1 1 1 1 }
+    { 3 2 }
+    { 2 2 1 }
+}
+~~~
+
+### Generating $$ S_{=k}(n) $$
 
 ### Intermezzo: A small test suite
 
