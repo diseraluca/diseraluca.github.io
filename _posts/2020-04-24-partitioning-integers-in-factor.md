@@ -489,6 +489,63 @@ IN: scratchpad 5 partitions .
 
 ### Generating $$ S_{=k}(n) $$
 
+To generate $$ S_{=k}(n) $$ we will thus use the method from the paper.
+
+The conversion word is the following:
+
+~~~factor
+: <=k>=k ( partition k -- partition )
+    [ [ [ 1 + ] map ] [ length ] bi ] dip swap - 1 <repetition> append ;
+~~~
+
+As per the paper we add $$ 1 $$ to each part and then append $$ b - k $$ ones to the end.
+
+The entry point is the following:
+
+~~~factor
+: =k-partitions ( n k -- partitions )
+    [ [ - ] keep <=k-partitions ] 
+    [ nip [ <=k>=k ] curry map ] 
+    2bi ;
+~~~
+
+Again, as per the paper we build $$ S_{<= k}(n - k) $$ and map it to $$ S_{=k}(n) $$.
+
+For example:
+
+~~~factor
+IN: scratchpad 12 3 =k-partitions .
+{
+    { 10 1 1 }
+    { 9 2 1 }
+    { 8 2 2 }
+    { 8 3 1 }
+    { 7 3 2 }
+    { 6 3 3 }
+    { 7 4 1 }
+    { 6 4 2 }
+    { 5 4 3 }
+    { 4 4 4 }
+    { 6 5 1 }
+    { 5 5 2 }
+}
+IN: scratchpad 7 6 =k-partitions .
+{ { 2 1 1 1 1 1 } }
+IN: scratchpad 240 1 =k-partitions .
+{ { 240 } }
+~~~
+
+I find  that those two words are particularly ugly and would probably look at refactoring them. I feel that I'm doing something unnecessary that could be shaved out.
+Maybe even something as simple as using lexical variables might make this better, like this:
+
+~~~factor
+:: =k-partitions ( n k -- partitions )
+    n k - k <=k-partitions
+    [ k <=k>=k ] map ;
+~~~
+
+When there so much stack shuffling it may be a case of wrongly forming the interface so it may require some more work to become a decent implementation.
+
 ### Intermezzo: A small test suite
 
 While building the code I used a small test suite to check that I was going in the right direction.
