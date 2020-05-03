@@ -491,6 +491,177 @@ IN: scratchpad 5 partitions .
 
 ### Intermezzo: A small test suite
 
+While building the code I used a small test suite to check that I was going in the right direction.
+
+~~~factor
+! If either of the first two elements of the stack is 0 or less <=k-partitions produces the empty-sequence
+{ t } [ 449944 0 <=k-partitions empty? ] unit-test
+{ t } [ 0 567 <=k-partitions empty? ] unit-test
+
+{ t } [ 449944 -235 <=k-partitions empty? ] unit-test
+{ t } [ -1233 567 <=k-partitions empty? ] unit-test
+
+! <=k-partitions constructs a sequence
+{ t } [ 4 4 <=k-partitions sequence? ] unit-test
+
+! The sequence produced by <=k-partitions contains sequences
+{ t } [ 3 2 <=k-partitions [ sequence? ] all? ] unit-test
+
+! The sequences contained in the sequence produced by <=k-partitions contain integers
+{ t } [ 3 2 <=k-partitions flatten [ integer? ] all? ] unit-test
+
+! The integers contained in the sequences that are elements of the sequence produced by <=k-partitions are greater than zero
+{ t } [ 46 23 <=k-partitions flatten [ 0 > ] all? ] unit-test
+
+! The sum of each sequence contained in the sequence produced by <=k-partitions is equal to the second element of the stack
+{ t } [ 12 dup 7 <=k-partitions [ sum ] map [ = ] with all? ] unit-test
+
+! The sequences contained in the sequence produced by <=k-partitions are monotonically decreasing
+{ t } [ 14 9 <=k-partitions [ [ >= ] monotonic? ] all? ] unit-test
+
+! The sequences contained in the sequence produced by <=k-partitions are of at most the head of the stack length
+{ t } [ 13 11 [ <=k-partitions ] [ [ swap length >= ] curry all? ] bi ] unit-test
+
+CONSTANT: <=k-partitions-test-data {
+    { 8 2 {
+         { 8 } { 7 1 } { 6 2 } { 5 3 } { 4 4 }
+      } }
+    { 4 3 {
+        { 4 } { 3 1 } { 2 2 } { 2 1 1 }
+      } }
+    { 2 2 {
+          { 2 } { 1 1 }
+      } }
+    { 3 8 {
+          { 3 } { 2 1 } { 1 1 1 }
+      } }
+}
+
+{ t } [ <=k-partitions-test-data [
+            unclip-last [ first2 <=k-partitions ] dip [ natural-sort ] bi@ = ]
+        [ and ] map-reduce
+      ] unit-test
+
+! If the first element of the stack is 0 or less partitions produces the empty-sequence
+{ t } [ -23 partitions empty? ] unit-test
+{ t } [ 0 partitions empty? ] unit-test
+
+! partitions constructs a sequence
+{ t } [ 5 partitions sequence? ] unit-test
+
+! The sequence produced by partitions contains sequences
+{ t } [ 2 partitions [ sequence? ] all? ] unit-test
+
+! The sequences contained in the sequence produced by partitions contain integers
+{ t } [ 7 partitions flatten [ integer? ] all? ] unit-test
+
+! The integers contained in the sequences that are elements of the sequence produced by partitions are greater than zero
+{ t } [ 9 partitions flatten [ 0 > ] all? ] unit-test
+
+! The sum of each sequence contained in the sequence produced by partitions is equal to the head of the stack
+{ t } [  7 dup partitions [ sum ] map [ = ] with all? ] unit-test
+
+! The sequences contained in the sequence produced by partitions are monotonically decreasing
+{ t } [ 2 partitions [ [ >= ] monotonic? ] all? ] unit-test
+
+CONSTANT: partitions-test-data {
+    { 8 {
+          { 8 }
+          { 7 1 } { 6 2 } { 5 3 } { 4 4 }
+          { 6 1 1 } { 5 2 1 } { 4 2 2 } { 4 3 1 } { 3 3 2 }
+          { 5 1 1 1 } { 4 2 1 1 } { 3 2 2 1 } { 2 2 2 2 } { 3 3 1 1 }
+          { 4 1 1 1 1 } { 3 2 1 1 1 } { 2 2 2 1 1 }
+          { 3 1 1 1 1 1 } { 2 2 1 1 1 1 }
+          { 2 1 1 1 1 1 1 }
+          { 1 1 1 1 1 1 1 1 }
+      } }
+    { 4 {
+          { 4 }
+          { 3 1 } { 2 2 }
+          { 2 1 1 }
+          { 1 1 1 1 }
+      } }
+    { 5 {
+          { 5 }
+          { 4 1 } { 3 2 }
+          { 3 1 1 } { 2 2 1 }
+          { 2 1 1 1 }
+          { 1 1 1 1 1 }
+      } }
+}
+
+{ t } [ partitions-test-data [
+            first2 swap partitions [ natural-sort ] bi@ = ]
+        [ and ] map-reduce
+      ] unit-test
+
+
+! If either of the first two elements of the stack is 0 or less =k-partitions produces the empty-sequence
+{ t } [ 566060 0 =k-partitions empty? ] unit-test
+{ t } [ 0 404030 =k-partitions empty? ] unit-test
+
+{ t } [ 34 -235 =k-partitions empty? ] unit-test
+{ t } [ -1233 345 =k-partitions empty? ] unit-test
+
+! If the head of the 0 =k-partitions empty? ] unit-test
+
+! =k-partitions constructs a sequence
+{ t } [ 2 2 =k-partitions sequence? ] unit-test
+
+! The sequence produced by =k-partitions contains sequences
+{ t } [ 4 2 =k-partitions [ sequence? ] all? ] unit-test
+
+! The sequences contained in the sequence produced by =k-partitions contain integers
+{ t } [ 17 3 =k-partitions flatten [ integer? ] all? ] unit-test
+
+! The integers contained in the sequences that are elements of the sequence produced by =k-partitions are greater than zero
+{ t } [ 13 6 =k-partitions flatten [ 0 > ] all? ] unit-test
+
+! The sum of each sequence contained in the sequence produced by =k-partitions is equal to the second element of the stack
+{ t } [ 9 dup 6 =k-partitions [ sum ] map [ = ] with all? ] unit-test
+
+! The sequences contained in the sequence produced by =k-partitions are monotonically decreasing
+{ t } [ 22 12 =k-partitions [ [ >= ] monotonic? ] all? ] unit-test
+
+! The sequences contained in the sequence produced by =k-partitions are exactly the head of the stack long
+{ t } [ 7 2 [ =k-partitions ] [ [ swap length = ] curry all? ] bi ] unit-test
+
+CONSTANT: =k-partitions-test-data {
+    { 12 10 {
+          { 3 1 1 1 1 1 1 1 1 1 } { 2 2 1 1 1 1 1 1 1 1 }
+      } }
+    { 7 2 {
+          { 6 1 } { 5 2 } { 4 3 }
+      } }
+    { 6 3 {
+          { 4 1 1 } { 3 2 1 } { 2 2 2 }
+      } }
+}
+
+{ t } [ =k-partitions-test-data [
+            unclip-last [ first2 =k-partitions ] dip [ natural-sort ] bi@ = ]
+        [ and ] map-reduce
+      ] unit-test
+
+~~~
+
+While it was meant to be throwaway code, I still am not happy with it.
+
+While I find it customary to check for type-correctness trough unit-testing in dynamic languages, I still dislike the fat it brings to a test suite.
+
+Factor provides [typed](https://docs.factorcode.org/content/vocab-typed.html), so I would probably type the code and make the suite more lightweight in a more general context.
+
+Most tests are repeated between the various partitions generating words. While I dislike this kind of repetition ( I would probably build some parameterized tests in this case ) I still feel that the fact that the words are built on one other is an implementation detail and should not creep to the public interface, thus requiring us to enforce the invariants, even if some are shared, for each word.
+
+I can envision contexts in which the different algorithms are implemented for each word for some reason ( This actually points to the fact that instead of using *<=k-partitions* as an atomic procedure it may make sense to abstract the common parts of the algorithms and then implement the specific restrictions for each word ).
+
+Obviously, the code itself is small and somewhat simple, but I still think that in a production environment a suite similar to this would be meaningless.
+It is true that in a production environment we would have ( well... it would really depend on where I would be working actually ) a good idea of what we were needing this for, what are the constraints and so on such that we may have a different or more defined execution context.
+Nonetheless, I still have the usual, malignant dilemma: Would I really do better than this? 
+
+Apart from the general dislike, I felt, again, the weight of the lack of a property-testing library in factor.
+I think that trying to tackle such a library might be an interesting project and wouldn't mind trying it in the future.
+
 ## But didn't we need compositions?
 
 ## Uhm...okay that was easy. But didn't we need to partition a sequence?
