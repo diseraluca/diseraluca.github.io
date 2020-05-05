@@ -702,6 +702,9 @@ CONSTANT: =k-partitions-test-data {
 
 ~~~
 
+One thing that I was initially dabbling was testing the order of the produced sequence of partitions.
+I later decided to avoid enforcing a particular order ( even tough we do have a specific order in which we generate the partitions ) as I don't think that such an invariant makes sense in this context.
+
 While it was meant to be throwaway code, I still am not happy with it.
 
 While I find it customary to check for type-correctness trough unit-testing in dynamic languages, I still dislike the fat it brings to a test suite.
