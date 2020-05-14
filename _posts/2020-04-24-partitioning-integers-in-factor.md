@@ -197,14 +197,14 @@ We will call the set of partitions of $$ n $$ with exactly $$ k $$ parts, where 
 
 If $$ k = n $$ there is a single, trivial partition of $$ k $$ parts, i.e a multiset of $$ n $$ ones.
 
-In the case where $$ n > k $$, the paper shows that there is bijection between $$ S_{\le k}(n - k) $$ and $$ S_{=k}(n) $$.
+In the case where $$ n > k $$, the paper shows that there is a bijection between $$ S_{\le k}(n - k) $$ and $$ S_{=k}(n) $$.
 
 We can go from a partition $$ A \in S_{=k}(n) $$ to a partition $$ B \in S_{\le k}(n - k) $$, by subtracting one from each part of $$ A $$.
 
 $$ A $$ has exactly $$ k $$ parts thus $$ B $$ will have at most $$ k $$ parts.
 Since we are removing one from each part, we will subtract $$ k $$ from the sum of the partition, which is $$ n $$, and thus the new partition will have a sum of $$ n - k $$.
 
-To go from a partition $$ B \in S_{\le k}(n - k) $$, with $$ b \le k $$ parts, to a partition $$ A \in S_{=k}(n), we will add one to each part of $$ B $$ and then append $$ k - b $$ ones to the resulting partition.
+To go from a partition $$ B \in S_{\le k}(n - k) $$, with $$ b \le k $$ parts, to a partition $$ A \in S_{=k}(n) $$, we will add one to each part of $$ B $$ and then append $$ k - b $$ ones to the resulting partition.
 
 Since we are adding one to each part of $$ B $$, the new partition has a sum of $$ n - k + b $$.
 We then add $$ k - b $$ ones and thus have a sum of $$ n - k + b + k - b = n $$.
@@ -223,7 +223,7 @@ We can thus find the partitions of $$ S_{=4}(8) $$ as follows:
 
 1. $$ \{\!\{ \,4\, \}\!\} $$ has $$ 1 $$ part.
    1. $$ \{\!\{ \,5\, \}\!\} $$ is the result of adding one to each of its parts.
-   2. $$ \{\!\{ \,5\, 1\,1\,1\, \}\!\} is the result of appending $$ 4 - 1 = 3 $$ ones to the new partition.
+   2. $$ \{\!\{ \,5\, 1\,1\,1\, \}\!\} $$ is the result of appending $$ 4 - 1 = 3 $$ ones to the new partition.
 2. $$ \{\!\{ \,3\, 1\, \}\!\} $$ has $$ 2 $$ parts.
    1. $$ \{\!\{ \,4\, 2\, \}\!\} $$ is the result of adding one to each of its parts.
    2. $$ \{\!\{ \,4\, 2\,1\,1\, \}\!\} $$ is the result of appending $$ 4 - 2 = 2 $$ ones to the new partition.
@@ -247,11 +247,9 @@ Thus the $$ 4 $$-partitions of $$ 8 $$ are:
 
 The paper has some more interesting sections about generating restricted partitions but I won't cover them as they are not needed for the task at hand. 
 
-## Intermezzo:
-
-TODO: Complete and add the experiments done in idris.
-
 # Implementing it in Factor
+
+As the code is not particularly interesting, I won't spend too much time explaining it.
 
 ## $$ S_{\le k}(n) $$ generation as the atomic procedure
 
@@ -307,7 +305,7 @@ In all other cases, we have an $$ A[m+1] $$ child.
 Since we are generating $$ S_{\le k}(n) $$, instead of directly recurring we have one more check to ensure that we actually want to generate that $$ A[m+1] $$ child that we know to be existing.
 If we do, i.e we are not working on a partition that has $$ k $$-parts, we recur and start descending the child-branch.
 
-When we start to get back again, we check if we have an $$ A[m] $$ and descend that branch.
+When we start to get back again, we check if we have an $$ A[m] $$ child and descend that branch.
 
 *has-a-preserving-child* is defined as follows:
 
@@ -355,7 +353,7 @@ As a last indirection, the actual public entry point, from which everything star
 
 > This is one of the ugliest parts of the code in my opinion and one of the first parts I would surely refactor.
 
-Basically, we generate a empty-sequence in the case where the request is malformed, i.e $$ n $$ or $$ k $$ are not positive naturals.
+Basically, we generate an empty-sequence in the case where the request is malformed, i.e $$ n $$ or $$ k $$ are not positive naturals.
 Otherwise, we generate a sequence containing the root partition and then dispatch to *(<=k-partitions)* and adding its result to our sequence.
 
 This is all for generating $$ S{\le k}(n) $$.
@@ -544,7 +542,7 @@ Maybe even something as simple as using lexical variables might make this better
     [ k <=k>=k ] map ;
 ~~~
 
-When there so much stack shuffling it may be a case of wrongly forming the interface so it may require some more work to become a decent implementation.
+When there is so much stack shuffling it may be a case of wrongly forming the interface so it may require some more work to become a decent implementation.
 
 ### Intermezzo: A small test suite
 
@@ -724,7 +722,7 @@ I think that trying to tackle such a library might be an interesting project and
 
 ## But didn't we need compositions?
 
-As we said in the beginnig, we actually need to compute the composition of an integer rather than its partitions.
+As we said in the beginning, we actually need to compute the composition of an integer rather than its partitions.
 
 The difference between the two is that partitions are unordered ( In the case of the paper we have an order constraint on them but that is not necessary ), such that $$ \{\!\{\,4\,1\,1\,\}\!\} $$ is the same partition as $$ \{\!\{\,1\,4\,1\,\}\!\} $$, while compositions are ordered, thus $$ \{\!\{\,4\,1\,1\,\}\!\} $$ and $$ \{\!\{\,1\,4\,1\,\}\!\} $$ are different compositions.
 
@@ -869,3 +867,10 @@ IN: scratchpad "(i+i)xi" dup length 3 =k-partitions compositions split-compositi
 ~~~
 
 And that is exactly what we needed!
+
+## There is much more
+
+The paper itself explore quite a few more interesting generating algorithms.
+Furthermore, for parsing grammars with $$ \epsilon $$-producing rules we would need to be able to generate partitions that have $$ 0 $$-parts and that is something that I may have to look at in the future.
+
+The basic concept seems simple enough but I've really had a kick looking at this paper and would like to look at partitions a bit more but will probably stop here for now as the objective was already reached and I have a plethora of exercises that I want to do.
