@@ -869,7 +869,8 @@ And that is exactly what we needed!
 
 ## There is much more
 
-The paper itself explore quite a few more interesting generating algorithms.
+The paper itself explores quite a few more interesting generating algorithms.
 Furthermore, for parsing grammars with $$ \epsilon $$-producing rules we would need to be able to generate partitions that have $$ 0 $$-parts and that is something that I may have to look at in the future.
 
-The basic concept seems simple enough but I've really had a kick looking at this paper and would like to look at partitions a bit more but will probably stop here for now as the objective was already reached and I have a plethora of exercises that I want to do.
+The basic concept seems simple enough but I've really had a kick looking at this paper and would like to look at partitions a bit more. 
+I will probably stop here, for now, as the objective was already reached and I have a plethora of exercises that I want to do.
